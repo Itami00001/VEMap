@@ -1,4 +1,6 @@
-# step15 — Admin
+# step15 — Admin (v1.1)
+
+> Актуализировано по tz-v1.1: импорт расширяется под города/периоды и газеты; газеты — после утверждения структуры БД.
 
 ## Файлы
 backend/app/modules/surveys/router.py (admin-часть)
@@ -16,6 +18,9 @@ frontend/src/pages/admin/*
    - GET /api/admin/export (SUPER_ADMIN)
    - GET /api/admin/logs (SUPER_ADMIN)
 2. Импорт: этапы validate → preview → confirm → import. При ошибке — понятное сообщение.
+   Формат записи v1.1 (после утверждения владельцем данных):
+   `{city, year, month, mood_coefficient (0–1/0–10), source_metrics}` —
+   нормализация к 0–100 на входе. Импорт newspapers/articles — только после структуры БД.
 3. Audit log: кто, что, когда.
 4. Frontend /admin/login, /admin/dashboard, /admin/surveys, /admin/import, /admin/data.
 5. Защитить роуты через JWT в заголовке.

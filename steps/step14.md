@@ -1,4 +1,6 @@
-# step14 — Auth
+# step14 — Auth (v1.1)
+
+> Актуализировано по tz-v1.1: без изменений логики. Роли USER / ADMIN / SUPER_ADMIN сохранены.
 
 ## Файлы
 backend/app/modules/auth/model.py
