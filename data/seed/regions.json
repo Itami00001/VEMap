@@ -1,0 +1,682 @@
+[
+  {
+    "region_id": "RU-AD",
+    "region_code": "RU-AD",
+    "name_ru": "Республика Адыгея",
+    "name_en": "Republic of Adygea",
+    "name_crh": "Республика Адыгея",
+    "federal_district": "Южный"
+  },
+  {
+    "region_id": "RU-AL",
+    "region_code": "RU-AL",
+    "name_ru": "Республика Алтай",
+    "name_en": "Altai Republic",
+    "name_crh": "Республика Алтай",
+    "federal_district": "Сибирский"
+  },
+  {
+    "region_id": "RU-ALT",
+    "region_code": "RU-ALT",
+    "name_ru": "Алтайский край",
+    "name_en": "Altai Krai",
+    "name_crh": "Алтайский край",
+    "federal_district": "Сибирский"
+  },
+  {
+    "region_id": "RU-AMU",
+    "region_code": "RU-AMU",
+    "name_ru": "Амурская область",
+    "name_en": "Amur Oblast",
+    "name_crh": "Амурская область",
+    "federal_district": "Дальневосточный"
+  },
+  {
+    "region_id": "RU-ARK",
+    "region_code": "RU-ARK",
+    "name_ru": "Архангельская область",
+    "name_en": "Arkhangelsk Oblast",
+    "name_crh": "Архангельская область",
+    "federal_district": "Северо-Западный"
+  },
+  {
+    "region_id": "RU-AST",
+    "region_code": "RU-AST",
+    "name_ru": "Астраханская область",
+    "name_en": "Astrakhan Oblast",
+    "name_crh": "Астраханская область",
+    "federal_district": "Южный"
+  },
+  {
+    "region_id": "RU-BA",
+    "region_code": "RU-BA",
+    "name_ru": "Республика Башкортостан",
+    "name_en": "Republic of Bashkortostan",
+    "name_crh": "Республика Башкортостан",
+    "federal_district": "Приволжский"
+  },
+  {
+    "region_id": "RU-BEL",
+    "region_code": "RU-BEL",
+    "name_ru": "Белгородская область",
+    "name_en": "Belgorod Oblast",
+    "name_crh": "Белгородская область",
+    "federal_district": "Центральный"
+  },
+  {
+    "region_id": "RU-BRY",
+    "region_code": "RU-BRY",
+    "name_ru": "Брянская область",
+    "name_en": "Bryansk Oblast",
+    "name_crh": "Брянская область",
+    "federal_district": "Центральный"
+  },
+  {
+    "region_id": "RU-BU",
+    "region_code": "RU-BU",
+    "name_ru": "Республика Бурятия",
+    "name_en": "Republic of Buryatia",
+    "name_crh": "Республика Бурятия",
+    "federal_district": "Дальневосточный"
+  },
+  {
+    "region_id": "RU-CE",
+    "region_code": "RU-CE",
+    "name_ru": "Чеченская Республика",
+    "name_en": "Chechen Republic",
+    "name_crh": "Чеченская Республика",
+    "federal_district": "Северо-Кавказский"
+  },
+  {
+    "region_id": "RU-CHE",
+    "region_code": "RU-CHE",
+    "name_ru": "Челябинская область",
+    "name_en": "Chelyabinsk Oblast",
+    "name_crh": "Челябинская область",
+    "federal_district": "Уральский"
+  },
+  {
+    "region_id": "RU-CHU",
+    "region_code": "RU-CHU",
+    "name_ru": "Чукотский автономный округ",
+    "name_en": "Chukotka Autonomous Okrug",
+    "name_crh": "Чукотский автономный округ",
+    "federal_district": "Дальневосточный"
+  },
+  {
+    "region_id": "RU-CU",
+    "region_code": "RU-CU",
+    "name_ru": "Чувашия",
+    "name_en": "Chuvash Republic",
+    "name_crh": "Чувашия",
+    "federal_district": "Приволжский"
+  },
+  {
+    "region_id": "RU-DA",
+    "region_code": "RU-DA",
+    "name_ru": "Республика Дагестан",
+    "name_en": "Republic of Dagestan",
+    "name_crh": "Республика Дагестан",
+    "federal_district": "Северо-Кавказский"
+  },
+  {
+    "region_id": "RU-IN",
+    "region_code": "RU-IN",
+    "name_ru": "Республика Ингушетия",
+    "name_en": "Republic of Ingushetia",
+    "name_crh": "Республика Ингушетия",
+    "federal_district": "Северо-Кавказский"
+  },
+  {
+    "region_id": "RU-IRK",
+    "region_code": "RU-IRK",
+    "name_ru": "Иркутская область",
+    "name_en": "Irkutsk Oblast",
+    "name_crh": "Иркутская область",
+    "federal_district": "Сибирский"
+  },
+  {
+    "region_id": "RU-IVA",
+    "region_code": "RU-IVA",
+    "name_ru": "Ивановская область",
+    "name_en": "Ivanovo Oblast",
+    "name_crh": "Ивановская область",
+    "federal_district": "Центральный"
+  },
+  {
+    "region_id": "RU-KAM",
+    "region_code": "RU-KAM",
+    "name_ru": "Камчатский край",
+    "name_en": "Kamchatka Krai",
+    "name_crh": "Камчатский край",
+    "federal_district": "Дальневосточный"
+  },
+  {
+    "region_id": "RU-KB",
+    "region_code": "RU-KB",
+    "name_ru": "Кабардино-Балкарская Республика",
+    "name_en": "Kabardino-Balkarian Republic",
+    "name_crh": "Кабардино-Балкарская Республика",
+    "federal_district": "Северо-Кавказский"
+  },
+  {
+    "region_id": "RU-KC",
+    "region_code": "RU-KC",
+    "name_ru": "Карачаево-Черкесская республика",
+    "name_en": "Karachay-Cherkess Republic",
+    "name_crh": "Карачаево-Черкесская республика",
+    "federal_district": "Северо-Кавказский"
+  },
+  {
+    "region_id": "RU-KDA",
+    "region_code": "RU-KDA",
+    "name_ru": "Краснодарский край",
+    "name_en": "Krasnodar Krai",
+    "name_crh": "Краснодарский край",
+    "federal_district": "Южный"
+  },
+  {
+    "region_id": "RU-KEM",
+    "region_code": "RU-KEM",
+    "name_ru": "Кемеровская область",
+    "name_en": "Kemerovo Oblast",
+    "name_crh": "Кемеровская область",
+    "federal_district": "Сибирский"
+  },
+  {
+    "region_id": "RU-KGD",
+    "region_code": "RU-KGD",
+    "name_ru": "Калининградская область",
+    "name_en": "Kaliningrad Oblast",
+    "name_crh": "Калининградская область",
+    "federal_district": "Северо-Западный"
+  },
+  {
+    "region_id": "RU-KGN",
+    "region_code": "RU-KGN",
+    "name_ru": "Курганская область",
+    "name_en": "Kurgan Oblast",
+    "name_crh": "Курганская область",
+    "federal_district": "Уральский"
+  },
+  {
+    "region_id": "RU-KHA",
+    "region_code": "RU-KHA",
+    "name_ru": "Хабаровский край",
+    "name_en": "Khabarovsk Krai",
+    "name_crh": "Хабаровский край",
+    "federal_district": "Дальневосточный"
+  },
+  {
+    "region_id": "RU-KHM",
+    "region_code": "RU-KHM",
+    "name_ru": "Ханты-Мансийский автономный округ - Югра",
+    "name_en": "Khanty-Mansi Autonomous Okrug",
+    "name_crh": "Ханты-Мансийский автономный округ - Югра",
+    "federal_district": "Уральский"
+  },
+  {
+    "region_id": "RU-KIR",
+    "region_code": "RU-KIR",
+    "name_ru": "Кировская область",
+    "name_en": "Kirov Oblast",
+    "name_crh": "Кировская область",
+    "federal_district": "Приволжский"
+  },
+  {
+    "region_id": "RU-KK",
+    "region_code": "RU-KK",
+    "name_ru": "Республика Хакасия",
+    "name_en": "Republic of Khakassia",
+    "name_crh": "Республика Хакасия",
+    "federal_district": "Сибирский"
+  },
+  {
+    "region_id": "RU-KL",
+    "region_code": "RU-KL",
+    "name_ru": "Республика Калмыкия",
+    "name_en": "Republic of Kalmykia",
+    "name_crh": "Республика Калмыкия",
+    "federal_district": "Южный"
+  },
+  {
+    "region_id": "RU-KLU",
+    "region_code": "RU-KLU",
+    "name_ru": "Калужская область",
+    "name_en": "Kaluga Oblast",
+    "name_crh": "Калужская область",
+    "federal_district": "Центральный"
+  },
+  {
+    "region_id": "RU-KO",
+    "region_code": "RU-KO",
+    "name_ru": "Республика Коми",
+    "name_en": "Komi Republic",
+    "name_crh": "Республика Коми",
+    "federal_district": "Северо-Западный"
+  },
+  {
+    "region_id": "RU-KOS",
+    "region_code": "RU-KOS",
+    "name_ru": "Костромская область",
+    "name_en": "Kostroma Oblast",
+    "name_crh": "Костромская область",
+    "federal_district": "Центральный"
+  },
+  {
+    "region_id": "RU-KR",
+    "region_code": "RU-KR",
+    "name_ru": "Республика Карелия",
+    "name_en": "Republic of Karelia",
+    "name_crh": "Республика Карелия",
+    "federal_district": "Северо-Западный"
+  },
+  {
+    "region_id": "RU-KRS",
+    "region_code": "RU-KRS",
+    "name_ru": "Курская область",
+    "name_en": "Kursk Oblast",
+    "name_crh": "Курская область",
+    "federal_district": "Центральный"
+  },
+  {
+    "region_id": "RU-KYA",
+    "region_code": "RU-KYA",
+    "name_ru": "Красноярский край",
+    "name_en": "Krasnoyarsk Krai",
+    "name_crh": "Красноярский край",
+    "federal_district": "Сибирский"
+  },
+  {
+    "region_id": "RU-LEN",
+    "region_code": "RU-LEN",
+    "name_ru": "Ленинградская область",
+    "name_en": "Leningrad Oblast",
+    "name_crh": "Ленинградская область",
+    "federal_district": "Северо-Западный"
+  },
+  {
+    "region_id": "RU-LIP",
+    "region_code": "RU-LIP",
+    "name_ru": "Липецкая область",
+    "name_en": "Lipetsk Oblast",
+    "name_crh": "Липецкая область",
+    "federal_district": "Центральный"
+  },
+  {
+    "region_id": "RU-MAG",
+    "region_code": "RU-MAG",
+    "name_ru": "Магаданская область",
+    "name_en": "Magadan Oblast",
+    "name_crh": "Магаданская область",
+    "federal_district": "Дальневосточный"
+  },
+  {
+    "region_id": "RU-ME",
+    "region_code": "RU-ME",
+    "name_ru": "Республика Марий Эл",
+    "name_en": "Mari El Republic",
+    "name_crh": "Республика Марий Эл",
+    "federal_district": "Приволжский"
+  },
+  {
+    "region_id": "RU-MO",
+    "region_code": "RU-MO",
+    "name_ru": "Республика Мордовия",
+    "name_en": "Republic of Mordovia",
+    "name_crh": "Республика Мордовия",
+    "federal_district": "Приволжский"
+  },
+  {
+    "region_id": "RU-MOS",
+    "region_code": "RU-MOS",
+    "name_ru": "Московская область",
+    "name_en": "Moscow Oblast",
+    "name_crh": "Московская область",
+    "federal_district": "Центральный"
+  },
+  {
+    "region_id": "RU-MOW",
+    "region_code": "RU-MOW",
+    "name_ru": "Москва",
+    "name_en": "Moscow",
+    "name_crh": "Москва",
+    "federal_district": "Центральный"
+  },
+  {
+    "region_id": "RU-MUR",
+    "region_code": "RU-MUR",
+    "name_ru": "Мурманская область",
+    "name_en": "Murmansk Oblast",
+    "name_crh": "Мурманская область",
+    "federal_district": "Северо-Западный"
+  },
+  {
+    "region_id": "RU-NEN",
+    "region_code": "RU-NEN",
+    "name_ru": "Ненецкий автономный округ",
+    "name_en": "Nenets Autonomous Okrug",
+    "name_crh": "Ненецкий автономный округ",
+    "federal_district": "Северо-Западный"
+  },
+  {
+    "region_id": "RU-NGR",
+    "region_code": "RU-NGR",
+    "name_ru": "Новгородская область",
+    "name_en": "Novgorod Oblast",
+    "name_crh": "Новгородская область",
+    "federal_district": "Северо-Западный"
+  },
+  {
+    "region_id": "RU-NIZ",
+    "region_code": "RU-NIZ",
+    "name_ru": "Нижегородская область",
+    "name_en": "Nizhny Novgorod Oblast",
+    "name_crh": "Нижегородская область",
+    "federal_district": "Приволжский"
+  },
+  {
+    "region_id": "RU-NVS",
+    "region_code": "RU-NVS",
+    "name_ru": "Новосибирская область",
+    "name_en": "Novosibirsk Oblast",
+    "name_crh": "Новосибирская область",
+    "federal_district": "Сибирский"
+  },
+  {
+    "region_id": "RU-OMS",
+    "region_code": "RU-OMS",
+    "name_ru": "Омская область",
+    "name_en": "Omsk Oblast",
+    "name_crh": "Омская область",
+    "federal_district": "Сибирский"
+  },
+  {
+    "region_id": "RU-ORE",
+    "region_code": "RU-ORE",
+    "name_ru": "Оренбургская область",
+    "name_en": "Orenburg Oblast",
+    "name_crh": "Оренбургская область",
+    "federal_district": "Приволжский"
+  },
+  {
+    "region_id": "RU-ORL",
+    "region_code": "RU-ORL",
+    "name_ru": "Орловская область",
+    "name_en": "Oryol Oblast",
+    "name_crh": "Орловская область",
+    "federal_district": "Центральный"
+  },
+  {
+    "region_id": "RU-PER",
+    "region_code": "RU-PER",
+    "name_ru": "Пермский край",
+    "name_en": "Perm Krai",
+    "name_crh": "Пермский край",
+    "federal_district": "Приволжский"
+  },
+  {
+    "region_id": "RU-PNZ",
+    "region_code": "RU-PNZ",
+    "name_ru": "Пензенская область",
+    "name_en": "Penza Oblast",
+    "name_crh": "Пензенская область",
+    "federal_district": "Приволжский"
+  },
+  {
+    "region_id": "RU-PRI",
+    "region_code": "RU-PRI",
+    "name_ru": "Приморский край",
+    "name_en": "Primorsky Krai",
+    "name_crh": "Приморский край",
+    "federal_district": "Дальневосточный"
+  },
+  {
+    "region_id": "RU-PSK",
+    "region_code": "RU-PSK",
+    "name_ru": "Псковская область",
+    "name_en": "Pskov Oblast",
+    "name_crh": "Псковская область",
+    "federal_district": "Северо-Западный"
+  },
+  {
+    "region_id": "RU-ROS",
+    "region_code": "RU-ROS",
+    "name_ru": "Ростовская область",
+    "name_en": "Rostov Oblast",
+    "name_crh": "Ростовская область",
+    "federal_district": "Южный"
+  },
+  {
+    "region_id": "RU-RYA",
+    "region_code": "RU-RYA",
+    "name_ru": "Рязанская область",
+    "name_en": "Ryazan Oblast",
+    "name_crh": "Рязанская область",
+    "federal_district": "Центральный"
+  },
+  {
+    "region_id": "RU-SA",
+    "region_code": "RU-SA",
+    "name_ru": "Республика Саха (Якутия)",
+    "name_en": "Republic of Sakha",
+    "name_crh": "Республика Саха (Якутия)",
+    "federal_district": "Дальневосточный"
+  },
+  {
+    "region_id": "RU-SAK",
+    "region_code": "RU-SAK",
+    "name_ru": "Сахалинская область",
+    "name_en": "Sakhalin Oblast",
+    "name_crh": "Сахалинская область",
+    "federal_district": "Дальневосточный"
+  },
+  {
+    "region_id": "RU-SAM",
+    "region_code": "RU-SAM",
+    "name_ru": "Самарская область",
+    "name_en": "Samara Oblast",
+    "name_crh": "Самарская область",
+    "federal_district": "Приволжский"
+  },
+  {
+    "region_id": "RU-SAR",
+    "region_code": "RU-SAR",
+    "name_ru": "Саратовская область",
+    "name_en": "Saratov Oblast",
+    "name_crh": "Саратовская область",
+    "federal_district": "Приволжский"
+  },
+  {
+    "region_id": "RU-SE",
+    "region_code": "RU-SE",
+    "name_ru": "Республика Северная Осетия-Алания",
+    "name_en": "Republic of North Ossetia-Alania",
+    "name_crh": "Республика Северная Осетия-Алания",
+    "federal_district": "Северо-Кавказский"
+  },
+  {
+    "region_id": "RU-SMO",
+    "region_code": "RU-SMO",
+    "name_ru": "Смоленская область",
+    "name_en": "Smolensk Oblast",
+    "name_crh": "Смоленская область",
+    "federal_district": "Центральный"
+  },
+  {
+    "region_id": "RU-SPE",
+    "region_code": "RU-SPE",
+    "name_ru": "Санкт-Петербург",
+    "name_en": "Saint Petersburg",
+    "name_crh": "Санкт-Петербург",
+    "federal_district": "Северо-Западный"
+  },
+  {
+    "region_id": "RU-STA",
+    "region_code": "RU-STA",
+    "name_ru": "Ставропольский край",
+    "name_en": "Stavropol Krai",
+    "name_crh": "Ставропольский край",
+    "federal_district": "Северо-Кавказский"
+  },
+  {
+    "region_id": "RU-SVE",
+    "region_code": "RU-SVE",
+    "name_ru": "Свердловская область",
+    "name_en": "Sverdlovsk Oblast",
+    "name_crh": "Свердловская область",
+    "federal_district": "Уральский"
+  },
+  {
+    "region_id": "RU-TA",
+    "region_code": "RU-TA",
+    "name_ru": "Республика Татарстан",
+    "name_en": "Republic of Tatarstan",
+    "name_crh": "Республика Татарстан",
+    "federal_district": "Приволжский"
+  },
+  {
+    "region_id": "RU-TAM",
+    "region_code": "RU-TAM",
+    "name_ru": "Тамбовская область",
+    "name_en": "Tambov Oblast",
+    "name_crh": "Тамбовская область",
+    "federal_district": "Центральный"
+  },
+  {
+    "region_id": "RU-TOM",
+    "region_code": "RU-TOM",
+    "name_ru": "Томская область",
+    "name_en": "Tomsk Oblast",
+    "name_crh": "Томская область",
+    "federal_district": "Сибирский"
+  },
+  {
+    "region_id": "RU-TUL",
+    "region_code": "RU-TUL",
+    "name_ru": "Тульская область",
+    "name_en": "Tula Oblast",
+    "name_crh": "Тульская область",
+    "federal_district": "Центральный"
+  },
+  {
+    "region_id": "RU-TVE",
+    "region_code": "RU-TVE",
+    "name_ru": "Тверская область",
+    "name_en": "Tver Oblast",
+    "name_crh": "Тверская область",
+    "federal_district": "Центральный"
+  },
+  {
+    "region_id": "RU-TY",
+    "region_code": "RU-TY",
+    "name_ru": "Республика Тыва",
+    "name_en": "Tuva Republic",
+    "name_crh": "Республика Тыва",
+    "federal_district": "Сибирский"
+  },
+  {
+    "region_id": "RU-TYU",
+    "region_code": "RU-TYU",
+    "name_ru": "Тюменская область",
+    "name_en": "Tyumen Oblast",
+    "name_crh": "Тюменская область",
+    "federal_district": "Уральский"
+  },
+  {
+    "region_id": "RU-UD",
+    "region_code": "RU-UD",
+    "name_ru": "Удмуртская Республика",
+    "name_en": "Udmurt Republic",
+    "name_crh": "Удмуртская Республика",
+    "federal_district": "Приволжский"
+  },
+  {
+    "region_id": "RU-ULY",
+    "region_code": "RU-ULY",
+    "name_ru": "Ульяновская область",
+    "name_en": "Ulyanovsk Oblast",
+    "name_crh": "Ульяновская область",
+    "federal_district": "Приволжский"
+  },
+  {
+    "region_id": "RU-VGG",
+    "region_code": "RU-VGG",
+    "name_ru": "Волгоградская область",
+    "name_en": "Volgograd Oblast",
+    "name_crh": "Волгоградская область",
+    "federal_district": "Южный"
+  },
+  {
+    "region_id": "RU-VLA",
+    "region_code": "RU-VLA",
+    "name_ru": "Владимирская область",
+    "name_en": "Vladimir Oblast",
+    "name_crh": "Владимирская область",
+    "federal_district": "Центральный"
+  },
+  {
+    "region_id": "RU-VLG",
+    "region_code": "RU-VLG",
+    "name_ru": "Вологодская область",
+    "name_en": "Vologda Oblast",
+    "name_crh": "Вологодская область",
+    "federal_district": "Северо-Западный"
+  },
+  {
+    "region_id": "RU-VOR",
+    "region_code": "RU-VOR",
+    "name_ru": "Воронежская область",
+    "name_en": "Voronezh Oblast",
+    "name_crh": "Воронежская область",
+    "federal_district": "Центральный"
+  },
+  {
+    "region_id": "RU-YAN",
+    "region_code": "RU-YAN",
+    "name_ru": "Ямало-Ненецкий автономный округ",
+    "name_en": "Yamalo-Nenets Autonomous Okrug",
+    "name_crh": "Ямало-Ненецкий автономный округ",
+    "federal_district": "Уральский"
+  },
+  {
+    "region_id": "RU-YAR",
+    "region_code": "RU-YAR",
+    "name_ru": "Ярославская область",
+    "name_en": "Yaroslavl Oblast",
+    "name_crh": "Ярославская область",
+    "federal_district": "Центральный"
+  },
+  {
+    "region_id": "RU-YEV",
+    "region_code": "RU-YEV",
+    "name_ru": "Еврейская автономная область",
+    "name_en": "Jewish Autonomous Oblast",
+    "name_crh": "Еврейская автономная область",
+    "federal_district": "Дальневосточный"
+  },
+  {
+    "region_id": "RU-ZAB",
+    "region_code": "RU-ZAB",
+    "name_ru": "Забайкальский край",
+    "name_en": "Zabaykalsky Krai",
+    "name_crh": "Забайкальский край",
+    "federal_district": "Дальневосточный"
+  },
+  {
+    "region_id": "RU-CR",
+    "region_code": "RU-CR",
+    "name_ru": "Республика Крым",
+    "name_en": "Republic of Crimea",
+    "name_crh": "Qırım",
+    "federal_district": "Южный"
+  },
+  {
+    "region_id": "RU-SEV",
+    "region_code": "RU-SEV",
+    "name_ru": "Севастополь",
+    "name_en": "Sevastopol",
+    "name_crh": "Aqyar",
+    "federal_district": "Южный"
+  }
+]

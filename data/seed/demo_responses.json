@@ -1,0 +1,3302 @@
+[
+  {
+    "survey_year": 2016,
+    "region_id": "RU-MOW",
+    "source": "import",
+    "user_id": "demo-2016-RU-MOW-0",
+    "answers": {
+      "1": 2,
+      "2": "bad",
+      "3": "DEMO комментарий RU-MOW #0"
+    }
+  },
+  {
+    "survey_year": 2016,
+    "region_id": "RU-MOW",
+    "source": "import",
+    "user_id": "demo-2016-RU-MOW-1",
+    "answers": {
+      "1": 3,
+      "2": "ok",
+      "3": "DEMO комментарий RU-MOW #1"
+    }
+  },
+  {
+    "survey_year": 2016,
+    "region_id": "RU-MOW",
+    "source": "import",
+    "user_id": "demo-2016-RU-MOW-2",
+    "answers": {
+      "1": 4,
+      "2": "good",
+      "3": "DEMO комментарий RU-MOW #2"
+    }
+  },
+  {
+    "survey_year": 2016,
+    "region_id": "RU-MOW",
+    "source": "import",
+    "user_id": "demo-2016-RU-MOW-3",
+    "answers": {
+      "1": 5,
+      "2": "great",
+      "3": "DEMO комментарий RU-MOW #3"
+    }
+  },
+  {
+    "survey_year": 2016,
+    "region_id": "RU-MOW",
+    "source": "import",
+    "user_id": "demo-2016-RU-MOW-4",
+    "answers": {
+      "1": 2,
+      "2": "bad",
+      "3": "DEMO комментарий RU-MOW #4"
+    }
+  },
+  {
+    "survey_year": 2016,
+    "region_id": "RU-MOW",
+    "source": "import",
+    "user_id": "demo-2016-RU-MOW-5",
+    "answers": {
+      "1": 3,
+      "2": "ok",
+      "3": "DEMO комментарий RU-MOW #5"
+    }
+  },
+  {
+    "survey_year": 2016,
+    "region_id": "RU-MOW",
+    "source": "import",
+    "user_id": "demo-2016-RU-MOW-6",
+    "answers": {
+      "1": 4,
+      "2": "good",
+      "3": "DEMO комментарий RU-MOW #6"
+    }
+  },
+  {
+    "survey_year": 2016,
+    "region_id": "RU-MOW",
+    "source": "import",
+    "user_id": "demo-2016-RU-MOW-7",
+    "answers": {
+      "1": 5,
+      "2": "great",
+      "3": "DEMO комментарий RU-MOW #7"
+    }
+  },
+  {
+    "survey_year": 2016,
+    "region_id": "RU-MOW",
+    "source": "import",
+    "user_id": "demo-2016-RU-MOW-8",
+    "answers": {
+      "1": 2,
+      "2": "bad",
+      "3": "DEMO комментарий RU-MOW #8"
+    }
+  },
+  {
+    "survey_year": 2016,
+    "region_id": "RU-MOW",
+    "source": "import",
+    "user_id": "demo-2016-RU-MOW-9",
+    "answers": {
+      "1": 3,
+      "2": "ok",
+      "3": "DEMO комментарий RU-MOW #9"
+    }
+  },
+  {
+    "survey_year": 2016,
+    "region_id": "RU-SPE",
+    "source": "import",
+    "user_id": "demo-2016-RU-SPE-0",
+    "answers": {
+      "1": 5,
+      "2": "ok",
+      "3": "DEMO комментарий RU-SPE #0"
+    }
+  },
+  {
+    "survey_year": 2016,
+    "region_id": "RU-SPE",
+    "source": "import",
+    "user_id": "demo-2016-RU-SPE-1",
+    "answers": {
+      "1": 2,
+      "2": "good",
+      "3": "DEMO комментарий RU-SPE #1"
+    }
+  },
+  {
+    "survey_year": 2016,
+    "region_id": "RU-SPE",
+    "source": "import",
+    "user_id": "demo-2016-RU-SPE-2",
+    "answers": {
+      "1": 3,
+      "2": "great",
+      "3": "DEMO комментарий RU-SPE #2"
+    }
+  },
+  {
+    "survey_year": 2016,
+    "region_id": "RU-SPE",
+    "source": "import",
+    "user_id": "demo-2016-RU-SPE-3",
+    "answers": {
+      "1": 4,
+      "2": "bad",
+      "3": "DEMO комментарий RU-SPE #3"
+    }
+  },
+  {
+    "survey_year": 2016,
+    "region_id": "RU-SPE",
+    "source": "import",
+    "user_id": "demo-2016-RU-SPE-4",
+    "answers": {
+      "1": 5,
+      "2": "ok",
+      "3": "DEMO комментарий RU-SPE #4"
+    }
+  },
+  {
+    "survey_year": 2016,
+    "region_id": "RU-SPE",
+    "source": "import",
+    "user_id": "demo-2016-RU-SPE-5",
+    "answers": {
+      "1": 2,
+      "2": "good",
+      "3": "DEMO комментарий RU-SPE #5"
+    }
+  },
+  {
+    "survey_year": 2016,
+    "region_id": "RU-SPE",
+    "source": "import",
+    "user_id": "demo-2016-RU-SPE-6",
+    "answers": {
+      "1": 3,
+      "2": "great",
+      "3": "DEMO комментарий RU-SPE #6"
+    }
+  },
+  {
+    "survey_year": 2016,
+    "region_id": "RU-SPE",
+    "source": "import",
+    "user_id": "demo-2016-RU-SPE-7",
+    "answers": {
+      "1": 4,
+      "2": "bad",
+      "3": "DEMO комментарий RU-SPE #7"
+    }
+  },
+  {
+    "survey_year": 2016,
+    "region_id": "RU-SPE",
+    "source": "import",
+    "user_id": "demo-2016-RU-SPE-8",
+    "answers": {
+      "1": 5,
+      "2": "ok",
+      "3": "DEMO комментарий RU-SPE #8"
+    }
+  },
+  {
+    "survey_year": 2016,
+    "region_id": "RU-SPE",
+    "source": "import",
+    "user_id": "demo-2016-RU-SPE-9",
+    "answers": {
+      "1": 2,
+      "2": "good",
+      "3": "DEMO комментарий RU-SPE #9"
+    }
+  },
+  {
+    "survey_year": 2016,
+    "region_id": "RU-TA",
+    "source": "import",
+    "user_id": "demo-2016-RU-TA-0",
+    "answers": {
+      "1": 4,
+      "2": "good",
+      "3": "DEMO комментарий RU-TA #0"
+    }
+  },
+  {
+    "survey_year": 2016,
+    "region_id": "RU-TA",
+    "source": "import",
+    "user_id": "demo-2016-RU-TA-1",
+    "answers": {
+      "1": 5,
+      "2": "great",
+      "3": "DEMO комментарий RU-TA #1"
+    }
+  },
+  {
+    "survey_year": 2016,
+    "region_id": "RU-TA",
+    "source": "import",
+    "user_id": "demo-2016-RU-TA-2",
+    "answers": {
+      "1": 2,
+      "2": "bad",
+      "3": "DEMO комментарий RU-TA #2"
+    }
+  },
+  {
+    "survey_year": 2016,
+    "region_id": "RU-TA",
+    "source": "import",
+    "user_id": "demo-2016-RU-TA-3",
+    "answers": {
+      "1": 3,
+      "2": "ok",
+      "3": "DEMO комментарий RU-TA #3"
+    }
+  },
+  {
+    "survey_year": 2016,
+    "region_id": "RU-TA",
+    "source": "import",
+    "user_id": "demo-2016-RU-TA-4",
+    "answers": {
+      "1": 4,
+      "2": "good",
+      "3": "DEMO комментарий RU-TA #4"
+    }
+  },
+  {
+    "survey_year": 2016,
+    "region_id": "RU-TA",
+    "source": "import",
+    "user_id": "demo-2016-RU-TA-5",
+    "answers": {
+      "1": 5,
+      "2": "great",
+      "3": "DEMO комментарий RU-TA #5"
+    }
+  },
+  {
+    "survey_year": 2016,
+    "region_id": "RU-TA",
+    "source": "import",
+    "user_id": "demo-2016-RU-TA-6",
+    "answers": {
+      "1": 2,
+      "2": "bad",
+      "3": "DEMO комментарий RU-TA #6"
+    }
+  },
+  {
+    "survey_year": 2016,
+    "region_id": "RU-TA",
+    "source": "import",
+    "user_id": "demo-2016-RU-TA-7",
+    "answers": {
+      "1": 3,
+      "2": "ok",
+      "3": "DEMO комментарий RU-TA #7"
+    }
+  },
+  {
+    "survey_year": 2016,
+    "region_id": "RU-TA",
+    "source": "import",
+    "user_id": "demo-2016-RU-TA-8",
+    "answers": {
+      "1": 4,
+      "2": "good",
+      "3": "DEMO комментарий RU-TA #8"
+    }
+  },
+  {
+    "survey_year": 2016,
+    "region_id": "RU-TA",
+    "source": "import",
+    "user_id": "demo-2016-RU-TA-9",
+    "answers": {
+      "1": 5,
+      "2": "great",
+      "3": "DEMO комментарий RU-TA #9"
+    }
+  },
+  {
+    "survey_year": 2016,
+    "region_id": "RU-CR",
+    "source": "import",
+    "user_id": "demo-2016-RU-CR-0",
+    "answers": {
+      "1": 3,
+      "2": "great",
+      "3": "DEMO комментарий RU-CR #0"
+    }
+  },
+  {
+    "survey_year": 2016,
+    "region_id": "RU-CR",
+    "source": "import",
+    "user_id": "demo-2016-RU-CR-1",
+    "answers": {
+      "1": 4,
+      "2": "bad",
+      "3": "DEMO комментарий RU-CR #1"
+    }
+  },
+  {
+    "survey_year": 2016,
+    "region_id": "RU-CR",
+    "source": "import",
+    "user_id": "demo-2016-RU-CR-2",
+    "answers": {
+      "1": 5,
+      "2": "ok",
+      "3": "DEMO комментарий RU-CR #2"
+    }
+  },
+  {
+    "survey_year": 2016,
+    "region_id": "RU-CR",
+    "source": "import",
+    "user_id": "demo-2016-RU-CR-3",
+    "answers": {
+      "1": 2,
+      "2": "good",
+      "3": "DEMO комментарий RU-CR #3"
+    }
+  },
+  {
+    "survey_year": 2016,
+    "region_id": "RU-CR",
+    "source": "import",
+    "user_id": "demo-2016-RU-CR-4",
+    "answers": {
+      "1": 3,
+      "2": "great",
+      "3": "DEMO комментарий RU-CR #4"
+    }
+  },
+  {
+    "survey_year": 2016,
+    "region_id": "RU-CR",
+    "source": "import",
+    "user_id": "demo-2016-RU-CR-5",
+    "answers": {
+      "1": 4,
+      "2": "bad",
+      "3": "DEMO комментарий RU-CR #5"
+    }
+  },
+  {
+    "survey_year": 2016,
+    "region_id": "RU-CR",
+    "source": "import",
+    "user_id": "demo-2016-RU-CR-6",
+    "answers": {
+      "1": 5,
+      "2": "ok",
+      "3": "DEMO комментарий RU-CR #6"
+    }
+  },
+  {
+    "survey_year": 2016,
+    "region_id": "RU-CR",
+    "source": "import",
+    "user_id": "demo-2016-RU-CR-7",
+    "answers": {
+      "1": 2,
+      "2": "good",
+      "3": "DEMO комментарий RU-CR #7"
+    }
+  },
+  {
+    "survey_year": 2016,
+    "region_id": "RU-CR",
+    "source": "import",
+    "user_id": "demo-2016-RU-CR-8",
+    "answers": {
+      "1": 3,
+      "2": "great",
+      "3": "DEMO комментарий RU-CR #8"
+    }
+  },
+  {
+    "survey_year": 2016,
+    "region_id": "RU-CR",
+    "source": "import",
+    "user_id": "demo-2016-RU-CR-9",
+    "answers": {
+      "1": 4,
+      "2": "bad",
+      "3": "DEMO комментарий RU-CR #9"
+    }
+  },
+  {
+    "survey_year": 2016,
+    "region_id": "RU-KDA",
+    "source": "import",
+    "user_id": "demo-2016-RU-KDA-0",
+    "answers": {
+      "1": 2,
+      "2": "bad",
+      "3": "DEMO комментарий RU-KDA #0"
+    }
+  },
+  {
+    "survey_year": 2016,
+    "region_id": "RU-KDA",
+    "source": "import",
+    "user_id": "demo-2016-RU-KDA-1",
+    "answers": {
+      "1": 3,
+      "2": "ok",
+      "3": "DEMO комментарий RU-KDA #1"
+    }
+  },
+  {
+    "survey_year": 2016,
+    "region_id": "RU-KDA",
+    "source": "import",
+    "user_id": "demo-2016-RU-KDA-2",
+    "answers": {
+      "1": 4,
+      "2": "good",
+      "3": "DEMO комментарий RU-KDA #2"
+    }
+  },
+  {
+    "survey_year": 2016,
+    "region_id": "RU-KDA",
+    "source": "import",
+    "user_id": "demo-2016-RU-KDA-3",
+    "answers": {
+      "1": 5,
+      "2": "great",
+      "3": "DEMO комментарий RU-KDA #3"
+    }
+  },
+  {
+    "survey_year": 2016,
+    "region_id": "RU-KDA",
+    "source": "import",
+    "user_id": "demo-2016-RU-KDA-4",
+    "answers": {
+      "1": 2,
+      "2": "bad",
+      "3": "DEMO комментарий RU-KDA #4"
+    }
+  },
+  {
+    "survey_year": 2016,
+    "region_id": "RU-KDA",
+    "source": "import",
+    "user_id": "demo-2016-RU-KDA-5",
+    "answers": {
+      "1": 3,
+      "2": "ok",
+      "3": "DEMO комментарий RU-KDA #5"
+    }
+  },
+  {
+    "survey_year": 2016,
+    "region_id": "RU-KDA",
+    "source": "import",
+    "user_id": "demo-2016-RU-KDA-6",
+    "answers": {
+      "1": 4,
+      "2": "good",
+      "3": "DEMO комментарий RU-KDA #6"
+    }
+  },
+  {
+    "survey_year": 2016,
+    "region_id": "RU-KDA",
+    "source": "import",
+    "user_id": "demo-2016-RU-KDA-7",
+    "answers": {
+      "1": 5,
+      "2": "great",
+      "3": "DEMO комментарий RU-KDA #7"
+    }
+  },
+  {
+    "survey_year": 2016,
+    "region_id": "RU-KDA",
+    "source": "import",
+    "user_id": "demo-2016-RU-KDA-8",
+    "answers": {
+      "1": 2,
+      "2": "bad",
+      "3": "DEMO комментарий RU-KDA #8"
+    }
+  },
+  {
+    "survey_year": 2016,
+    "region_id": "RU-KDA",
+    "source": "import",
+    "user_id": "demo-2016-RU-KDA-9",
+    "answers": {
+      "1": 3,
+      "2": "ok",
+      "3": "DEMO комментарий RU-KDA #9"
+    }
+  },
+  {
+    "survey_year": 2016,
+    "region_id": "RU-NVS",
+    "source": "import",
+    "user_id": "demo-2016-RU-NVS-0",
+    "answers": {
+      "1": 5,
+      "2": "ok",
+      "3": "DEMO комментарий RU-NVS #0"
+    }
+  },
+  {
+    "survey_year": 2016,
+    "region_id": "RU-NVS",
+    "source": "import",
+    "user_id": "demo-2016-RU-NVS-1",
+    "answers": {
+      "1": 2,
+      "2": "good",
+      "3": "DEMO комментарий RU-NVS #1"
+    }
+  },
+  {
+    "survey_year": 2016,
+    "region_id": "RU-NVS",
+    "source": "import",
+    "user_id": "demo-2016-RU-NVS-2",
+    "answers": {
+      "1": 3,
+      "2": "great",
+      "3": "DEMO комментарий RU-NVS #2"
+    }
+  },
+  {
+    "survey_year": 2016,
+    "region_id": "RU-NVS",
+    "source": "import",
+    "user_id": "demo-2016-RU-NVS-3",
+    "answers": {
+      "1": 4,
+      "2": "bad",
+      "3": "DEMO комментарий RU-NVS #3"
+    }
+  },
+  {
+    "survey_year": 2016,
+    "region_id": "RU-NVS",
+    "source": "import",
+    "user_id": "demo-2016-RU-NVS-4",
+    "answers": {
+      "1": 5,
+      "2": "ok",
+      "3": "DEMO комментарий RU-NVS #4"
+    }
+  },
+  {
+    "survey_year": 2016,
+    "region_id": "RU-NVS",
+    "source": "import",
+    "user_id": "demo-2016-RU-NVS-5",
+    "answers": {
+      "1": 2,
+      "2": "good",
+      "3": "DEMO комментарий RU-NVS #5"
+    }
+  },
+  {
+    "survey_year": 2016,
+    "region_id": "RU-NVS",
+    "source": "import",
+    "user_id": "demo-2016-RU-NVS-6",
+    "answers": {
+      "1": 3,
+      "2": "great",
+      "3": "DEMO комментарий RU-NVS #6"
+    }
+  },
+  {
+    "survey_year": 2016,
+    "region_id": "RU-NVS",
+    "source": "import",
+    "user_id": "demo-2016-RU-NVS-7",
+    "answers": {
+      "1": 4,
+      "2": "bad",
+      "3": "DEMO комментарий RU-NVS #7"
+    }
+  },
+  {
+    "survey_year": 2016,
+    "region_id": "RU-NVS",
+    "source": "import",
+    "user_id": "demo-2016-RU-NVS-8",
+    "answers": {
+      "1": 5,
+      "2": "ok",
+      "3": "DEMO комментарий RU-NVS #8"
+    }
+  },
+  {
+    "survey_year": 2016,
+    "region_id": "RU-NVS",
+    "source": "import",
+    "user_id": "demo-2016-RU-NVS-9",
+    "answers": {
+      "1": 2,
+      "2": "good",
+      "3": "DEMO комментарий RU-NVS #9"
+    }
+  },
+  {
+    "survey_year": 2018,
+    "region_id": "RU-MOW",
+    "source": "import",
+    "user_id": "demo-2018-RU-MOW-0",
+    "answers": {
+      "1": 4,
+      "2": "good",
+      "3": "DEMO комментарий RU-MOW #0"
+    }
+  },
+  {
+    "survey_year": 2018,
+    "region_id": "RU-MOW",
+    "source": "import",
+    "user_id": "demo-2018-RU-MOW-1",
+    "answers": {
+      "1": 5,
+      "2": "great",
+      "3": "DEMO комментарий RU-MOW #1"
+    }
+  },
+  {
+    "survey_year": 2018,
+    "region_id": "RU-MOW",
+    "source": "import",
+    "user_id": "demo-2018-RU-MOW-2",
+    "answers": {
+      "1": 2,
+      "2": "bad",
+      "3": "DEMO комментарий RU-MOW #2"
+    }
+  },
+  {
+    "survey_year": 2018,
+    "region_id": "RU-MOW",
+    "source": "import",
+    "user_id": "demo-2018-RU-MOW-3",
+    "answers": {
+      "1": 3,
+      "2": "ok",
+      "3": "DEMO комментарий RU-MOW #3"
+    }
+  },
+  {
+    "survey_year": 2018,
+    "region_id": "RU-MOW",
+    "source": "import",
+    "user_id": "demo-2018-RU-MOW-4",
+    "answers": {
+      "1": 4,
+      "2": "good",
+      "3": "DEMO комментарий RU-MOW #4"
+    }
+  },
+  {
+    "survey_year": 2018,
+    "region_id": "RU-MOW",
+    "source": "import",
+    "user_id": "demo-2018-RU-MOW-5",
+    "answers": {
+      "1": 5,
+      "2": "great",
+      "3": "DEMO комментарий RU-MOW #5"
+    }
+  },
+  {
+    "survey_year": 2018,
+    "region_id": "RU-MOW",
+    "source": "import",
+    "user_id": "demo-2018-RU-MOW-6",
+    "answers": {
+      "1": 2,
+      "2": "bad",
+      "3": "DEMO комментарий RU-MOW #6"
+    }
+  },
+  {
+    "survey_year": 2018,
+    "region_id": "RU-MOW",
+    "source": "import",
+    "user_id": "demo-2018-RU-MOW-7",
+    "answers": {
+      "1": 3,
+      "2": "ok",
+      "3": "DEMO комментарий RU-MOW #7"
+    }
+  },
+  {
+    "survey_year": 2018,
+    "region_id": "RU-MOW",
+    "source": "import",
+    "user_id": "demo-2018-RU-MOW-8",
+    "answers": {
+      "1": 4,
+      "2": "good",
+      "3": "DEMO комментарий RU-MOW #8"
+    }
+  },
+  {
+    "survey_year": 2018,
+    "region_id": "RU-MOW",
+    "source": "import",
+    "user_id": "demo-2018-RU-MOW-9",
+    "answers": {
+      "1": 5,
+      "2": "great",
+      "3": "DEMO комментарий RU-MOW #9"
+    }
+  },
+  {
+    "survey_year": 2018,
+    "region_id": "RU-SPE",
+    "source": "import",
+    "user_id": "demo-2018-RU-SPE-0",
+    "answers": {
+      "1": 3,
+      "2": "great",
+      "3": "DEMO комментарий RU-SPE #0"
+    }
+  },
+  {
+    "survey_year": 2018,
+    "region_id": "RU-SPE",
+    "source": "import",
+    "user_id": "demo-2018-RU-SPE-1",
+    "answers": {
+      "1": 4,
+      "2": "bad",
+      "3": "DEMO комментарий RU-SPE #1"
+    }
+  },
+  {
+    "survey_year": 2018,
+    "region_id": "RU-SPE",
+    "source": "import",
+    "user_id": "demo-2018-RU-SPE-2",
+    "answers": {
+      "1": 5,
+      "2": "ok",
+      "3": "DEMO комментарий RU-SPE #2"
+    }
+  },
+  {
+    "survey_year": 2018,
+    "region_id": "RU-SPE",
+    "source": "import",
+    "user_id": "demo-2018-RU-SPE-3",
+    "answers": {
+      "1": 2,
+      "2": "good",
+      "3": "DEMO комментарий RU-SPE #3"
+    }
+  },
+  {
+    "survey_year": 2018,
+    "region_id": "RU-SPE",
+    "source": "import",
+    "user_id": "demo-2018-RU-SPE-4",
+    "answers": {
+      "1": 3,
+      "2": "great",
+      "3": "DEMO комментарий RU-SPE #4"
+    }
+  },
+  {
+    "survey_year": 2018,
+    "region_id": "RU-SPE",
+    "source": "import",
+    "user_id": "demo-2018-RU-SPE-5",
+    "answers": {
+      "1": 4,
+      "2": "bad",
+      "3": "DEMO комментарий RU-SPE #5"
+    }
+  },
+  {
+    "survey_year": 2018,
+    "region_id": "RU-SPE",
+    "source": "import",
+    "user_id": "demo-2018-RU-SPE-6",
+    "answers": {
+      "1": 5,
+      "2": "ok",
+      "3": "DEMO комментарий RU-SPE #6"
+    }
+  },
+  {
+    "survey_year": 2018,
+    "region_id": "RU-SPE",
+    "source": "import",
+    "user_id": "demo-2018-RU-SPE-7",
+    "answers": {
+      "1": 2,
+      "2": "good",
+      "3": "DEMO комментарий RU-SPE #7"
+    }
+  },
+  {
+    "survey_year": 2018,
+    "region_id": "RU-SPE",
+    "source": "import",
+    "user_id": "demo-2018-RU-SPE-8",
+    "answers": {
+      "1": 3,
+      "2": "great",
+      "3": "DEMO комментарий RU-SPE #8"
+    }
+  },
+  {
+    "survey_year": 2018,
+    "region_id": "RU-SPE",
+    "source": "import",
+    "user_id": "demo-2018-RU-SPE-9",
+    "answers": {
+      "1": 4,
+      "2": "bad",
+      "3": "DEMO комментарий RU-SPE #9"
+    }
+  },
+  {
+    "survey_year": 2018,
+    "region_id": "RU-TA",
+    "source": "import",
+    "user_id": "demo-2018-RU-TA-0",
+    "answers": {
+      "1": 2,
+      "2": "bad",
+      "3": "DEMO комментарий RU-TA #0"
+    }
+  },
+  {
+    "survey_year": 2018,
+    "region_id": "RU-TA",
+    "source": "import",
+    "user_id": "demo-2018-RU-TA-1",
+    "answers": {
+      "1": 3,
+      "2": "ok",
+      "3": "DEMO комментарий RU-TA #1"
+    }
+  },
+  {
+    "survey_year": 2018,
+    "region_id": "RU-TA",
+    "source": "import",
+    "user_id": "demo-2018-RU-TA-2",
+    "answers": {
+      "1": 4,
+      "2": "good",
+      "3": "DEMO комментарий RU-TA #2"
+    }
+  },
+  {
+    "survey_year": 2018,
+    "region_id": "RU-TA",
+    "source": "import",
+    "user_id": "demo-2018-RU-TA-3",
+    "answers": {
+      "1": 5,
+      "2": "great",
+      "3": "DEMO комментарий RU-TA #3"
+    }
+  },
+  {
+    "survey_year": 2018,
+    "region_id": "RU-TA",
+    "source": "import",
+    "user_id": "demo-2018-RU-TA-4",
+    "answers": {
+      "1": 2,
+      "2": "bad",
+      "3": "DEMO комментарий RU-TA #4"
+    }
+  },
+  {
+    "survey_year": 2018,
+    "region_id": "RU-TA",
+    "source": "import",
+    "user_id": "demo-2018-RU-TA-5",
+    "answers": {
+      "1": 3,
+      "2": "ok",
+      "3": "DEMO комментарий RU-TA #5"
+    }
+  },
+  {
+    "survey_year": 2018,
+    "region_id": "RU-TA",
+    "source": "import",
+    "user_id": "demo-2018-RU-TA-6",
+    "answers": {
+      "1": 4,
+      "2": "good",
+      "3": "DEMO комментарий RU-TA #6"
+    }
+  },
+  {
+    "survey_year": 2018,
+    "region_id": "RU-TA",
+    "source": "import",
+    "user_id": "demo-2018-RU-TA-7",
+    "answers": {
+      "1": 5,
+      "2": "great",
+      "3": "DEMO комментарий RU-TA #7"
+    }
+  },
+  {
+    "survey_year": 2018,
+    "region_id": "RU-TA",
+    "source": "import",
+    "user_id": "demo-2018-RU-TA-8",
+    "answers": {
+      "1": 2,
+      "2": "bad",
+      "3": "DEMO комментарий RU-TA #8"
+    }
+  },
+  {
+    "survey_year": 2018,
+    "region_id": "RU-TA",
+    "source": "import",
+    "user_id": "demo-2018-RU-TA-9",
+    "answers": {
+      "1": 3,
+      "2": "ok",
+      "3": "DEMO комментарий RU-TA #9"
+    }
+  },
+  {
+    "survey_year": 2018,
+    "region_id": "RU-CR",
+    "source": "import",
+    "user_id": "demo-2018-RU-CR-0",
+    "answers": {
+      "1": 5,
+      "2": "ok",
+      "3": "DEMO комментарий RU-CR #0"
+    }
+  },
+  {
+    "survey_year": 2018,
+    "region_id": "RU-CR",
+    "source": "import",
+    "user_id": "demo-2018-RU-CR-1",
+    "answers": {
+      "1": 2,
+      "2": "good",
+      "3": "DEMO комментарий RU-CR #1"
+    }
+  },
+  {
+    "survey_year": 2018,
+    "region_id": "RU-CR",
+    "source": "import",
+    "user_id": "demo-2018-RU-CR-2",
+    "answers": {
+      "1": 3,
+      "2": "great",
+      "3": "DEMO комментарий RU-CR #2"
+    }
+  },
+  {
+    "survey_year": 2018,
+    "region_id": "RU-CR",
+    "source": "import",
+    "user_id": "demo-2018-RU-CR-3",
+    "answers": {
+      "1": 4,
+      "2": "bad",
+      "3": "DEMO комментарий RU-CR #3"
+    }
+  },
+  {
+    "survey_year": 2018,
+    "region_id": "RU-CR",
+    "source": "import",
+    "user_id": "demo-2018-RU-CR-4",
+    "answers": {
+      "1": 5,
+      "2": "ok",
+      "3": "DEMO комментарий RU-CR #4"
+    }
+  },
+  {
+    "survey_year": 2018,
+    "region_id": "RU-CR",
+    "source": "import",
+    "user_id": "demo-2018-RU-CR-5",
+    "answers": {
+      "1": 2,
+      "2": "good",
+      "3": "DEMO комментарий RU-CR #5"
+    }
+  },
+  {
+    "survey_year": 2018,
+    "region_id": "RU-CR",
+    "source": "import",
+    "user_id": "demo-2018-RU-CR-6",
+    "answers": {
+      "1": 3,
+      "2": "great",
+      "3": "DEMO комментарий RU-CR #6"
+    }
+  },
+  {
+    "survey_year": 2018,
+    "region_id": "RU-CR",
+    "source": "import",
+    "user_id": "demo-2018-RU-CR-7",
+    "answers": {
+      "1": 4,
+      "2": "bad",
+      "3": "DEMO комментарий RU-CR #7"
+    }
+  },
+  {
+    "survey_year": 2018,
+    "region_id": "RU-CR",
+    "source": "import",
+    "user_id": "demo-2018-RU-CR-8",
+    "answers": {
+      "1": 5,
+      "2": "ok",
+      "3": "DEMO комментарий RU-CR #8"
+    }
+  },
+  {
+    "survey_year": 2018,
+    "region_id": "RU-CR",
+    "source": "import",
+    "user_id": "demo-2018-RU-CR-9",
+    "answers": {
+      "1": 2,
+      "2": "good",
+      "3": "DEMO комментарий RU-CR #9"
+    }
+  },
+  {
+    "survey_year": 2018,
+    "region_id": "RU-KDA",
+    "source": "import",
+    "user_id": "demo-2018-RU-KDA-0",
+    "answers": {
+      "1": 4,
+      "2": "good",
+      "3": "DEMO комментарий RU-KDA #0"
+    }
+  },
+  {
+    "survey_year": 2018,
+    "region_id": "RU-KDA",
+    "source": "import",
+    "user_id": "demo-2018-RU-KDA-1",
+    "answers": {
+      "1": 5,
+      "2": "great",
+      "3": "DEMO комментарий RU-KDA #1"
+    }
+  },
+  {
+    "survey_year": 2018,
+    "region_id": "RU-KDA",
+    "source": "import",
+    "user_id": "demo-2018-RU-KDA-2",
+    "answers": {
+      "1": 2,
+      "2": "bad",
+      "3": "DEMO комментарий RU-KDA #2"
+    }
+  },
+  {
+    "survey_year": 2018,
+    "region_id": "RU-KDA",
+    "source": "import",
+    "user_id": "demo-2018-RU-KDA-3",
+    "answers": {
+      "1": 3,
+      "2": "ok",
+      "3": "DEMO комментарий RU-KDA #3"
+    }
+  },
+  {
+    "survey_year": 2018,
+    "region_id": "RU-KDA",
+    "source": "import",
+    "user_id": "demo-2018-RU-KDA-4",
+    "answers": {
+      "1": 4,
+      "2": "good",
+      "3": "DEMO комментарий RU-KDA #4"
+    }
+  },
+  {
+    "survey_year": 2018,
+    "region_id": "RU-KDA",
+    "source": "import",
+    "user_id": "demo-2018-RU-KDA-5",
+    "answers": {
+      "1": 5,
+      "2": "great",
+      "3": "DEMO комментарий RU-KDA #5"
+    }
+  },
+  {
+    "survey_year": 2018,
+    "region_id": "RU-KDA",
+    "source": "import",
+    "user_id": "demo-2018-RU-KDA-6",
+    "answers": {
+      "1": 2,
+      "2": "bad",
+      "3": "DEMO комментарий RU-KDA #6"
+    }
+  },
+  {
+    "survey_year": 2018,
+    "region_id": "RU-KDA",
+    "source": "import",
+    "user_id": "demo-2018-RU-KDA-7",
+    "answers": {
+      "1": 3,
+      "2": "ok",
+      "3": "DEMO комментарий RU-KDA #7"
+    }
+  },
+  {
+    "survey_year": 2018,
+    "region_id": "RU-KDA",
+    "source": "import",
+    "user_id": "demo-2018-RU-KDA-8",
+    "answers": {
+      "1": 4,
+      "2": "good",
+      "3": "DEMO комментарий RU-KDA #8"
+    }
+  },
+  {
+    "survey_year": 2018,
+    "region_id": "RU-KDA",
+    "source": "import",
+    "user_id": "demo-2018-RU-KDA-9",
+    "answers": {
+      "1": 5,
+      "2": "great",
+      "3": "DEMO комментарий RU-KDA #9"
+    }
+  },
+  {
+    "survey_year": 2018,
+    "region_id": "RU-NVS",
+    "source": "import",
+    "user_id": "demo-2018-RU-NVS-0",
+    "answers": {
+      "1": 3,
+      "2": "great",
+      "3": "DEMO комментарий RU-NVS #0"
+    }
+  },
+  {
+    "survey_year": 2018,
+    "region_id": "RU-NVS",
+    "source": "import",
+    "user_id": "demo-2018-RU-NVS-1",
+    "answers": {
+      "1": 4,
+      "2": "bad",
+      "3": "DEMO комментарий RU-NVS #1"
+    }
+  },
+  {
+    "survey_year": 2018,
+    "region_id": "RU-NVS",
+    "source": "import",
+    "user_id": "demo-2018-RU-NVS-2",
+    "answers": {
+      "1": 5,
+      "2": "ok",
+      "3": "DEMO комментарий RU-NVS #2"
+    }
+  },
+  {
+    "survey_year": 2018,
+    "region_id": "RU-NVS",
+    "source": "import",
+    "user_id": "demo-2018-RU-NVS-3",
+    "answers": {
+      "1": 2,
+      "2": "good",
+      "3": "DEMO комментарий RU-NVS #3"
+    }
+  },
+  {
+    "survey_year": 2018,
+    "region_id": "RU-NVS",
+    "source": "import",
+    "user_id": "demo-2018-RU-NVS-4",
+    "answers": {
+      "1": 3,
+      "2": "great",
+      "3": "DEMO комментарий RU-NVS #4"
+    }
+  },
+  {
+    "survey_year": 2018,
+    "region_id": "RU-NVS",
+    "source": "import",
+    "user_id": "demo-2018-RU-NVS-5",
+    "answers": {
+      "1": 4,
+      "2": "bad",
+      "3": "DEMO комментарий RU-NVS #5"
+    }
+  },
+  {
+    "survey_year": 2018,
+    "region_id": "RU-NVS",
+    "source": "import",
+    "user_id": "demo-2018-RU-NVS-6",
+    "answers": {
+      "1": 5,
+      "2": "ok",
+      "3": "DEMO комментарий RU-NVS #6"
+    }
+  },
+  {
+    "survey_year": 2018,
+    "region_id": "RU-NVS",
+    "source": "import",
+    "user_id": "demo-2018-RU-NVS-7",
+    "answers": {
+      "1": 2,
+      "2": "good",
+      "3": "DEMO комментарий RU-NVS #7"
+    }
+  },
+  {
+    "survey_year": 2018,
+    "region_id": "RU-NVS",
+    "source": "import",
+    "user_id": "demo-2018-RU-NVS-8",
+    "answers": {
+      "1": 3,
+      "2": "great",
+      "3": "DEMO комментарий RU-NVS #8"
+    }
+  },
+  {
+    "survey_year": 2018,
+    "region_id": "RU-NVS",
+    "source": "import",
+    "user_id": "demo-2018-RU-NVS-9",
+    "answers": {
+      "1": 4,
+      "2": "bad",
+      "3": "DEMO комментарий RU-NVS #9"
+    }
+  },
+  {
+    "survey_year": 2020,
+    "region_id": "RU-MOW",
+    "source": "import",
+    "user_id": "demo-2020-RU-MOW-0",
+    "answers": {
+      "1": 2,
+      "2": "bad",
+      "3": "DEMO комментарий RU-MOW #0"
+    }
+  },
+  {
+    "survey_year": 2020,
+    "region_id": "RU-MOW",
+    "source": "import",
+    "user_id": "demo-2020-RU-MOW-1",
+    "answers": {
+      "1": 3,
+      "2": "ok",
+      "3": "DEMO комментарий RU-MOW #1"
+    }
+  },
+  {
+    "survey_year": 2020,
+    "region_id": "RU-MOW",
+    "source": "import",
+    "user_id": "demo-2020-RU-MOW-2",
+    "answers": {
+      "1": 4,
+      "2": "good",
+      "3": "DEMO комментарий RU-MOW #2"
+    }
+  },
+  {
+    "survey_year": 2020,
+    "region_id": "RU-MOW",
+    "source": "import",
+    "user_id": "demo-2020-RU-MOW-3",
+    "answers": {
+      "1": 5,
+      "2": "great",
+      "3": "DEMO комментарий RU-MOW #3"
+    }
+  },
+  {
+    "survey_year": 2020,
+    "region_id": "RU-MOW",
+    "source": "import",
+    "user_id": "demo-2020-RU-MOW-4",
+    "answers": {
+      "1": 2,
+      "2": "bad",
+      "3": "DEMO комментарий RU-MOW #4"
+    }
+  },
+  {
+    "survey_year": 2020,
+    "region_id": "RU-MOW",
+    "source": "import",
+    "user_id": "demo-2020-RU-MOW-5",
+    "answers": {
+      "1": 3,
+      "2": "ok",
+      "3": "DEMO комментарий RU-MOW #5"
+    }
+  },
+  {
+    "survey_year": 2020,
+    "region_id": "RU-MOW",
+    "source": "import",
+    "user_id": "demo-2020-RU-MOW-6",
+    "answers": {
+      "1": 4,
+      "2": "good",
+      "3": "DEMO комментарий RU-MOW #6"
+    }
+  },
+  {
+    "survey_year": 2020,
+    "region_id": "RU-MOW",
+    "source": "import",
+    "user_id": "demo-2020-RU-MOW-7",
+    "answers": {
+      "1": 5,
+      "2": "great",
+      "3": "DEMO комментарий RU-MOW #7"
+    }
+  },
+  {
+    "survey_year": 2020,
+    "region_id": "RU-MOW",
+    "source": "import",
+    "user_id": "demo-2020-RU-MOW-8",
+    "answers": {
+      "1": 2,
+      "2": "bad",
+      "3": "DEMO комментарий RU-MOW #8"
+    }
+  },
+  {
+    "survey_year": 2020,
+    "region_id": "RU-MOW",
+    "source": "import",
+    "user_id": "demo-2020-RU-MOW-9",
+    "answers": {
+      "1": 3,
+      "2": "ok",
+      "3": "DEMO комментарий RU-MOW #9"
+    }
+  },
+  {
+    "survey_year": 2020,
+    "region_id": "RU-SPE",
+    "source": "import",
+    "user_id": "demo-2020-RU-SPE-0",
+    "answers": {
+      "1": 5,
+      "2": "ok",
+      "3": "DEMO комментарий RU-SPE #0"
+    }
+  },
+  {
+    "survey_year": 2020,
+    "region_id": "RU-SPE",
+    "source": "import",
+    "user_id": "demo-2020-RU-SPE-1",
+    "answers": {
+      "1": 2,
+      "2": "good",
+      "3": "DEMO комментарий RU-SPE #1"
+    }
+  },
+  {
+    "survey_year": 2020,
+    "region_id": "RU-SPE",
+    "source": "import",
+    "user_id": "demo-2020-RU-SPE-2",
+    "answers": {
+      "1": 3,
+      "2": "great",
+      "3": "DEMO комментарий RU-SPE #2"
+    }
+  },
+  {
+    "survey_year": 2020,
+    "region_id": "RU-SPE",
+    "source": "import",
+    "user_id": "demo-2020-RU-SPE-3",
+    "answers": {
+      "1": 4,
+      "2": "bad",
+      "3": "DEMO комментарий RU-SPE #3"
+    }
+  },
+  {
+    "survey_year": 2020,
+    "region_id": "RU-SPE",
+    "source": "import",
+    "user_id": "demo-2020-RU-SPE-4",
+    "answers": {
+      "1": 5,
+      "2": "ok",
+      "3": "DEMO комментарий RU-SPE #4"
+    }
+  },
+  {
+    "survey_year": 2020,
+    "region_id": "RU-SPE",
+    "source": "import",
+    "user_id": "demo-2020-RU-SPE-5",
+    "answers": {
+      "1": 2,
+      "2": "good",
+      "3": "DEMO комментарий RU-SPE #5"
+    }
+  },
+  {
+    "survey_year": 2020,
+    "region_id": "RU-SPE",
+    "source": "import",
+    "user_id": "demo-2020-RU-SPE-6",
+    "answers": {
+      "1": 3,
+      "2": "great",
+      "3": "DEMO комментарий RU-SPE #6"
+    }
+  },
+  {
+    "survey_year": 2020,
+    "region_id": "RU-SPE",
+    "source": "import",
+    "user_id": "demo-2020-RU-SPE-7",
+    "answers": {
+      "1": 4,
+      "2": "bad",
+      "3": "DEMO комментарий RU-SPE #7"
+    }
+  },
+  {
+    "survey_year": 2020,
+    "region_id": "RU-SPE",
+    "source": "import",
+    "user_id": "demo-2020-RU-SPE-8",
+    "answers": {
+      "1": 5,
+      "2": "ok",
+      "3": "DEMO комментарий RU-SPE #8"
+    }
+  },
+  {
+    "survey_year": 2020,
+    "region_id": "RU-SPE",
+    "source": "import",
+    "user_id": "demo-2020-RU-SPE-9",
+    "answers": {
+      "1": 2,
+      "2": "good",
+      "3": "DEMO комментарий RU-SPE #9"
+    }
+  },
+  {
+    "survey_year": 2020,
+    "region_id": "RU-TA",
+    "source": "import",
+    "user_id": "demo-2020-RU-TA-0",
+    "answers": {
+      "1": 4,
+      "2": "good",
+      "3": "DEMO комментарий RU-TA #0"
+    }
+  },
+  {
+    "survey_year": 2020,
+    "region_id": "RU-TA",
+    "source": "import",
+    "user_id": "demo-2020-RU-TA-1",
+    "answers": {
+      "1": 5,
+      "2": "great",
+      "3": "DEMO комментарий RU-TA #1"
+    }
+  },
+  {
+    "survey_year": 2020,
+    "region_id": "RU-TA",
+    "source": "import",
+    "user_id": "demo-2020-RU-TA-2",
+    "answers": {
+      "1": 2,
+      "2": "bad",
+      "3": "DEMO комментарий RU-TA #2"
+    }
+  },
+  {
+    "survey_year": 2020,
+    "region_id": "RU-TA",
+    "source": "import",
+    "user_id": "demo-2020-RU-TA-3",
+    "answers": {
+      "1": 3,
+      "2": "ok",
+      "3": "DEMO комментарий RU-TA #3"
+    }
+  },
+  {
+    "survey_year": 2020,
+    "region_id": "RU-TA",
+    "source": "import",
+    "user_id": "demo-2020-RU-TA-4",
+    "answers": {
+      "1": 4,
+      "2": "good",
+      "3": "DEMO комментарий RU-TA #4"
+    }
+  },
+  {
+    "survey_year": 2020,
+    "region_id": "RU-TA",
+    "source": "import",
+    "user_id": "demo-2020-RU-TA-5",
+    "answers": {
+      "1": 5,
+      "2": "great",
+      "3": "DEMO комментарий RU-TA #5"
+    }
+  },
+  {
+    "survey_year": 2020,
+    "region_id": "RU-TA",
+    "source": "import",
+    "user_id": "demo-2020-RU-TA-6",
+    "answers": {
+      "1": 2,
+      "2": "bad",
+      "3": "DEMO комментарий RU-TA #6"
+    }
+  },
+  {
+    "survey_year": 2020,
+    "region_id": "RU-TA",
+    "source": "import",
+    "user_id": "demo-2020-RU-TA-7",
+    "answers": {
+      "1": 3,
+      "2": "ok",
+      "3": "DEMO комментарий RU-TA #7"
+    }
+  },
+  {
+    "survey_year": 2020,
+    "region_id": "RU-TA",
+    "source": "import",
+    "user_id": "demo-2020-RU-TA-8",
+    "answers": {
+      "1": 4,
+      "2": "good",
+      "3": "DEMO комментарий RU-TA #8"
+    }
+  },
+  {
+    "survey_year": 2020,
+    "region_id": "RU-TA",
+    "source": "import",
+    "user_id": "demo-2020-RU-TA-9",
+    "answers": {
+      "1": 5,
+      "2": "great",
+      "3": "DEMO комментарий RU-TA #9"
+    }
+  },
+  {
+    "survey_year": 2020,
+    "region_id": "RU-CR",
+    "source": "import",
+    "user_id": "demo-2020-RU-CR-0",
+    "answers": {
+      "1": 3,
+      "2": "great",
+      "3": "DEMO комментарий RU-CR #0"
+    }
+  },
+  {
+    "survey_year": 2020,
+    "region_id": "RU-CR",
+    "source": "import",
+    "user_id": "demo-2020-RU-CR-1",
+    "answers": {
+      "1": 4,
+      "2": "bad",
+      "3": "DEMO комментарий RU-CR #1"
+    }
+  },
+  {
+    "survey_year": 2020,
+    "region_id": "RU-CR",
+    "source": "import",
+    "user_id": "demo-2020-RU-CR-2",
+    "answers": {
+      "1": 5,
+      "2": "ok",
+      "3": "DEMO комментарий RU-CR #2"
+    }
+  },
+  {
+    "survey_year": 2020,
+    "region_id": "RU-CR",
+    "source": "import",
+    "user_id": "demo-2020-RU-CR-3",
+    "answers": {
+      "1": 2,
+      "2": "good",
+      "3": "DEMO комментарий RU-CR #3"
+    }
+  },
+  {
+    "survey_year": 2020,
+    "region_id": "RU-CR",
+    "source": "import",
+    "user_id": "demo-2020-RU-CR-4",
+    "answers": {
+      "1": 3,
+      "2": "great",
+      "3": "DEMO комментарий RU-CR #4"
+    }
+  },
+  {
+    "survey_year": 2020,
+    "region_id": "RU-CR",
+    "source": "import",
+    "user_id": "demo-2020-RU-CR-5",
+    "answers": {
+      "1": 4,
+      "2": "bad",
+      "3": "DEMO комментарий RU-CR #5"
+    }
+  },
+  {
+    "survey_year": 2020,
+    "region_id": "RU-CR",
+    "source": "import",
+    "user_id": "demo-2020-RU-CR-6",
+    "answers": {
+      "1": 5,
+      "2": "ok",
+      "3": "DEMO комментарий RU-CR #6"
+    }
+  },
+  {
+    "survey_year": 2020,
+    "region_id": "RU-CR",
+    "source": "import",
+    "user_id": "demo-2020-RU-CR-7",
+    "answers": {
+      "1": 2,
+      "2": "good",
+      "3": "DEMO комментарий RU-CR #7"
+    }
+  },
+  {
+    "survey_year": 2020,
+    "region_id": "RU-CR",
+    "source": "import",
+    "user_id": "demo-2020-RU-CR-8",
+    "answers": {
+      "1": 3,
+      "2": "great",
+      "3": "DEMO комментарий RU-CR #8"
+    }
+  },
+  {
+    "survey_year": 2020,
+    "region_id": "RU-CR",
+    "source": "import",
+    "user_id": "demo-2020-RU-CR-9",
+    "answers": {
+      "1": 4,
+      "2": "bad",
+      "3": "DEMO комментарий RU-CR #9"
+    }
+  },
+  {
+    "survey_year": 2020,
+    "region_id": "RU-KDA",
+    "source": "import",
+    "user_id": "demo-2020-RU-KDA-0",
+    "answers": {
+      "1": 2,
+      "2": "bad",
+      "3": "DEMO комментарий RU-KDA #0"
+    }
+  },
+  {
+    "survey_year": 2020,
+    "region_id": "RU-KDA",
+    "source": "import",
+    "user_id": "demo-2020-RU-KDA-1",
+    "answers": {
+      "1": 3,
+      "2": "ok",
+      "3": "DEMO комментарий RU-KDA #1"
+    }
+  },
+  {
+    "survey_year": 2020,
+    "region_id": "RU-KDA",
+    "source": "import",
+    "user_id": "demo-2020-RU-KDA-2",
+    "answers": {
+      "1": 4,
+      "2": "good",
+      "3": "DEMO комментарий RU-KDA #2"
+    }
+  },
+  {
+    "survey_year": 2020,
+    "region_id": "RU-KDA",
+    "source": "import",
+    "user_id": "demo-2020-RU-KDA-3",
+    "answers": {
+      "1": 5,
+      "2": "great",
+      "3": "DEMO комментарий RU-KDA #3"
+    }
+  },
+  {
+    "survey_year": 2020,
+    "region_id": "RU-KDA",
+    "source": "import",
+    "user_id": "demo-2020-RU-KDA-4",
+    "answers": {
+      "1": 2,
+      "2": "bad",
+      "3": "DEMO комментарий RU-KDA #4"
+    }
+  },
+  {
+    "survey_year": 2020,
+    "region_id": "RU-KDA",
+    "source": "import",
+    "user_id": "demo-2020-RU-KDA-5",
+    "answers": {
+      "1": 3,
+      "2": "ok",
+      "3": "DEMO комментарий RU-KDA #5"
+    }
+  },
+  {
+    "survey_year": 2020,
+    "region_id": "RU-KDA",
+    "source": "import",
+    "user_id": "demo-2020-RU-KDA-6",
+    "answers": {
+      "1": 4,
+      "2": "good",
+      "3": "DEMO комментарий RU-KDA #6"
+    }
+  },
+  {
+    "survey_year": 2020,
+    "region_id": "RU-KDA",
+    "source": "import",
+    "user_id": "demo-2020-RU-KDA-7",
+    "answers": {
+      "1": 5,
+      "2": "great",
+      "3": "DEMO комментарий RU-KDA #7"
+    }
+  },
+  {
+    "survey_year": 2020,
+    "region_id": "RU-KDA",
+    "source": "import",
+    "user_id": "demo-2020-RU-KDA-8",
+    "answers": {
+      "1": 2,
+      "2": "bad",
+      "3": "DEMO комментарий RU-KDA #8"
+    }
+  },
+  {
+    "survey_year": 2020,
+    "region_id": "RU-KDA",
+    "source": "import",
+    "user_id": "demo-2020-RU-KDA-9",
+    "answers": {
+      "1": 3,
+      "2": "ok",
+      "3": "DEMO комментарий RU-KDA #9"
+    }
+  },
+  {
+    "survey_year": 2020,
+    "region_id": "RU-NVS",
+    "source": "import",
+    "user_id": "demo-2020-RU-NVS-0",
+    "answers": {
+      "1": 5,
+      "2": "ok",
+      "3": "DEMO комментарий RU-NVS #0"
+    }
+  },
+  {
+    "survey_year": 2020,
+    "region_id": "RU-NVS",
+    "source": "import",
+    "user_id": "demo-2020-RU-NVS-1",
+    "answers": {
+      "1": 2,
+      "2": "good",
+      "3": "DEMO комментарий RU-NVS #1"
+    }
+  },
+  {
+    "survey_year": 2020,
+    "region_id": "RU-NVS",
+    "source": "import",
+    "user_id": "demo-2020-RU-NVS-2",
+    "answers": {
+      "1": 3,
+      "2": "great",
+      "3": "DEMO комментарий RU-NVS #2"
+    }
+  },
+  {
+    "survey_year": 2020,
+    "region_id": "RU-NVS",
+    "source": "import",
+    "user_id": "demo-2020-RU-NVS-3",
+    "answers": {
+      "1": 4,
+      "2": "bad",
+      "3": "DEMO комментарий RU-NVS #3"
+    }
+  },
+  {
+    "survey_year": 2020,
+    "region_id": "RU-NVS",
+    "source": "import",
+    "user_id": "demo-2020-RU-NVS-4",
+    "answers": {
+      "1": 5,
+      "2": "ok",
+      "3": "DEMO комментарий RU-NVS #4"
+    }
+  },
+  {
+    "survey_year": 2020,
+    "region_id": "RU-NVS",
+    "source": "import",
+    "user_id": "demo-2020-RU-NVS-5",
+    "answers": {
+      "1": 2,
+      "2": "good",
+      "3": "DEMO комментарий RU-NVS #5"
+    }
+  },
+  {
+    "survey_year": 2020,
+    "region_id": "RU-NVS",
+    "source": "import",
+    "user_id": "demo-2020-RU-NVS-6",
+    "answers": {
+      "1": 3,
+      "2": "great",
+      "3": "DEMO комментарий RU-NVS #6"
+    }
+  },
+  {
+    "survey_year": 2020,
+    "region_id": "RU-NVS",
+    "source": "import",
+    "user_id": "demo-2020-RU-NVS-7",
+    "answers": {
+      "1": 4,
+      "2": "bad",
+      "3": "DEMO комментарий RU-NVS #7"
+    }
+  },
+  {
+    "survey_year": 2020,
+    "region_id": "RU-NVS",
+    "source": "import",
+    "user_id": "demo-2020-RU-NVS-8",
+    "answers": {
+      "1": 5,
+      "2": "ok",
+      "3": "DEMO комментарий RU-NVS #8"
+    }
+  },
+  {
+    "survey_year": 2020,
+    "region_id": "RU-NVS",
+    "source": "import",
+    "user_id": "demo-2020-RU-NVS-9",
+    "answers": {
+      "1": 2,
+      "2": "good",
+      "3": "DEMO комментарий RU-NVS #9"
+    }
+  },
+  {
+    "survey_year": 2022,
+    "region_id": "RU-MOW",
+    "source": "import",
+    "user_id": "demo-2022-RU-MOW-0",
+    "answers": {
+      "1": 4,
+      "2": "good",
+      "3": "DEMO комментарий RU-MOW #0"
+    }
+  },
+  {
+    "survey_year": 2022,
+    "region_id": "RU-MOW",
+    "source": "import",
+    "user_id": "demo-2022-RU-MOW-1",
+    "answers": {
+      "1": 5,
+      "2": "great",
+      "3": "DEMO комментарий RU-MOW #1"
+    }
+  },
+  {
+    "survey_year": 2022,
+    "region_id": "RU-MOW",
+    "source": "import",
+    "user_id": "demo-2022-RU-MOW-2",
+    "answers": {
+      "1": 2,
+      "2": "bad",
+      "3": "DEMO комментарий RU-MOW #2"
+    }
+  },
+  {
+    "survey_year": 2022,
+    "region_id": "RU-MOW",
+    "source": "import",
+    "user_id": "demo-2022-RU-MOW-3",
+    "answers": {
+      "1": 3,
+      "2": "ok",
+      "3": "DEMO комментарий RU-MOW #3"
+    }
+  },
+  {
+    "survey_year": 2022,
+    "region_id": "RU-MOW",
+    "source": "import",
+    "user_id": "demo-2022-RU-MOW-4",
+    "answers": {
+      "1": 4,
+      "2": "good",
+      "3": "DEMO комментарий RU-MOW #4"
+    }
+  },
+  {
+    "survey_year": 2022,
+    "region_id": "RU-MOW",
+    "source": "import",
+    "user_id": "demo-2022-RU-MOW-5",
+    "answers": {
+      "1": 5,
+      "2": "great",
+      "3": "DEMO комментарий RU-MOW #5"
+    }
+  },
+  {
+    "survey_year": 2022,
+    "region_id": "RU-MOW",
+    "source": "import",
+    "user_id": "demo-2022-RU-MOW-6",
+    "answers": {
+      "1": 2,
+      "2": "bad",
+      "3": "DEMO комментарий RU-MOW #6"
+    }
+  },
+  {
+    "survey_year": 2022,
+    "region_id": "RU-MOW",
+    "source": "import",
+    "user_id": "demo-2022-RU-MOW-7",
+    "answers": {
+      "1": 3,
+      "2": "ok",
+      "3": "DEMO комментарий RU-MOW #7"
+    }
+  },
+  {
+    "survey_year": 2022,
+    "region_id": "RU-MOW",
+    "source": "import",
+    "user_id": "demo-2022-RU-MOW-8",
+    "answers": {
+      "1": 4,
+      "2": "good",
+      "3": "DEMO комментарий RU-MOW #8"
+    }
+  },
+  {
+    "survey_year": 2022,
+    "region_id": "RU-MOW",
+    "source": "import",
+    "user_id": "demo-2022-RU-MOW-9",
+    "answers": {
+      "1": 5,
+      "2": "great",
+      "3": "DEMO комментарий RU-MOW #9"
+    }
+  },
+  {
+    "survey_year": 2022,
+    "region_id": "RU-SPE",
+    "source": "import",
+    "user_id": "demo-2022-RU-SPE-0",
+    "answers": {
+      "1": 3,
+      "2": "great",
+      "3": "DEMO комментарий RU-SPE #0"
+    }
+  },
+  {
+    "survey_year": 2022,
+    "region_id": "RU-SPE",
+    "source": "import",
+    "user_id": "demo-2022-RU-SPE-1",
+    "answers": {
+      "1": 4,
+      "2": "bad",
+      "3": "DEMO комментарий RU-SPE #1"
+    }
+  },
+  {
+    "survey_year": 2022,
+    "region_id": "RU-SPE",
+    "source": "import",
+    "user_id": "demo-2022-RU-SPE-2",
+    "answers": {
+      "1": 5,
+      "2": "ok",
+      "3": "DEMO комментарий RU-SPE #2"
+    }
+  },
+  {
+    "survey_year": 2022,
+    "region_id": "RU-SPE",
+    "source": "import",
+    "user_id": "demo-2022-RU-SPE-3",
+    "answers": {
+      "1": 2,
+      "2": "good",
+      "3": "DEMO комментарий RU-SPE #3"
+    }
+  },
+  {
+    "survey_year": 2022,
+    "region_id": "RU-SPE",
+    "source": "import",
+    "user_id": "demo-2022-RU-SPE-4",
+    "answers": {
+      "1": 3,
+      "2": "great",
+      "3": "DEMO комментарий RU-SPE #4"
+    }
+  },
+  {
+    "survey_year": 2022,
+    "region_id": "RU-SPE",
+    "source": "import",
+    "user_id": "demo-2022-RU-SPE-5",
+    "answers": {
+      "1": 4,
+      "2": "bad",
+      "3": "DEMO комментарий RU-SPE #5"
+    }
+  },
+  {
+    "survey_year": 2022,
+    "region_id": "RU-SPE",
+    "source": "import",
+    "user_id": "demo-2022-RU-SPE-6",
+    "answers": {
+      "1": 5,
+      "2": "ok",
+      "3": "DEMO комментарий RU-SPE #6"
+    }
+  },
+  {
+    "survey_year": 2022,
+    "region_id": "RU-SPE",
+    "source": "import",
+    "user_id": "demo-2022-RU-SPE-7",
+    "answers": {
+      "1": 2,
+      "2": "good",
+      "3": "DEMO комментарий RU-SPE #7"
+    }
+  },
+  {
+    "survey_year": 2022,
+    "region_id": "RU-SPE",
+    "source": "import",
+    "user_id": "demo-2022-RU-SPE-8",
+    "answers": {
+      "1": 3,
+      "2": "great",
+      "3": "DEMO комментарий RU-SPE #8"
+    }
+  },
+  {
+    "survey_year": 2022,
+    "region_id": "RU-SPE",
+    "source": "import",
+    "user_id": "demo-2022-RU-SPE-9",
+    "answers": {
+      "1": 4,
+      "2": "bad",
+      "3": "DEMO комментарий RU-SPE #9"
+    }
+  },
+  {
+    "survey_year": 2022,
+    "region_id": "RU-TA",
+    "source": "import",
+    "user_id": "demo-2022-RU-TA-0",
+    "answers": {
+      "1": 2,
+      "2": "bad",
+      "3": "DEMO комментарий RU-TA #0"
+    }
+  },
+  {
+    "survey_year": 2022,
+    "region_id": "RU-TA",
+    "source": "import",
+    "user_id": "demo-2022-RU-TA-1",
+    "answers": {
+      "1": 3,
+      "2": "ok",
+      "3": "DEMO комментарий RU-TA #1"
+    }
+  },
+  {
+    "survey_year": 2022,
+    "region_id": "RU-TA",
+    "source": "import",
+    "user_id": "demo-2022-RU-TA-2",
+    "answers": {
+      "1": 4,
+      "2": "good",
+      "3": "DEMO комментарий RU-TA #2"
+    }
+  },
+  {
+    "survey_year": 2022,
+    "region_id": "RU-TA",
+    "source": "import",
+    "user_id": "demo-2022-RU-TA-3",
+    "answers": {
+      "1": 5,
+      "2": "great",
+      "3": "DEMO комментарий RU-TA #3"
+    }
+  },
+  {
+    "survey_year": 2022,
+    "region_id": "RU-TA",
+    "source": "import",
+    "user_id": "demo-2022-RU-TA-4",
+    "answers": {
+      "1": 2,
+      "2": "bad",
+      "3": "DEMO комментарий RU-TA #4"
+    }
+  },
+  {
+    "survey_year": 2022,
+    "region_id": "RU-TA",
+    "source": "import",
+    "user_id": "demo-2022-RU-TA-5",
+    "answers": {
+      "1": 3,
+      "2": "ok",
+      "3": "DEMO комментарий RU-TA #5"
+    }
+  },
+  {
+    "survey_year": 2022,
+    "region_id": "RU-TA",
+    "source": "import",
+    "user_id": "demo-2022-RU-TA-6",
+    "answers": {
+      "1": 4,
+      "2": "good",
+      "3": "DEMO комментарий RU-TA #6"
+    }
+  },
+  {
+    "survey_year": 2022,
+    "region_id": "RU-TA",
+    "source": "import",
+    "user_id": "demo-2022-RU-TA-7",
+    "answers": {
+      "1": 5,
+      "2": "great",
+      "3": "DEMO комментарий RU-TA #7"
+    }
+  },
+  {
+    "survey_year": 2022,
+    "region_id": "RU-TA",
+    "source": "import",
+    "user_id": "demo-2022-RU-TA-8",
+    "answers": {
+      "1": 2,
+      "2": "bad",
+      "3": "DEMO комментарий RU-TA #8"
+    }
+  },
+  {
+    "survey_year": 2022,
+    "region_id": "RU-TA",
+    "source": "import",
+    "user_id": "demo-2022-RU-TA-9",
+    "answers": {
+      "1": 3,
+      "2": "ok",
+      "3": "DEMO комментарий RU-TA #9"
+    }
+  },
+  {
+    "survey_year": 2022,
+    "region_id": "RU-CR",
+    "source": "import",
+    "user_id": "demo-2022-RU-CR-0",
+    "answers": {
+      "1": 5,
+      "2": "ok",
+      "3": "DEMO комментарий RU-CR #0"
+    }
+  },
+  {
+    "survey_year": 2022,
+    "region_id": "RU-CR",
+    "source": "import",
+    "user_id": "demo-2022-RU-CR-1",
+    "answers": {
+      "1": 2,
+      "2": "good",
+      "3": "DEMO комментарий RU-CR #1"
+    }
+  },
+  {
+    "survey_year": 2022,
+    "region_id": "RU-CR",
+    "source": "import",
+    "user_id": "demo-2022-RU-CR-2",
+    "answers": {
+      "1": 3,
+      "2": "great",
+      "3": "DEMO комментарий RU-CR #2"
+    }
+  },
+  {
+    "survey_year": 2022,
+    "region_id": "RU-CR",
+    "source": "import",
+    "user_id": "demo-2022-RU-CR-3",
+    "answers": {
+      "1": 4,
+      "2": "bad",
+      "3": "DEMO комментарий RU-CR #3"
+    }
+  },
+  {
+    "survey_year": 2022,
+    "region_id": "RU-CR",
+    "source": "import",
+    "user_id": "demo-2022-RU-CR-4",
+    "answers": {
+      "1": 5,
+      "2": "ok",
+      "3": "DEMO комментарий RU-CR #4"
+    }
+  },
+  {
+    "survey_year": 2022,
+    "region_id": "RU-CR",
+    "source": "import",
+    "user_id": "demo-2022-RU-CR-5",
+    "answers": {
+      "1": 2,
+      "2": "good",
+      "3": "DEMO комментарий RU-CR #5"
+    }
+  },
+  {
+    "survey_year": 2022,
+    "region_id": "RU-CR",
+    "source": "import",
+    "user_id": "demo-2022-RU-CR-6",
+    "answers": {
+      "1": 3,
+      "2": "great",
+      "3": "DEMO комментарий RU-CR #6"
+    }
+  },
+  {
+    "survey_year": 2022,
+    "region_id": "RU-CR",
+    "source": "import",
+    "user_id": "demo-2022-RU-CR-7",
+    "answers": {
+      "1": 4,
+      "2": "bad",
+      "3": "DEMO комментарий RU-CR #7"
+    }
+  },
+  {
+    "survey_year": 2022,
+    "region_id": "RU-CR",
+    "source": "import",
+    "user_id": "demo-2022-RU-CR-8",
+    "answers": {
+      "1": 5,
+      "2": "ok",
+      "3": "DEMO комментарий RU-CR #8"
+    }
+  },
+  {
+    "survey_year": 2022,
+    "region_id": "RU-CR",
+    "source": "import",
+    "user_id": "demo-2022-RU-CR-9",
+    "answers": {
+      "1": 2,
+      "2": "good",
+      "3": "DEMO комментарий RU-CR #9"
+    }
+  },
+  {
+    "survey_year": 2022,
+    "region_id": "RU-KDA",
+    "source": "import",
+    "user_id": "demo-2022-RU-KDA-0",
+    "answers": {
+      "1": 4,
+      "2": "good",
+      "3": "DEMO комментарий RU-KDA #0"
+    }
+  },
+  {
+    "survey_year": 2022,
+    "region_id": "RU-KDA",
+    "source": "import",
+    "user_id": "demo-2022-RU-KDA-1",
+    "answers": {
+      "1": 5,
+      "2": "great",
+      "3": "DEMO комментарий RU-KDA #1"
+    }
+  },
+  {
+    "survey_year": 2022,
+    "region_id": "RU-KDA",
+    "source": "import",
+    "user_id": "demo-2022-RU-KDA-2",
+    "answers": {
+      "1": 2,
+      "2": "bad",
+      "3": "DEMO комментарий RU-KDA #2"
+    }
+  },
+  {
+    "survey_year": 2022,
+    "region_id": "RU-KDA",
+    "source": "import",
+    "user_id": "demo-2022-RU-KDA-3",
+    "answers": {
+      "1": 3,
+      "2": "ok",
+      "3": "DEMO комментарий RU-KDA #3"
+    }
+  },
+  {
+    "survey_year": 2022,
+    "region_id": "RU-KDA",
+    "source": "import",
+    "user_id": "demo-2022-RU-KDA-4",
+    "answers": {
+      "1": 4,
+      "2": "good",
+      "3": "DEMO комментарий RU-KDA #4"
+    }
+  },
+  {
+    "survey_year": 2022,
+    "region_id": "RU-KDA",
+    "source": "import",
+    "user_id": "demo-2022-RU-KDA-5",
+    "answers": {
+      "1": 5,
+      "2": "great",
+      "3": "DEMO комментарий RU-KDA #5"
+    }
+  },
+  {
+    "survey_year": 2022,
+    "region_id": "RU-KDA",
+    "source": "import",
+    "user_id": "demo-2022-RU-KDA-6",
+    "answers": {
+      "1": 2,
+      "2": "bad",
+      "3": "DEMO комментарий RU-KDA #6"
+    }
+  },
+  {
+    "survey_year": 2022,
+    "region_id": "RU-KDA",
+    "source": "import",
+    "user_id": "demo-2022-RU-KDA-7",
+    "answers": {
+      "1": 3,
+      "2": "ok",
+      "3": "DEMO комментарий RU-KDA #7"
+    }
+  },
+  {
+    "survey_year": 2022,
+    "region_id": "RU-KDA",
+    "source": "import",
+    "user_id": "demo-2022-RU-KDA-8",
+    "answers": {
+      "1": 4,
+      "2": "good",
+      "3": "DEMO комментарий RU-KDA #8"
+    }
+  },
+  {
+    "survey_year": 2022,
+    "region_id": "RU-KDA",
+    "source": "import",
+    "user_id": "demo-2022-RU-KDA-9",
+    "answers": {
+      "1": 5,
+      "2": "great",
+      "3": "DEMO комментарий RU-KDA #9"
+    }
+  },
+  {
+    "survey_year": 2022,
+    "region_id": "RU-NVS",
+    "source": "import",
+    "user_id": "demo-2022-RU-NVS-0",
+    "answers": {
+      "1": 3,
+      "2": "great",
+      "3": "DEMO комментарий RU-NVS #0"
+    }
+  },
+  {
+    "survey_year": 2022,
+    "region_id": "RU-NVS",
+    "source": "import",
+    "user_id": "demo-2022-RU-NVS-1",
+    "answers": {
+      "1": 4,
+      "2": "bad",
+      "3": "DEMO комментарий RU-NVS #1"
+    }
+  },
+  {
+    "survey_year": 2022,
+    "region_id": "RU-NVS",
+    "source": "import",
+    "user_id": "demo-2022-RU-NVS-2",
+    "answers": {
+      "1": 5,
+      "2": "ok",
+      "3": "DEMO комментарий RU-NVS #2"
+    }
+  },
+  {
+    "survey_year": 2022,
+    "region_id": "RU-NVS",
+    "source": "import",
+    "user_id": "demo-2022-RU-NVS-3",
+    "answers": {
+      "1": 2,
+      "2": "good",
+      "3": "DEMO комментарий RU-NVS #3"
+    }
+  },
+  {
+    "survey_year": 2022,
+    "region_id": "RU-NVS",
+    "source": "import",
+    "user_id": "demo-2022-RU-NVS-4",
+    "answers": {
+      "1": 3,
+      "2": "great",
+      "3": "DEMO комментарий RU-NVS #4"
+    }
+  },
+  {
+    "survey_year": 2022,
+    "region_id": "RU-NVS",
+    "source": "import",
+    "user_id": "demo-2022-RU-NVS-5",
+    "answers": {
+      "1": 4,
+      "2": "bad",
+      "3": "DEMO комментарий RU-NVS #5"
+    }
+  },
+  {
+    "survey_year": 2022,
+    "region_id": "RU-NVS",
+    "source": "import",
+    "user_id": "demo-2022-RU-NVS-6",
+    "answers": {
+      "1": 5,
+      "2": "ok",
+      "3": "DEMO комментарий RU-NVS #6"
+    }
+  },
+  {
+    "survey_year": 2022,
+    "region_id": "RU-NVS",
+    "source": "import",
+    "user_id": "demo-2022-RU-NVS-7",
+    "answers": {
+      "1": 2,
+      "2": "good",
+      "3": "DEMO комментарий RU-NVS #7"
+    }
+  },
+  {
+    "survey_year": 2022,
+    "region_id": "RU-NVS",
+    "source": "import",
+    "user_id": "demo-2022-RU-NVS-8",
+    "answers": {
+      "1": 3,
+      "2": "great",
+      "3": "DEMO комментарий RU-NVS #8"
+    }
+  },
+  {
+    "survey_year": 2022,
+    "region_id": "RU-NVS",
+    "source": "import",
+    "user_id": "demo-2022-RU-NVS-9",
+    "answers": {
+      "1": 4,
+      "2": "bad",
+      "3": "DEMO комментарий RU-NVS #9"
+    }
+  },
+  {
+    "survey_year": 2024,
+    "region_id": "RU-MOW",
+    "source": "import",
+    "user_id": "demo-2024-RU-MOW-0",
+    "answers": {
+      "1": 2,
+      "2": "bad",
+      "3": "DEMO комментарий RU-MOW #0"
+    }
+  },
+  {
+    "survey_year": 2024,
+    "region_id": "RU-MOW",
+    "source": "import",
+    "user_id": "demo-2024-RU-MOW-1",
+    "answers": {
+      "1": 3,
+      "2": "ok",
+      "3": "DEMO комментарий RU-MOW #1"
+    }
+  },
+  {
+    "survey_year": 2024,
+    "region_id": "RU-MOW",
+    "source": "import",
+    "user_id": "demo-2024-RU-MOW-2",
+    "answers": {
+      "1": 4,
+      "2": "good",
+      "3": "DEMO комментарий RU-MOW #2"
+    }
+  },
+  {
+    "survey_year": 2024,
+    "region_id": "RU-MOW",
+    "source": "import",
+    "user_id": "demo-2024-RU-MOW-3",
+    "answers": {
+      "1": 5,
+      "2": "great",
+      "3": "DEMO комментарий RU-MOW #3"
+    }
+  },
+  {
+    "survey_year": 2024,
+    "region_id": "RU-MOW",
+    "source": "import",
+    "user_id": "demo-2024-RU-MOW-4",
+    "answers": {
+      "1": 2,
+      "2": "bad",
+      "3": "DEMO комментарий RU-MOW #4"
+    }
+  },
+  {
+    "survey_year": 2024,
+    "region_id": "RU-MOW",
+    "source": "import",
+    "user_id": "demo-2024-RU-MOW-5",
+    "answers": {
+      "1": 3,
+      "2": "ok",
+      "3": "DEMO комментарий RU-MOW #5"
+    }
+  },
+  {
+    "survey_year": 2024,
+    "region_id": "RU-MOW",
+    "source": "import",
+    "user_id": "demo-2024-RU-MOW-6",
+    "answers": {
+      "1": 4,
+      "2": "good",
+      "3": "DEMO комментарий RU-MOW #6"
+    }
+  },
+  {
+    "survey_year": 2024,
+    "region_id": "RU-MOW",
+    "source": "import",
+    "user_id": "demo-2024-RU-MOW-7",
+    "answers": {
+      "1": 5,
+      "2": "great",
+      "3": "DEMO комментарий RU-MOW #7"
+    }
+  },
+  {
+    "survey_year": 2024,
+    "region_id": "RU-MOW",
+    "source": "import",
+    "user_id": "demo-2024-RU-MOW-8",
+    "answers": {
+      "1": 2,
+      "2": "bad",
+      "3": "DEMO комментарий RU-MOW #8"
+    }
+  },
+  {
+    "survey_year": 2024,
+    "region_id": "RU-MOW",
+    "source": "import",
+    "user_id": "demo-2024-RU-MOW-9",
+    "answers": {
+      "1": 3,
+      "2": "ok",
+      "3": "DEMO комментарий RU-MOW #9"
+    }
+  },
+  {
+    "survey_year": 2024,
+    "region_id": "RU-SPE",
+    "source": "import",
+    "user_id": "demo-2024-RU-SPE-0",
+    "answers": {
+      "1": 5,
+      "2": "ok",
+      "3": "DEMO комментарий RU-SPE #0"
+    }
+  },
+  {
+    "survey_year": 2024,
+    "region_id": "RU-SPE",
+    "source": "import",
+    "user_id": "demo-2024-RU-SPE-1",
+    "answers": {
+      "1": 2,
+      "2": "good",
+      "3": "DEMO комментарий RU-SPE #1"
+    }
+  },
+  {
+    "survey_year": 2024,
+    "region_id": "RU-SPE",
+    "source": "import",
+    "user_id": "demo-2024-RU-SPE-2",
+    "answers": {
+      "1": 3,
+      "2": "great",
+      "3": "DEMO комментарий RU-SPE #2"
+    }
+  },
+  {
+    "survey_year": 2024,
+    "region_id": "RU-SPE",
+    "source": "import",
+    "user_id": "demo-2024-RU-SPE-3",
+    "answers": {
+      "1": 4,
+      "2": "bad",
+      "3": "DEMO комментарий RU-SPE #3"
+    }
+  },
+  {
+    "survey_year": 2024,
+    "region_id": "RU-SPE",
+    "source": "import",
+    "user_id": "demo-2024-RU-SPE-4",
+    "answers": {
+      "1": 5,
+      "2": "ok",
+      "3": "DEMO комментарий RU-SPE #4"
+    }
+  },
+  {
+    "survey_year": 2024,
+    "region_id": "RU-SPE",
+    "source": "import",
+    "user_id": "demo-2024-RU-SPE-5",
+    "answers": {
+      "1": 2,
+      "2": "good",
+      "3": "DEMO комментарий RU-SPE #5"
+    }
+  },
+  {
+    "survey_year": 2024,
+    "region_id": "RU-SPE",
+    "source": "import",
+    "user_id": "demo-2024-RU-SPE-6",
+    "answers": {
+      "1": 3,
+      "2": "great",
+      "3": "DEMO комментарий RU-SPE #6"
+    }
+  },
+  {
+    "survey_year": 2024,
+    "region_id": "RU-SPE",
+    "source": "import",
+    "user_id": "demo-2024-RU-SPE-7",
+    "answers": {
+      "1": 4,
+      "2": "bad",
+      "3": "DEMO комментарий RU-SPE #7"
+    }
+  },
+  {
+    "survey_year": 2024,
+    "region_id": "RU-SPE",
+    "source": "import",
+    "user_id": "demo-2024-RU-SPE-8",
+    "answers": {
+      "1": 5,
+      "2": "ok",
+      "3": "DEMO комментарий RU-SPE #8"
+    }
+  },
+  {
+    "survey_year": 2024,
+    "region_id": "RU-SPE",
+    "source": "import",
+    "user_id": "demo-2024-RU-SPE-9",
+    "answers": {
+      "1": 2,
+      "2": "good",
+      "3": "DEMO комментарий RU-SPE #9"
+    }
+  },
+  {
+    "survey_year": 2024,
+    "region_id": "RU-TA",
+    "source": "import",
+    "user_id": "demo-2024-RU-TA-0",
+    "answers": {
+      "1": 4,
+      "2": "good",
+      "3": "DEMO комментарий RU-TA #0"
+    }
+  },
+  {
+    "survey_year": 2024,
+    "region_id": "RU-TA",
+    "source": "import",
+    "user_id": "demo-2024-RU-TA-1",
+    "answers": {
+      "1": 5,
+      "2": "great",
+      "3": "DEMO комментарий RU-TA #1"
+    }
+  },
+  {
+    "survey_year": 2024,
+    "region_id": "RU-TA",
+    "source": "import",
+    "user_id": "demo-2024-RU-TA-2",
+    "answers": {
+      "1": 2,
+      "2": "bad",
+      "3": "DEMO комментарий RU-TA #2"
+    }
+  },
+  {
+    "survey_year": 2024,
+    "region_id": "RU-TA",
+    "source": "import",
+    "user_id": "demo-2024-RU-TA-3",
+    "answers": {
+      "1": 3,
+      "2": "ok",
+      "3": "DEMO комментарий RU-TA #3"
+    }
+  },
+  {
+    "survey_year": 2024,
+    "region_id": "RU-TA",
+    "source": "import",
+    "user_id": "demo-2024-RU-TA-4",
+    "answers": {
+      "1": 4,
+      "2": "good",
+      "3": "DEMO комментарий RU-TA #4"
+    }
+  },
+  {
+    "survey_year": 2024,
+    "region_id": "RU-TA",
+    "source": "import",
+    "user_id": "demo-2024-RU-TA-5",
+    "answers": {
+      "1": 5,
+      "2": "great",
+      "3": "DEMO комментарий RU-TA #5"
+    }
+  },
+  {
+    "survey_year": 2024,
+    "region_id": "RU-TA",
+    "source": "import",
+    "user_id": "demo-2024-RU-TA-6",
+    "answers": {
+      "1": 2,
+      "2": "bad",
+      "3": "DEMO комментарий RU-TA #6"
+    }
+  },
+  {
+    "survey_year": 2024,
+    "region_id": "RU-TA",
+    "source": "import",
+    "user_id": "demo-2024-RU-TA-7",
+    "answers": {
+      "1": 3,
+      "2": "ok",
+      "3": "DEMO комментарий RU-TA #7"
+    }
+  },
+  {
+    "survey_year": 2024,
+    "region_id": "RU-TA",
+    "source": "import",
+    "user_id": "demo-2024-RU-TA-8",
+    "answers": {
+      "1": 4,
+      "2": "good",
+      "3": "DEMO комментарий RU-TA #8"
+    }
+  },
+  {
+    "survey_year": 2024,
+    "region_id": "RU-TA",
+    "source": "import",
+    "user_id": "demo-2024-RU-TA-9",
+    "answers": {
+      "1": 5,
+      "2": "great",
+      "3": "DEMO комментарий RU-TA #9"
+    }
+  },
+  {
+    "survey_year": 2024,
+    "region_id": "RU-CR",
+    "source": "import",
+    "user_id": "demo-2024-RU-CR-0",
+    "answers": {
+      "1": 3,
+      "2": "great",
+      "3": "DEMO комментарий RU-CR #0"
+    }
+  },
+  {
+    "survey_year": 2024,
+    "region_id": "RU-CR",
+    "source": "import",
+    "user_id": "demo-2024-RU-CR-1",
+    "answers": {
+      "1": 4,
+      "2": "bad",
+      "3": "DEMO комментарий RU-CR #1"
+    }
+  },
+  {
+    "survey_year": 2024,
+    "region_id": "RU-CR",
+    "source": "import",
+    "user_id": "demo-2024-RU-CR-2",
+    "answers": {
+      "1": 5,
+      "2": "ok",
+      "3": "DEMO комментарий RU-CR #2"
+    }
+  },
+  {
+    "survey_year": 2024,
+    "region_id": "RU-CR",
+    "source": "import",
+    "user_id": "demo-2024-RU-CR-3",
+    "answers": {
+      "1": 2,
+      "2": "good",
+      "3": "DEMO комментарий RU-CR #3"
+    }
+  },
+  {
+    "survey_year": 2024,
+    "region_id": "RU-CR",
+    "source": "import",
+    "user_id": "demo-2024-RU-CR-4",
+    "answers": {
+      "1": 3,
+      "2": "great",
+      "3": "DEMO комментарий RU-CR #4"
+    }
+  },
+  {
+    "survey_year": 2024,
+    "region_id": "RU-CR",
+    "source": "import",
+    "user_id": "demo-2024-RU-CR-5",
+    "answers": {
+      "1": 4,
+      "2": "bad",
+      "3": "DEMO комментарий RU-CR #5"
+    }
+  },
+  {
+    "survey_year": 2024,
+    "region_id": "RU-CR",
+    "source": "import",
+    "user_id": "demo-2024-RU-CR-6",
+    "answers": {
+      "1": 5,
+      "2": "ok",
+      "3": "DEMO комментарий RU-CR #6"
+    }
+  },
+  {
+    "survey_year": 2024,
+    "region_id": "RU-CR",
+    "source": "import",
+    "user_id": "demo-2024-RU-CR-7",
+    "answers": {
+      "1": 2,
+      "2": "good",
+      "3": "DEMO комментарий RU-CR #7"
+    }
+  },
+  {
+    "survey_year": 2024,
+    "region_id": "RU-CR",
+    "source": "import",
+    "user_id": "demo-2024-RU-CR-8",
+    "answers": {
+      "1": 3,
+      "2": "great",
+      "3": "DEMO комментарий RU-CR #8"
+    }
+  },
+  {
+    "survey_year": 2024,
+    "region_id": "RU-CR",
+    "source": "import",
+    "user_id": "demo-2024-RU-CR-9",
+    "answers": {
+      "1": 4,
+      "2": "bad",
+      "3": "DEMO комментарий RU-CR #9"
+    }
+  },
+  {
+    "survey_year": 2024,
+    "region_id": "RU-KDA",
+    "source": "import",
+    "user_id": "demo-2024-RU-KDA-0",
+    "answers": {
+      "1": 2,
+      "2": "bad",
+      "3": "DEMO комментарий RU-KDA #0"
+    }
+  },
+  {
+    "survey_year": 2024,
+    "region_id": "RU-KDA",
+    "source": "import",
+    "user_id": "demo-2024-RU-KDA-1",
+    "answers": {
+      "1": 3,
+      "2": "ok",
+      "3": "DEMO комментарий RU-KDA #1"
+    }
+  },
+  {
+    "survey_year": 2024,
+    "region_id": "RU-KDA",
+    "source": "import",
+    "user_id": "demo-2024-RU-KDA-2",
+    "answers": {
+      "1": 4,
+      "2": "good",
+      "3": "DEMO комментарий RU-KDA #2"
+    }
+  },
+  {
+    "survey_year": 2024,
+    "region_id": "RU-KDA",
+    "source": "import",
+    "user_id": "demo-2024-RU-KDA-3",
+    "answers": {
+      "1": 5,
+      "2": "great",
+      "3": "DEMO комментарий RU-KDA #3"
+    }
+  },
+  {
+    "survey_year": 2024,
+    "region_id": "RU-KDA",
+    "source": "import",
+    "user_id": "demo-2024-RU-KDA-4",
+    "answers": {
+      "1": 2,
+      "2": "bad",
+      "3": "DEMO комментарий RU-KDA #4"
+    }
+  },
+  {
+    "survey_year": 2024,
+    "region_id": "RU-KDA",
+    "source": "import",
+    "user_id": "demo-2024-RU-KDA-5",
+    "answers": {
+      "1": 3,
+      "2": "ok",
+      "3": "DEMO комментарий RU-KDA #5"
+    }
+  },
+  {
+    "survey_year": 2024,
+    "region_id": "RU-KDA",
+    "source": "import",
+    "user_id": "demo-2024-RU-KDA-6",
+    "answers": {
+      "1": 4,
+      "2": "good",
+      "3": "DEMO комментарий RU-KDA #6"
+    }
+  },
+  {
+    "survey_year": 2024,
+    "region_id": "RU-KDA",
+    "source": "import",
+    "user_id": "demo-2024-RU-KDA-7",
+    "answers": {
+      "1": 5,
+      "2": "great",
+      "3": "DEMO комментарий RU-KDA #7"
+    }
+  },
+  {
+    "survey_year": 2024,
+    "region_id": "RU-KDA",
+    "source": "import",
+    "user_id": "demo-2024-RU-KDA-8",
+    "answers": {
+      "1": 2,
+      "2": "bad",
+      "3": "DEMO комментарий RU-KDA #8"
+    }
+  },
+  {
+    "survey_year": 2024,
+    "region_id": "RU-KDA",
+    "source": "import",
+    "user_id": "demo-2024-RU-KDA-9",
+    "answers": {
+      "1": 3,
+      "2": "ok",
+      "3": "DEMO комментарий RU-KDA #9"
+    }
+  },
+  {
+    "survey_year": 2024,
+    "region_id": "RU-NVS",
+    "source": "import",
+    "user_id": "demo-2024-RU-NVS-0",
+    "answers": {
+      "1": 5,
+      "2": "ok",
+      "3": "DEMO комментарий RU-NVS #0"
+    }
+  },
+  {
+    "survey_year": 2024,
+    "region_id": "RU-NVS",
+    "source": "import",
+    "user_id": "demo-2024-RU-NVS-1",
+    "answers": {
+      "1": 2,
+      "2": "good",
+      "3": "DEMO комментарий RU-NVS #1"
+    }
+  },
+  {
+    "survey_year": 2024,
+    "region_id": "RU-NVS",
+    "source": "import",
+    "user_id": "demo-2024-RU-NVS-2",
+    "answers": {
+      "1": 3,
+      "2": "great",
+      "3": "DEMO комментарий RU-NVS #2"
+    }
+  },
+  {
+    "survey_year": 2024,
+    "region_id": "RU-NVS",
+    "source": "import",
+    "user_id": "demo-2024-RU-NVS-3",
+    "answers": {
+      "1": 4,
+      "2": "bad",
+      "3": "DEMO комментарий RU-NVS #3"
+    }
+  },
+  {
+    "survey_year": 2024,
+    "region_id": "RU-NVS",
+    "source": "import",
+    "user_id": "demo-2024-RU-NVS-4",
+    "answers": {
+      "1": 5,
+      "2": "ok",
+      "3": "DEMO комментарий RU-NVS #4"
+    }
+  },
+  {
+    "survey_year": 2024,
+    "region_id": "RU-NVS",
+    "source": "import",
+    "user_id": "demo-2024-RU-NVS-5",
+    "answers": {
+      "1": 2,
+      "2": "good",
+      "3": "DEMO комментарий RU-NVS #5"
+    }
+  },
+  {
+    "survey_year": 2024,
+    "region_id": "RU-NVS",
+    "source": "import",
+    "user_id": "demo-2024-RU-NVS-6",
+    "answers": {
+      "1": 3,
+      "2": "great",
+      "3": "DEMO комментарий RU-NVS #6"
+    }
+  },
+  {
+    "survey_year": 2024,
+    "region_id": "RU-NVS",
+    "source": "import",
+    "user_id": "demo-2024-RU-NVS-7",
+    "answers": {
+      "1": 4,
+      "2": "bad",
+      "3": "DEMO комментарий RU-NVS #7"
+    }
+  },
+  {
+    "survey_year": 2024,
+    "region_id": "RU-NVS",
+    "source": "import",
+    "user_id": "demo-2024-RU-NVS-8",
+    "answers": {
+      "1": 5,
+      "2": "ok",
+      "3": "DEMO комментарий RU-NVS #8"
+    }
+  },
+  {
+    "survey_year": 2024,
+    "region_id": "RU-NVS",
+    "source": "import",
+    "user_id": "demo-2024-RU-NVS-9",
+    "answers": {
+      "1": 2,
+      "2": "good",
+      "3": "DEMO комментарий RU-NVS #9"
+    }
+  }
+]

@@ -1,0 +1,15 @@
+# Root gitignore — VEMAP
+node_modules/
+frontend/node_modules/
+frontend/dist/
+dist/
+__pycache__/
+*.pyc
+.venv/
+venv/
+.env
+!.env.example
+frontend/.env
+!frontend/.env.example
+*.log
+.DS_Store

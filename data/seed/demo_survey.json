@@ -1,0 +1,189 @@
+{
+  "surveys": [
+    {
+      "year": 2016,
+      "title": "DEMO: Опрос настроения 2016",
+      "description": "Демонстрационный опрос Map Mood (не реальные данные)",
+      "status": "closed",
+      "scoring_version": "1.0",
+      "questions": [
+        {
+          "text": "Насколько вы удовлетворены жизнью в регионе? (1-5)",
+          "type": "scale",
+          "weight": 1.0,
+          "required": true,
+          "options": { "min": 1, "max": 5 }
+        },
+        {
+          "text": "Как вы оцениваете экономическую ситуацию?",
+          "type": "single_choice",
+          "weight": 1.2,
+          "required": true,
+          "options": {
+            "choices": [
+              { "key": "bad", "label": "Плохо", "score": 25 },
+              { "key": "ok", "label": "Средне", "score": 50 },
+              { "key": "good", "label": "Хорошо", "score": 75 },
+              { "key": "great", "label": "Отлично", "score": 95 }
+            ]
+          }
+        },
+        {
+          "text": "Свободный комментарий (не учитывается в v1.0)",
+          "type": "text",
+          "weight": 0,
+          "required": false,
+          "options": null
+        }
+      ]
+    },
+    {
+      "year": 2018,
+      "title": "DEMO: Опрос настроения 2018",
+      "description": "Демонстрационный опрос Map Mood (не реальные данные)",
+      "status": "closed",
+      "scoring_version": "1.0",
+      "questions": [
+        {
+          "text": "Насколько вы удовлетворены жизнью в регионе? (1-5)",
+          "type": "scale",
+          "weight": 1.0,
+          "required": true,
+          "options": { "min": 1, "max": 5 }
+        },
+        {
+          "text": "Как вы оцениваете экономическую ситуацию?",
+          "type": "single_choice",
+          "weight": 1.2,
+          "required": true,
+          "options": {
+            "choices": [
+              { "key": "bad", "label": "Плохо", "score": 25 },
+              { "key": "ok", "label": "Средне", "score": 50 },
+              { "key": "good", "label": "Хорошо", "score": 75 },
+              { "key": "great", "label": "Отлично", "score": 95 }
+            ]
+          }
+        },
+        {
+          "text": "Свободный комментарий (не учитывается в v1.0)",
+          "type": "text",
+          "weight": 0,
+          "required": false,
+          "options": null
+        }
+      ]
+    },
+    {
+      "year": 2020,
+      "title": "DEMO: Опрос настроения 2020",
+      "description": "Демонстрационный опрос Map Mood (не реальные данные)",
+      "status": "closed",
+      "scoring_version": "1.0",
+      "questions": [
+        {
+          "text": "Насколько вы удовлетворены жизнью в регионе? (1-5)",
+          "type": "scale",
+          "weight": 1.0,
+          "required": true,
+          "options": { "min": 1, "max": 5 }
+        },
+        {
+          "text": "Как вы оцениваете экономическую ситуацию?",
+          "type": "single_choice",
+          "weight": 1.2,
+          "required": true,
+          "options": {
+            "choices": [
+              { "key": "bad", "label": "Плохо", "score": 25 },
+              { "key": "ok", "label": "Средне", "score": 50 },
+              { "key": "good", "label": "Хорошо", "score": 75 },
+              { "key": "great", "label": "Отлично", "score": 95 }
+            ]
+          }
+        },
+        {
+          "text": "Свободный комментарий (не учитывается в v1.0)",
+          "type": "text",
+          "weight": 0,
+          "required": false,
+          "options": null
+        }
+      ]
+    },
+    {
+      "year": 2022,
+      "title": "DEMO: Опрос настроения 2022",
+      "description": "Демонстрационный опрос Map Mood (не реальные данные)",
+      "status": "closed",
+      "scoring_version": "1.0",
+      "questions": [
+        {
+          "text": "Насколько вы удовлетворены жизнью в регионе? (1-5)",
+          "type": "scale",
+          "weight": 1.0,
+          "required": true,
+          "options": { "min": 1, "max": 5 }
+        },
+        {
+          "text": "Как вы оцениваете экономическую ситуацию?",
+          "type": "single_choice",
+          "weight": 1.2,
+          "required": true,
+          "options": {
+            "choices": [
+              { "key": "bad", "label": "Плохо", "score": 25 },
+              { "key": "ok", "label": "Средне", "score": 50 },
+              { "key": "good", "label": "Хорошо", "score": 75 },
+              { "key": "great", "label": "Отлично", "score": 95 }
+            ]
+          }
+        },
+        {
+          "text": "Свободный комментарий (не учитывается в v1.0)",
+          "type": "text",
+          "weight": 0,
+          "required": false,
+          "options": null
+        }
+      ]
+    },
+    {
+      "year": 2024,
+      "title": "DEMO: Опрос настроения 2024",
+      "description": "Демонстрационный опрос Map Mood (не реальные данные)",
+      "status": "active",
+      "scoring_version": "1.0",
+      "questions": [
+        {
+          "text": "Насколько вы удовлетворены жизнью в регионе? (1-5)",
+          "type": "scale",
+          "weight": 1.0,
+          "required": true,
+          "options": { "min": 1, "max": 5 }
+        },
+        {
+          "text": "Как вы оцениваете экономическую ситуацию?",
+          "type": "single_choice",
+          "weight": 1.2,
+          "required": true,
+          "options": {
+            "choices": [
+              { "key": "bad", "label": "Плохо", "score": 25 },
+              { "key": "ok", "label": "Средне", "score": 50 },
+              { "key": "good", "label": "Хорошо", "score": 75 },
+              { "key": "great", "label": "Отлично", "score": 95 }
+            ]
+          }
+        },
+        {
+          "text": "Свободный комментарий (не учитывается в v1.0)",
+          "type": "text",
+          "weight": 0,
+          "required": false,
+          "options": null
+        }
+      ]
+    }
+  ]
+}

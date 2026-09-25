@@ -1,0 +1,26 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: mapmood
+      POSTGRES_PASSWORD: mapmood
+      POSTGRES_DB: mapmood
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql://mapmood:mapmood@postgres:5432/mapmood
+      JWT_SECRET: dev-jwt-secret
+      ADMIN_EMAIL: admin@mapmood.local
+      ADMIN_PASSWORD: changeme
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_data:
