@@ -1,13 +1,17 @@
 import type {
+  City,
   CompareRow,
   DataRow,
   ForecastResult,
   HistoryPoint,
   MapPoint,
   Region,
+  TimePeriod,
 } from '../types'
+import { DEMO_CITIES, DEMO_PERIODS, demoMapPoints } from '../mocks/demo'
 
 const BASE_URL: string = import.meta.env.VITE_API_URL ?? 'http://localhost:8000'
+const USE_MOCKS: boolean = String(import.meta.env.VITE_USE_MOCKS ?? 'false') === 'true'
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${BASE_URL}${path}`, {
@@ -34,12 +38,31 @@ export const GEOJSON_URL = '/data/geo/russia-regions.geojson'
 export const api = {
   getRegions: () => request<Region[]>('/api/regions'),
   getYears: () => request<number[]>('/api/years'),
-  getMapPoints: (year: number) => request<MapPoint[]>(`/api/map/${year}`),
+  // v1.1: периоды и города; при USE_MOCKS — локальные DEMO-данные
+  getPeriods: () =>
+    USE_MOCKS ? Promise.resolve(DEMO_PERIODS) : request<TimePeriod[]>('/api/periods'),
+  getCities: () =>
+    USE_MOCKS ? Promise.resolve(DEMO_CITIES) : request<City[]>('/api/cities'),
+  getMapPoints: (year: number, month?: number | null) => {
+    if (USE_MOCKS) {
+      return Promise.resolve(demoMapPoints({ year, month: month ?? null }))
+    }
+    const q = month != null ? `?month=${month}` : ''
+    return request<MapPoint[]>(`/api/map/${year}${q}`)
+  },
   getRegionHistory: (regionId: string) =>
     request<HistoryPoint[]>(`/api/regions/${encodeURIComponent(regionId)}/history`),
-  getData: (year: number) => request<DataRow[]>(`/api/data?year=${year}`),
-  getCompare: (yearA: number, yearB: number) =>
-    request<CompareRow[]>(`/api/compare?year_a=${yearA}&year_b=${yearB}`),
+  getCityHistory: (cityId: string) =>
+    request<HistoryPoint[]>(`/api/cities/${encodeURIComponent(cityId)}/history`),
+  getData: (year: number, month?: number | null) => {
+    const q = month != null ? `?year=${year}&month=${month}` : `?year=${year}`
+    return request<DataRow[]>(`/api/data${q}`)
+  },
+  getCompare: (yearA: number, yearB: number, monthA?: number | null, monthB?: number | null) => {
+    const extraA = monthA != null ? `&month_a=${monthA}` : ''
+    const extraB = monthB != null ? `&month_b=${monthB}` : ''
+    return request<CompareRow[]>(`/api/compare?year_a=${yearA}&year_b=${yearB}${extraA}${extraB}`)
+  },
   getRegionForecast: (regionId: string, horizon = 3) =>
     request<ForecastResult>(`/api/forecast/${encodeURIComponent(regionId)}?horizon=${horizon}`),
   getRussiaForecast: (horizon = 3) =>

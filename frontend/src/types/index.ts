@@ -80,3 +80,28 @@ export interface ImportStageResponse {
   preview_count?: number
   imported?: number
 }
+
+// ---- v1.1: города и периоды (ТЗ v1.1 §8, §12) ----
+// Mood Index на фронте — только «число + цвет», формулы нет.
+
+export interface City {
+  city_id: string
+  name_ru: string
+  region_id: string
+  region_name: string
+}
+
+export interface TimePeriod {
+  year: number
+  month: number | null
+}
+
+export interface CityDataRow {
+  city_id: string
+  name_ru: string
+  region_id: string
+  region_name: string
+  mood_index: number | null
+  responses_count: number | null
+  change_from_prev: number | null
+}
