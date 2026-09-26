@@ -7,10 +7,10 @@ import RegionPopup from '../features/map/RegionPopup'
 import { RegionDetails } from '../features/map/RegionPopup'
 import { moodLegend } from '../features/map/legend'
 import { useMapData } from '../features/map/useMapData'
-import YearSlider from '../features/map/YearSlider'
+import TimeSlider from '../features/map/TimeSlider'
 
 export default function MapPage() {
-  const { years, year, setYear, points, loading, error } = useMapData()
+  const { periods, period, setPeriod, points, loading, error } = useMapData()
   const [regions, setRegions] = useState<Region[]>([])
   const [popup, setPopup] = useState<{ regionId: string; x: number; y: number } | null>(null)
   const [searchParams, setSearchParams] = useSearchParams()
@@ -68,7 +68,7 @@ export default function MapPage() {
           onBackgroundClick={() => setPopup(null)}
         />
         <div className="map-overlay-top">
-          <YearSlider years={years} value={year} onChange={setYear} />
+          <TimeSlider periods={periods} value={period} onChange={setPeriod} />
           <div className="map-legend">
             <span>Mood Index</span>
             <div className="legend-scale">
@@ -93,7 +93,7 @@ export default function MapPage() {
             containerHeight={shellRef.current?.clientHeight ?? 560}
             onClose={() => setPopup(null)}
             region={popupRegion}
-            year={year}
+            year={period?.year ?? null}
             point={points[popup.regionId] ?? null}
           />
         )}
@@ -108,7 +108,7 @@ export default function MapPage() {
             >
               ✕
             </button>
-            <RegionDetails region={region} year={year} point={points[region.region_id] ?? null} />
+            <RegionDetails region={region}             year={period?.year ?? null} point={points[region.region_id] ?? null} />
           </div>
         )}
       </div>

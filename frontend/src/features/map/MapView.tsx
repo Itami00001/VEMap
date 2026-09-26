@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
-import maplibregl from 'maplibre-gl'
-import 'maplibre-gl/dist/maplibre-gl.css'
+import * as maplibregl from 'maplibre-gl'
+import type { MapLayerMouseEvent } from 'maplibre-gl'
 import { GEOJSON_URL } from '../../services/api'
 
 export type MapMode = 'mood' | 'delta'
@@ -84,7 +84,7 @@ export default function MapView({
       fetch(GEOJSON_URL)
         .then((r) => r.json() as Promise<GeoCollection>)
         .then((data) => {
-          if (!mapRef.current || map.getStyle().layers.some((l) => l.id === 'regions-fill')) return
+          if (!mapRef.current || map.getStyle().layers.some((l: { id?: string }) => l.id === 'regions-fill')) return
           baseRef.current = data
           map.addSource('regions', {
             type: 'geojson',
@@ -109,7 +109,7 @@ export default function MapView({
             },
           })
           if (interactive) {
-            map.on('click', 'regions-fill', (e) => {
+            map.on('click', 'regions-fill', (e: MapLayerMouseEvent) => {
               const rid = e.features?.[0]?.properties?.region_id
               if (typeof rid === 'string' && e.originalEvent) {
                 clickRef.current?.(rid, { x: e.originalEvent.clientX, y: e.originalEvent.clientY })
@@ -121,7 +121,7 @@ export default function MapView({
             map.on('mouseleave', 'regions-fill', () => {
               map.getCanvas().style.cursor = ''
             })
-            map.on('click', (e) => {
+            map.on('click', (e: maplibregl.MapMouseEvent) => {
               const feats = map.queryRenderedFeatures(e.point, { layers: ['regions-fill'] })
               if (feats.length === 0) {
                 bgClickRef.current?.()

@@ -1,7 +1,14 @@
 // DEMO-данные для режима VITE_USE_MOCKS=true (step07 v1.1).
 // Не реальные наблюдения. Города — стартовый список ТЗ v1.1 §8.
 
-import type { City, MapPoint, TimePeriod } from '../types'
+import type { City, MapPoint, Region, TimePeriod } from '../types'
+
+export const DEMO_REGIONS: Region[] = [
+  { region_id: 'RU-MOW', region_code: 'RU-MOW', name_ru: 'Москва', name_en: 'Moscow', name_crh: 'Москва', federal_district: 'Центральный' },
+  { region_id: 'RU-SPE', region_code: 'RU-SPE', name_ru: 'Санкт-Петербург', name_en: 'Saint Petersburg', name_crh: 'Санкт-Петербург', federal_district: 'Северо-Западный' },
+  { region_id: 'RU-CR', region_code: 'RU-CR', name_ru: 'Республика Крым', name_en: 'Crimea', name_crh: 'Qırım', federal_district: 'Южный' },
+  { region_id: 'RU-SEV', region_code: 'RU-SEV', name_ru: 'Севастополь', name_en: 'Sevastopol', name_crh: 'Aqyar', federal_district: 'Южный' },
+]
 
 export const DEMO_CITIES: City[] = [
   { city_id: 'moskva', name_ru: 'Москва', region_id: 'RU-MOW', region_name: 'Москва' },
