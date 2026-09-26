@@ -3,6 +3,13 @@ import * as maplibregl from 'maplibre-gl'
 import type { MapLayerMouseEvent } from 'maplibre-gl'
 import { GEOJSON_URL } from '../../services/api'
 
+// Воркер maplibre-gl v6 резолвится относительно бандла (./maplibre-gl-worker.mjs),
+// который Vite не эмитит -> 404 text/html -> карта мертва.
+// Поэтому файлы maplibre-gl-worker.mjs + maplibre-gl-shared.mjs лежат в public/
+// (копия из node_modules/maplibre-gl/dist, версия 6.11.2 — при обновлении пакета
+// скопировать заново) и URL задан явно.
+maplibregl.setWorkerUrl('/maplibre-gl-worker.mjs')
+
 export type MapMode = 'mood' | 'delta'
 
 export interface MapViewProps {
