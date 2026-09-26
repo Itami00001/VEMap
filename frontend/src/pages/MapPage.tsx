@@ -97,7 +97,7 @@ export default function MapPage() {
             containerHeight={shellRef.current?.clientHeight ?? 560}
             onClose={() => setPopup(null)}
             region={popupRegion}
-            year={period?.year ?? null}
+            period={period}
             point={points[popup.regionId] ?? null}
           />
         )}
@@ -112,7 +112,7 @@ export default function MapPage() {
             >
               ✕
             </button>
-            <RegionDetails region={region}             year={period?.year ?? null} point={points[region.region_id] ?? null} />
+            <RegionDetails region={region} period={period} point={points[region.region_id] ?? null} />
           </div>
         )}
       </div>

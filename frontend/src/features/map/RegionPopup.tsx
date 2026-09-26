@@ -1,17 +1,24 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { api } from '../../services/api'
-import type { HistoryPoint, MapPoint, Region } from '../../types'
+import type { City, CityMood, HistoryPoint, MapPoint, Region, TimePeriod } from '../../types'
 import RegionMiniChart from './RegionMiniChart'
 
 export interface RegionDetailsProps {
   region: Region | undefined
-  year: number | null
+  period: TimePeriod | null
   point: MapPoint | null
 }
 
-export function RegionDetails({ region, year, point }: RegionDetailsProps) {
+export function periodLabel(p: TimePeriod | null): string {
+  if (!p) return '—'
+  return p.month != null ? `${p.year}-${String(p.month).padStart(2, '0')}` : String(p.year)
+}
+
+export function RegionDetails({ region, period, point }: RegionDetailsProps) {
   const [history, setHistory] = useState<HistoryPoint[]>([])
+  const [cities, setCities] = useState<City[]>([])
+  const [cityMoods, setCityMoods] = useState<Record<string, CityMood>>({})
 
   useEffect(() => {
     if (!region) return
@@ -27,28 +34,61 @@ export function RegionDetails({ region, year, point }: RegionDetailsProps) {
     }
   }, [region])
 
+  useEffect(() => {
+    if (!region || !period) return
+    let cancelled = false
+    Promise.all([api.getCities(), api.getCityMoods(period.year, period.month)])
+      .then(([all, moods]) => {
+        if (cancelled) return
+        setCities(all.filter((c) => c.region_id === region.region_id))
+        const map: Record<string, CityMood> = {}
+        for (const m of moods) map[m.city_id] = m
+        setCityMoods(map)
+      })
+      .catch(() => undefined)
+    return () => {
+      cancelled = true
+    }
+  }, [region, period])
+
   if (!region) return null
   return (
     <div>
       <h3>{region.name_ru}</h3>
       <div className="muted" style={{ fontSize: 12, marginBottom: 8 }}>
-        {region.federal_district} · {region.region_id}
+        {region.federal_district} · {region.region_id} · {periodLabel(period)}
       </div>
       {point ? (
         <>
           <div className="mood-value">{point.mood_index.toFixed(1)}</div>
           <div className="popup-metric">
-            <span>Mood Index, {year}</span>
+            <span>Mood Index, {periodLabel(period)}</span>
           </div>
           <div className="popup-metric">
-            <span>Ответов</span>
+            <span>Ответов/статей</span>
             <b>{point.responses_count}</b>
           </div>
         </>
       ) : (
         <p className="no-data" style={{ margin: '6px 0 10px' }}>
-          Нет данных за {year} год
+          Нет данных за {periodLabel(period)}
         </p>
+      )}
+      {cities.length > 0 && (
+        <div style={{ margin: '8px 0' }}>
+          <div className="muted" style={{ fontSize: 12, marginBottom: 4 }}>Города</div>
+          <ul style={{ listStyle: 'none', margin: 0, padding: 0, fontSize: 13 }}>
+            {cities.map((c) => {
+              const m = cityMoods[c.city_id]
+              return (
+                <li key={c.city_id} className="popup-metric">
+                  <span>{c.name_ru}</span>
+                  <b>{m ? m.mood_index.toFixed(1) : '—'}</b>
+                </li>
+              )
+            })}
+          </ul>
+        </div>
       )}
       <div style={{ margin: '8px 0' }}>
         <RegionMiniChart history={history} />
@@ -69,7 +109,7 @@ export interface RegionPopupProps extends RegionDetailsProps {
 }
 
 const POPUP_W = 300
-const POPUP_H = 320
+const POPUP_H = 380
 
 export default function RegionPopup({ x, y, containerWidth, containerHeight, onClose, ...details }: RegionPopupProps) {
   const left = Math.min(Math.max(8, x - POPUP_W / 2), Math.max(8, containerWidth - POPUP_W - 8))

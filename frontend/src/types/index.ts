@@ -15,6 +15,7 @@ export interface MapPoint {
 
 export interface HistoryPoint {
   year: number
+  month?: number | null
   mood_index: number
   responses_count: number
 }
@@ -104,4 +105,10 @@ export interface CityDataRow {
   mood_index: number | null
   responses_count: number | null
   change_from_prev: number | null
+}
+
+export interface CityMood {
+  city_id: string
+  mood_index: number
+  responses_count: number
 }

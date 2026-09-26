@@ -1,5 +1,6 @@
 import type {
   City,
+  CityMood,
   CompareRow,
   DataRow,
   ForecastResult,
@@ -8,7 +9,7 @@ import type {
   Region,
   TimePeriod,
 } from '../types'
-import { DEMO_CITIES, DEMO_PERIODS, DEMO_REGIONS, demoMapPoints } from '../mocks/demo'
+import { DEMO_CITIES, DEMO_PERIODS, DEMO_REGIONS, demoCityMoods, demoMapPoints, demoRegionHistory } from '../mocks/demo'
 
 const BASE_URL: string = import.meta.env.VITE_API_URL ?? 'http://localhost:8000'
 const USE_MOCKS: boolean = String(import.meta.env.VITE_USE_MOCKS ?? 'false') === 'true'
@@ -28,7 +29,10 @@ export const api = {
   getPeriods: () => USE_MOCKS ? empty(DEMO_PERIODS) : request<TimePeriod[]>('/api/periods'),
   getCities: () => USE_MOCKS ? empty(DEMO_CITIES) : request<City[]>('/api/cities'),
   getMapPoints: (year: number, month?: number | null) => USE_MOCKS ? empty(demoMapPoints({ year, month: month ?? null })) : request<MapPoint[]>(`/api/map/${year}${month != null ? `?month=${month}` : ''}`),
-  getRegionHistory: (regionId: string) => request<HistoryPoint[]>(`/api/regions/${encodeURIComponent(regionId)}/history`),
+  getRegionHistory: (regionId: string) => USE_MOCKS ? empty(demoRegionHistory(regionId)) : request<HistoryPoint[]>(`/api/regions/${encodeURIComponent(regionId)}/history`),
+  getCityMoods: (year: number, month?: number | null) => USE_MOCKS
+    ? empty(demoCityMoods({ year, month: month ?? null }))
+    : request<CityMood[]>(`/api/cities/moods?year=${year}${month != null ? `&month=${month}` : ''}`),
   getCityHistory: (cityId: string) => request<HistoryPoint[]>(`/api/cities/${encodeURIComponent(cityId)}/history`),
   getData: (year: number, month?: number | null) => request<DataRow[]>(`/api/data?year=${year}${month != null ? `&month=${month}` : ''}`),
   getCompare: (yearA: number, yearB: number, monthA?: number | null, monthB?: number | null) => request<CompareRow[]>(`/api/compare?year_a=${yearA}&year_b=${yearB}${monthA != null ? `&month_a=${monthA}` : ''}${monthB != null ? `&month_b=${monthB}` : ''}`),

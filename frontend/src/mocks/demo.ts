@@ -1,7 +1,7 @@
 // DEMO-данные для режима VITE_USE_MOCKS=true (step07 v1.1).
 // Не реальные наблюдения. Города — стартовый список ТЗ v1.1 §8.
 
-import type { City, MapPoint, Region, TimePeriod } from '../types'
+import type { City, CityMood, HistoryPoint, MapPoint, Region, TimePeriod } from '../types'
 
 export const DEMO_REGIONS: Region[] = [
   { region_id: 'RU-MOW', region_code: 'RU-MOW', name_ru: 'Москва', name_en: 'Moscow', name_crh: 'Москва', federal_district: 'Центральный' },
@@ -55,4 +55,52 @@ const DEMO_MAP: Record<string, MapPoint[]> = {
 
 export function demoMapPoints(period: TimePeriod): MapPoint[] {
   return DEMO_MAP[key(period)] ?? []
+}
+
+// DEMO-значения по городам за период (согласованы с агрегатом региона выше).
+const DEMO_CITY_MOODS: Record<string, CityMood[]> = {
+  '2024-1': [
+    { city_id: 'moskva', mood_index: 68.2, responses_count: 42 },
+    { city_id: 'spb', mood_index: 64.5, responses_count: 31 },
+    { city_id: 'simferopol', mood_index: 60.2, responses_count: 15 },
+    { city_id: 'sevastopol', mood_index: 61.3, responses_count: 18 },
+    { city_id: 'yalta', mood_index: 58.4, responses_count: 12 },
+    { city_id: 'kerch', mood_index: 57.9, responses_count: 11 },
+    { city_id: 'evpatoria', mood_index: 59.6, responses_count: 9 },
+    { city_id: 'belogorsk', mood_index: 58.1, responses_count: 8 },
+  ],
+  '2024-5': [
+    { city_id: 'moskva', mood_index: 71.4, responses_count: 44 },
+    { city_id: 'spb', mood_index: 66.0, responses_count: 33 },
+    { city_id: 'simferopol', mood_index: 63.5, responses_count: 16 },
+    { city_id: 'sevastopol', mood_index: 63.9, responses_count: 19 },
+    { city_id: 'yalta', mood_index: 62.1, responses_count: 13 },
+    { city_id: 'kerch', mood_index: 61.8, responses_count: 11 },
+    { city_id: 'evpatoria', mood_index: 63.0, responses_count: 9 },
+    { city_id: 'belogorsk', mood_index: 62.4, responses_count: 8 },
+  ],
+  '2025-6': [
+    { city_id: 'moskva', mood_index: 69.8, responses_count: 40 },
+    { city_id: 'spb', mood_index: 65.2, responses_count: 30 },
+    { city_id: 'simferopol', mood_index: 61.0, responses_count: 14 },
+    { city_id: 'sevastopol', mood_index: 62.1, responses_count: 17 },
+    { city_id: 'yalta', mood_index: 60.1, responses_count: 12 },
+    { city_id: 'kerch', mood_index: 59.5, responses_count: 10 },
+    { city_id: 'evpatoria', mood_index: 60.8, responses_count: 9 },
+    { city_id: 'belogorsk', mood_index: 59.0, responses_count: 7 },
+  ],
+}
+
+export function demoCityMoods(period: TimePeriod): CityMood[] {
+  return DEMO_CITY_MOODS[key(period)] ?? []
+}
+
+// DEMO-история региона: точки агрегата по всем периодам.
+export function demoRegionHistory(regionId: string): HistoryPoint[] {
+  const out: HistoryPoint[] = []
+  for (const p of DEMO_PERIODS) {
+    const pt = (DEMO_MAP[key(p)] ?? []).find((m) => m.region_id === regionId)
+    if (pt) out.push({ year: p.year, month: p.month, mood_index: pt.mood_index, responses_count: pt.responses_count })
+  }
+  return out
 }
