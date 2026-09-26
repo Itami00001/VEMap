@@ -1,4 +1,4 @@
-# Map Mood
+# VEMap
 
 1. Скопируйте `.env.example` в `.env` и при необходимости измените переменные.
 2. `docker-compose up -d postgres` — PostgreSQL на порту 5432.

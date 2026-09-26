@@ -35,7 +35,7 @@
 `docker compose up --build -d` — postgres + backend + frontend (nginx) подняты.
 Фронт собран с `VITE_USE_MOCKS=true`, `VITE_API_URL=http://localhost:8001`.
 
-- `GET /` → `{"message":"Map Mood API"}` ✅
+- `GET /` → `{"message":"VEMap API"}` ✅
 - `GET /api/regions` → 85 ✅
 - `GET /api/cities` → 8 (ТЗ v1.1 §8) ✅
 - `GET /api/periods` → `[]` (пустая БД, честно) ✅

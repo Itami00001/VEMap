@@ -5,7 +5,7 @@ export default function Layout() {
     <div className="app-shell">
       <header className="site-header">
         <NavLink to="/" className="brand">
-          MAP&nbsp;MOOD
+          VEMAP
         </NavLink>
         <nav className="main-nav">
           <NavLink to="/map">Карта</NavLink>
@@ -19,7 +19,7 @@ export default function Layout() {
         <Outlet />
       </main>
       <footer className="site-footer">
-        <span>MAP MOOD — аналитическая платформа настроений регионов России</span>
+        <span>VEMAP — аналитическая платформа настроений регионов России</span>
         <span>Текущие данные: DEMO DATA (демонстрационные, не реальные)</span>
       </footer>
     </div>

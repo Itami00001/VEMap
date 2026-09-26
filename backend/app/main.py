@@ -13,7 +13,7 @@ from app.modules.moods.router import router as moods_router
 from app.modules.regions.router import router as regions_router
 from app.modules.telegram.model import TelegramUser  # noqa: F401
 
-app = FastAPI(title="Map Mood API")
+app = FastAPI(title="VEMap API")
 
 app.add_middleware(
     CORSMiddleware,
@@ -39,4 +39,4 @@ app.include_router(admin_router)
 
 @app.get("/")
 def root():
-    return {"message": "Map Mood API"}
+    return {"message": "VEMap API"}

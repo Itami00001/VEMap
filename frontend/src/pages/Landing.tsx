@@ -7,7 +7,7 @@ export default function Landing() {
         <div className="hero-bg" />
         <div className="hero-grid" />
         <div className="hero-content">
-          <h1>MAP MOOD</h1>
+          <h1>VEMAP</h1>
           <p className="tagline">Настроения городов — на карте, во времени, с прогнозом</p>
           <div className="hero-actions">
             <Link className="btn" to="/map">Карта настроений</Link>
@@ -18,7 +18,7 @@ export default function Landing() {
       </section>
 
       <section className="landing-section">
-        <h2>Что такое Map Mood</h2>
+        <h2>Что такое VEMap</h2>
         <p className="section-sub muted">Данные → анализ → визуализация → прогноз</p>
         <div className="pipeline">
           <div className="step"><b>Данные</b><span>газеты, опросы</span></div>
@@ -69,7 +69,7 @@ export default function Landing() {
       <section className="landing-section">
         <h2>О проекте / цель</h2>
         <p className="section-sub muted">
-          Map Mood отвечает на три вопроса: каково состояние настроений, как оно изменилось
+          VEMap отвечает на три вопроса: каково состояние настроений, как оно изменилось
           и что может быть дальше. Сейчас фронт работает на DEMO-данных; формула Mood Index v2.0
           и прогноз заморожены до утверждения методики владельцем данных.
         </p>

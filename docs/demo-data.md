@@ -5,7 +5,7 @@
 
 **Статус: DEMO DATA — не реальные наблюдения.**
 
-Набор `demo_survey.json` и `demo_responses.json` создан вручную для проверки пайплайна Map Mood:
+Набор `demo_survey.json` и `demo_responses.json` создан вручную для проверки пайплайна VEMap:
 
 - 2 демо-опроса (2020 и 2024);
 - ответы по 6 регионам (RU-MOW, RU-SPE, RU-TA, RU-CR, RU-KDA, RU-NVS);

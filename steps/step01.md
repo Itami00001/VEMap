@@ -22,7 +22,7 @@ docker-compose.yml
 README.md
 
 ## Что сделать
-1. backend/app/main.py: FastAPI, title="Map Mood API", CORS на localhost:5173.
+1. backend/app/main.py: FastAPI, title="VEMap API", CORS на localhost:5173.
 2. backend/app/config.py: класс Settings (pydantic-settings), читает DATABASE_URL, JWT_SECRET, ADMIN_EMAIL из .env.
 3. backend/app/db/database.py: engine, SessionLocal, Base, get_db().
 4. requirements.txt: fastapi, uvicorn[standard], pydantic, pydantic-settings, sqlalchemy, psycopg2-binary, python-multipart.
@@ -38,5 +38,5 @@ README.md
 
 ## Проверка
 - `docker-compose up` поднимает postgres.
-- `uvicorn app.main:app --reload` → http://localhost:8000/ возвращает {"message":"Map Mood API"}.
+- `uvicorn app.main:app --reload` → http://localhost:8000/ возвращает {"message":"VEMap API"}.
 - `npm run dev` во frontend → открывается дефолтная Vite-страница.
