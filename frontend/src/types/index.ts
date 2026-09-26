@@ -112,3 +112,12 @@ export interface CityMood {
   mood_index: number
   responses_count: number
 }
+
+export interface CityCompareRow {
+  city_id: string
+  name_ru: string
+  region_id: string
+  mood_a: number | null
+  mood_b: number | null
+  delta: number | null
+}

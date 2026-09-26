@@ -1,7 +1,7 @@
 // DEMO-данные для режима VITE_USE_MOCKS=true (step07 v1.1).
 // Не реальные наблюдения. Города — стартовый список ТЗ v1.1 §8.
 
-import type { City, CityMood, HistoryPoint, MapPoint, Region, TimePeriod } from '../types'
+import type { City, CityDataRow, CityMood, HistoryPoint, MapPoint, Region, TimePeriod } from '../types'
 
 export const DEMO_REGIONS: Region[] = [
   { region_id: 'RU-MOW', region_code: 'RU-MOW', name_ru: 'Москва', name_en: 'Moscow', name_crh: 'Москва', federal_district: 'Центральный' },
@@ -103,4 +103,43 @@ export function demoRegionHistory(regionId: string): HistoryPoint[] {
     if (pt) out.push({ year: p.year, month: p.month, mood_index: pt.mood_index, responses_count: pt.responses_count })
   }
   return out
+}
+
+// DEMO-таблица по городам за период + изменение к предыдущему существующему периоду.
+export function demoCityTable(period: TimePeriod): CityDataRow[] {
+  const idx = DEMO_PERIODS.findIndex((p) => p.year === period.year && (p.month ?? null) === (period.month ?? null))
+  const cur = DEMO_CITY_MOODS[key(period)] ?? []
+  const prev = idx > 0 ? DEMO_CITY_MOODS[key(DEMO_PERIODS[idx - 1])] ?? [] : []
+  const prevById = new Map(prev.map((m) => [m.city_id, m.mood_index]))
+  return DEMO_CITIES.map((c) => {
+    const m = cur.find((x) => x.city_id === c.city_id)
+    const prevV = prevById.get(c.city_id)
+    return {
+      city_id: c.city_id,
+      name_ru: c.name_ru,
+      region_id: c.region_id,
+      region_name: c.region_name,
+      mood_index: m ? m.mood_index : null,
+      responses_count: m ? m.responses_count : null,
+      change_from_prev: m && prevV != null ? Math.round((m.mood_index - prevV) * 10) / 10 : null,
+    }
+  })
+}
+
+// DEMO-сравнение двух периодов по городам.
+export function demoCompare(a: TimePeriod, b: TimePeriod) {
+  const ma = new Map(demoCityMoods(a).map((m) => [m.city_id, m.mood_index]))
+  const mb = new Map(demoCityMoods(b).map((m) => [m.city_id, m.mood_index]))
+  return DEMO_CITIES.map((c) => {
+    const va = ma.get(c.city_id) ?? null
+    const vb = mb.get(c.city_id) ?? null
+    return {
+      city_id: c.city_id,
+      name_ru: c.name_ru,
+      region_id: c.region_id,
+      mood_a: va,
+      mood_b: vb,
+      delta: va != null && vb != null ? Math.round((vb - va) * 10) / 10 : null,
+    }
+  })
 }
