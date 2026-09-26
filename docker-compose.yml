@@ -13,7 +13,7 @@ services:
   backend:
     build: ./backend
     ports:
-      - "8000:8000"
+      - "8001:8000"
     environment:
       DATABASE_URL: postgresql://mapmood:mapmood@postgres:5432/mapmood
       JWT_SECRET: dev-jwt-secret
@@ -26,7 +26,7 @@ services:
     build:
       context: ./frontend
       args:
-        VITE_API_URL: http://localhost:8000
+        VITE_API_URL: http://localhost:8001
         VITE_USE_MOCKS: "true"
     ports:
       - "5173:80"
