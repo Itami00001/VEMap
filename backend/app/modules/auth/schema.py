@@ -4,7 +4,8 @@ from app.modules.auth.model import AdminRole
 
 
 class LoginRequest(BaseModel):
-    email: EmailStr
+    # str вместо EmailStr: системные домены (.local) валидны для логина.
+    email: str
     password: str
 
 
