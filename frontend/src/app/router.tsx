@@ -6,6 +6,8 @@ import DataPage from '../pages/DataPage'
 import ForecastPage from '../pages/ForecastPage'
 import Landing from '../pages/Landing'
 import MapPage from '../pages/MapPage'
+import AdminDashboard from '../pages/admin/AdminDashboard'
+import AdminLogin from '../pages/admin/AdminLogin'
 
 export const router = createBrowserRouter([
   { path: '/', element: <Layout />, children: [
@@ -15,5 +17,7 @@ export const router = createBrowserRouter([
     { path: 'compare', element: <ComparePage /> },
     { path: 'forecast', element: <ForecastPage /> },
     { path: 'about', element: <AboutPage /> },
+    { path: 'admin/login', element: <AdminLogin /> },
+    { path: 'admin', element: <AdminDashboard /> },
   ] },
 ])
