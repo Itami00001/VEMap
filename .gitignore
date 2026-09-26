@@ -13,3 +13,10 @@ frontend/.env
 !frontend/.env.example
 *.log
 .DS_Store
+
+# AI/planning files — local only, not for repo
+steps/
+docs/
+delete/
+Untitled Workspace/
+.editorconfig
