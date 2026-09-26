@@ -6,6 +6,7 @@ from app.db.database import Base, engine
 from app.modules.admin.logs import AuditLog  # noqa: F401
 from app.modules.admin.router import router as admin_router
 from app.modules.auth.router import router as auth_router
+from app.modules.cities.router import router as cities_router
 from app.modules.forecast.models import ForecastRun  # noqa: F401
 from app.modules.forecast.router import router as forecast_router
 from app.modules.moods.router import router as moods_router
@@ -29,6 +30,7 @@ def on_startup() -> None:
 
 
 app.include_router(regions_router)
+app.include_router(cities_router)
 app.include_router(moods_router)
 app.include_router(forecast_router)
 app.include_router(auth_router)

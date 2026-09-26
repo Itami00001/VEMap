@@ -18,7 +18,11 @@ def list_years(db: Session = Depends(get_db)):
 
 
 @router.get("/map/{year}", response_model=list[MapPointOut])
-def map_for_year(year: int, db: Session = Depends(get_db)):
+def map_for_year(year: int, month: int | None = Query(default=None), db: Session = Depends(get_db)):
+    # v1.1: month принят для совместимости. Помесячных записей в БД пока нет
+    # (структура ждёт владельца данных) — запрос с month возвращает [].
+    if month is not None:
+        return []
     points = mood_service.get_map_points(db, year, SCORING_VERSION)
     if not points:
         return []
@@ -34,7 +38,14 @@ def region_history(region_id: str, db: Session = Depends(get_db)):
 
 
 @router.get("/data", response_model=list[DataRowOut])
-def public_data(year: int = Query(...), db: Session = Depends(get_db)):
+def public_data(
+    year: int = Query(...),
+    month: int | None = Query(default=None),
+    db: Session = Depends(get_db),
+):
+    # v1.1: см. комментарий выше — запрос с month возвращает [].
+    if month is not None:
+        return []
     return mood_service.get_public_table(db, year, SCORING_VERSION)
 
 
@@ -42,6 +53,11 @@ def public_data(year: int = Query(...), db: Session = Depends(get_db)):
 def compare_years(
     year_a: int = Query(...),
     year_b: int = Query(...),
+    month_a: int | None = Query(default=None),
+    month_b: int | None = Query(default=None),
     db: Session = Depends(get_db),
 ):
+    # v1.1: см. комментарий выше — запрос с month_* возвращает [].
+    if month_a is not None or month_b is not None:
+        return []
     return mood_service.compare(db, year_a, year_b, SCORING_VERSION)
