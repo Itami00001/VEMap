@@ -1,5 +1,6 @@
 import { createBrowserRouter } from 'react-router-dom'
 import Layout from './Layout'
+import ComparePage from '../pages/ComparePage'
 import DataPage from '../pages/DataPage'
 import MapPage from '../pages/MapPage'
 
@@ -12,7 +13,7 @@ export const router = createBrowserRouter([
     { index: true, element: <Placeholder title="MAP MOOD" /> },
     { path: 'map', element: <MapPage /> },
     { path: 'data', element: <DataPage /> },
-    { path: 'compare', element: <Placeholder title="Сравнение периодов" /> },
+    { path: 'compare', element: <ComparePage /> },
     { path: 'forecast', element: <Placeholder title="Прогноз" /> },
     { path: 'about', element: <Placeholder title="О проекте" /> },
   ] },

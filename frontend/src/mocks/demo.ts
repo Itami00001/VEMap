@@ -143,3 +143,17 @@ export function demoCompare(a: TimePeriod, b: TimePeriod) {
     }
   })
 }
+
+// DEMO-дельта по регионам между двумя периодами (для карты изменений).
+export function demoRegionCompare(a: TimePeriod, b: TimePeriod): { region_id: string; delta: number | null }[] {
+  const ma = new Map(demoMapPoints(a).map((m) => [m.region_id, m.mood_index]))
+  const mb = new Map(demoMapPoints(b).map((m) => [m.region_id, m.mood_index]))
+  return DEMO_REGIONS.map((r) => {
+    const va = ma.get(r.region_id) ?? null
+    const vb = mb.get(r.region_id) ?? null
+    return {
+      region_id: r.region_id,
+      delta: va != null && vb != null ? Math.round((vb - va) * 10) / 10 : null,
+    }
+  })
+}
