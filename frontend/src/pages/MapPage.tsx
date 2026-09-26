@@ -53,7 +53,11 @@ export default function MapPage() {
       <div className="page-head">
         <div>
           <h1>Карта настроений</h1>
-          <p>Mood Index по регионам России. Кликните по региону для деталей.</p>
+          <p>
+            Mood Index по регионам России (агрегат городов). Период:{' '}
+            {period ? `${period.year}-${String(period.month ?? 0).padStart(2, '0')}` : '—'}.
+            Кликните по региону для деталей. <span className="muted">DEMO DATA</span>
+          </p>
         </div>
       </div>
 
