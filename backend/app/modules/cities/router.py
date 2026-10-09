@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from app.core.dependencies import get_db
 from app.modules.cities import service as city_service
-from app.modules.cities.data import CITIES
+from app.modules.cities.model import City
 from app.modules.cities.schema import (
     CityCompareRowOut,
     CityDataRowOut,
@@ -13,6 +13,7 @@ from app.modules.cities.schema import (
 )
 from app.modules.moods import service as mood_service
 from app.modules.moods.router import SCORING_VERSION
+from app.modules.regions.model import Region
 
 router = APIRouter(prefix="/api", tags=["cities"])
 
@@ -24,8 +25,22 @@ def list_periods(db: Session = Depends(get_db)):
 
 
 @router.get("/cities", response_model=list[CityOut])
-def list_cities():
-    return [CityOut(**c) for c in CITIES]
+def list_cities(db: Session = Depends(get_db)):
+    # Справочник из БД (импорт CSV), а не статический список.
+    rows = (
+        db.query(City, Region.name_ru)
+        .outerjoin(Region, Region.region_id == City.region_id)
+        .order_by(City.name_ru)
+        .all()
+    )
+    out = []
+    for city, region_name in rows:
+        if city.region_id is None:
+            rn = "Украина" if city.country == "UA" else (city.country or "")
+        else:
+            rn = region_name or ""
+        out.append(CityOut(city_id=city.city_id, name_ru=city.name_ru, region_id=city.region_id, region_name=rn))
+    return out
 
 
 @router.get("/cities/moods", response_model=list[CityMoodOut])

@@ -9,7 +9,7 @@ class TimePeriodOut(BaseModel):
 class CityOut(BaseModel):
     city_id: str
     name_ru: str
-    region_id: str
+    region_id: str | None
     region_name: str
 
 

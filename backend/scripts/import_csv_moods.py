@@ -20,6 +20,8 @@ from app.modules.regions.model import Region  # noqa: F401 (FK target metadata)
 
 ROOT = Path(__file__).resolve().parents[2]
 CSV_FILE = ROOT / "data" / "examples" / "draft_for_webdev.csv"
+TEST_FILE = ROOT / "data" / "examples" / "test-data.csv"
+DEFAULT_FILES = [CSV_FILE, TEST_FILE]
 
 # Сырое имя (lower) -> каноника. См. docs/import-spec.md §4.
 CANONICAL: dict[str, dict] = {
@@ -34,6 +36,11 @@ CANONICAL: dict[str, dict] = {
     "киев": {"city_id": "kyiv", "name_ru": "Киев", "region_id": None, "country": "UA", "lat": 50.45, "lon": 30.52},
     "харьков": {"city_id": "kharkiv", "name_ru": "Харьков", "region_id": None, "country": "UA", "lat": 49.99, "lon": 36.23},
     "николаев": {"city_id": "mykolaiv", "name_ru": "Николаев", "region_id": None, "country": "UA", "lat": 46.97, "lon": 32.00},
+    "симферополь": {"city_id": "simferopol", "name_ru": "Симферополь", "region_id": "RU-CR", "country": "RU", "lat": 44.95, "lon": 34.10},
+    "ялта": {"city_id": "yalta", "name_ru": "Ялта", "region_id": "RU-CR", "country": "RU", "lat": 44.50, "lon": 34.17},
+    "керчь": {"city_id": "kerch", "name_ru": "Керчь", "region_id": "RU-CR", "country": "RU", "lat": 45.36, "lon": 36.47},
+    "евпатория": {"city_id": "evpatoria", "name_ru": "Евпатория", "region_id": "RU-CR", "country": "RU", "lat": 45.20, "lon": 33.37},
+    "белогорск": {"city_id": "belogorsk", "name_ru": "Белогорск", "region_id": "RU-CR", "country": "RU", "lat": 45.05, "lon": 34.60},
 }
 
 SCORING_VERSION = "2.0"
@@ -56,8 +63,15 @@ def load(path: Path) -> None:
             if not city:
                 city = City(**canon)
                 db.add(city)
+                db.flush()  # SessionLocal(autoflush=False): иначе повторный db.get не увидит pending-строку
                 cities_new += 1
-            mood = round(float(row["sentiment_norm"]) * 100, 2)
+            raw_norm = (row.get("sentiment_norm") or "").strip()
+            if raw_norm:
+                norm = float(raw_norm)
+            else:
+                # temporary norm, до подтверждения формулы
+                norm = (float(row["sentiment"]) + 1) / 2
+            mood = round(norm * 100, 2)
             year, month = int(row["year"]), int(row["month"])
             existing = (
                 db.query(CityMoodRecord)
@@ -94,4 +108,10 @@ def load(path: Path) -> None:
 
 
 if __name__ == "__main__":
-    load(Path(sys.argv[1]) if len(sys.argv) > 1 else CSV_FILE)
+    paths = [Path(a) for a in sys.argv[1:]] or DEFAULT_FILES
+    for p in paths:
+        if not p.exists():
+            print(f"Skip missing file: {p}")
+            continue
+        print(f"Importing {p} ...")
+        load(p)
