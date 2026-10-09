@@ -1000,8 +1000,18 @@ table.data th.num {
 /* ===== City markers ===== */
 
 .maplibregl-canvas { outline: none; }
-.city-popup .maplibregl-popup-content { box-shadow: 0 12px 32px rgba(0,0,0,.45); }
-.city-popup .maplibregl-popup-tip { border-top-color: var(--panel); }
+.city-popup .maplibregl-popup-content {
+  max-width: 280px;
+  padding: 10px 14px;
+  font-size: 13px;
+  background: #1a1f28;
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+  pointer-events: auto;
+}
+.city-popup .maplibregl-popup-tip { border-top-color: #1a1f28; }
 
 .map-overlay-cities {
   position: absolute;

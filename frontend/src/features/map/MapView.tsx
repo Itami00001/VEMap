@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 import * as maplibregl from 'maplibre-gl'
-import type { MapLayerMouseEvent } from 'maplibre-gl'
+import type { MapLayerMouseEvent, StyleSpecification } from 'maplibre-gl'
 import { GEOJSON_URL, WORLD_GEOJSON_URL } from '../../services/api'
 
 // Воркер maplibre-gl v6 резолвится относительно бандла (./maplibre-gl-worker.mjs),
@@ -59,7 +59,17 @@ function highlightBorderExpr(): Expression {
   ]
 }
 
+// Пустая подложка вместо внешнего demotiles-стиля: только тёмная вода.
+// Сушу рисует исключительно наш countries-fill (серый) — interference
+// базовых слоёв (landcover/landuse/boundary) исключена в принципе.
+const EMPTY_STYLE: StyleSpecification = {
+  version: 8,
+  sources: {},
+  layers: [{ id: 'background', type: 'background', paint: { 'background-color': '#0d1b2a' } }],
+}
+
 function applyValues(base: GeoCollection, values: Record<string, number | null | undefined>): GeoCollection {
+
   return {
     type: 'FeatureCollection',
     features: base.features.map((f) => ({
@@ -100,7 +110,7 @@ export default function MapView({
     if (!containerRef.current) return
     const map = new maplibregl.Map({
       container: containerRef.current,
-      style: 'https://demotiles.maplibre.org/style.json',
+      style: EMPTY_STYLE,
       center: [105, 61],
       zoom: 3,
       interactive,
