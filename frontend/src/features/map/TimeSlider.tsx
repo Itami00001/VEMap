@@ -16,10 +16,14 @@ export default function TimeSlider({ periods, value, onChange }: TimeSliderProps
   if (periods.length === 0 || value == null) {
     return <div className="year-slider muted">Нет периодов с данными</div>
   }
-  const idx = Math.max(
-    0,
-    periods.findIndex((p) => p.year === value.year && (p.month ?? null) === (value.month ?? null)),
+  const found = periods.findIndex(
+    (p) => p.year === value.year && (p.month ?? null) === (value.month ?? null),
   )
+  if (found === -1) {
+    console.warn('[TimeSlider] value not in periods:', value)
+    return <div className="year-slider muted">Нет данных за выбранный период</div>
+  }
+  const idx = found
   return (
     <div>
       <div className="year-slider">

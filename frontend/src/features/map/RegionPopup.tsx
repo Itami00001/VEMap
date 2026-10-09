@@ -22,33 +22,30 @@ export function RegionDetails({ region, period, point }: RegionDetailsProps) {
 
   useEffect(() => {
     if (!region) return
-    let cancelled = false
+    const controller = new AbortController()
     api
-      .getRegionHistory(region.region_id)
-      .then((h) => {
-        if (!cancelled) setHistory(h)
+      .getRegionHistory(region.region_id, controller.signal)
+      .then((h) => setHistory(h))
+      .catch((e: unknown) => {
+        if (e instanceof DOMException && e.name === 'AbortError') return
       })
-      .catch(() => undefined)
-    return () => {
-      cancelled = true
-    }
+    return () => controller.abort()
   }, [region])
 
   useEffect(() => {
     if (!region || !period) return
-    let cancelled = false
-    Promise.all([api.getCities(), api.getCityMoods(period.year, period.month)])
+    const controller = new AbortController()
+    Promise.all([api.getCities(controller.signal), api.getCityMoods(period.year, period.month, controller.signal)])
       .then(([all, moods]) => {
-        if (cancelled) return
         setCities(all.filter((c) => c.region_id === region.region_id))
         const map: Record<string, CityMood> = {}
         for (const m of moods) map[m.city_id] = m
         setCityMoods(map)
       })
-      .catch(() => undefined)
-    return () => {
-      cancelled = true
-    }
+      .catch((e: unknown) => {
+        if (e instanceof DOMException && e.name === 'AbortError') return
+      })
+    return () => controller.abort()
   }, [region, period])
 
   if (!region) return null

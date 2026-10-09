@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 import * as maplibregl from 'maplibre-gl'
 import type { MapLayerMouseEvent } from 'maplibre-gl'
-import { GEOJSON_URL } from '../../services/api'
+import { GEOJSON_URL, WORLD_GEOJSON_URL } from '../../services/api'
 
 // Воркер maplibre-gl v6 резолвится относительно бандла (./maplibre-gl-worker.mjs),
 // который Vite не эмитит -> 404 text/html -> карта мертва.
@@ -19,6 +19,7 @@ export interface MapViewProps {
   interactive?: boolean
   onRegionClick?: (regionId: string, point: { x: number; y: number }) => void
   onBackgroundClick?: () => void
+  onMapReady?: (map: maplibregl.Map) => void
 }
 
 interface GeoFeature {
@@ -42,6 +43,21 @@ function fillColorExpr(mode: MapMode): Expression {
   return ['case', ['==', ['get', 'value'], null], '#39404e', stops]
 }
 
+// Подложка стран: все — серые.
+function countryColorExpr(): string {
+  return '#2a2f36'
+}
+
+// Яркие границы для РФ, Украины, Крыма, Севастополя.
+function highlightBorderExpr(): Expression {
+  return [
+    'case',
+    ['in', ['get', 'ISO_A3'], ['literal', ['RUS', 'UKR']]],
+    '#ffffff',
+    '#6b7484',
+  ]
+}
+
 function applyValues(base: GeoCollection, values: Record<string, number | null | undefined>): GeoCollection {
   return {
     type: 'FeatureCollection',
@@ -62,6 +78,7 @@ export default function MapView({
   interactive = true,
   onRegionClick,
   onBackgroundClick,
+  onMapReady,
 }: MapViewProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<maplibregl.Map | null>(null)
@@ -70,11 +87,13 @@ export default function MapView({
   const modeRef = useRef(mode)
   const clickRef = useRef(onRegionClick)
   const bgClickRef = useRef(onBackgroundClick)
+  const readyRef = useRef(onMapReady)
 
   valuesRef.current = values
   modeRef.current = mode
   clickRef.current = onRegionClick
   bgClickRef.current = onBackgroundClick
+  readyRef.current = onMapReady
 
   useEffect(() => {
     if (!containerRef.current) return
@@ -88,16 +107,30 @@ export default function MapView({
     mapRef.current = map
 
     map.on('load', () => {
-      fetch(GEOJSON_URL)
-        .then((r) => r.json() as Promise<GeoCollection>)
-        .then((data) => {
-          if (!mapRef.current || map.getStyle().layers.some((l: { id?: string }) => l.id === 'regions-fill')) return
+      Promise.all([
+        fetch(WORLD_GEOJSON_URL).then((r) => r.json() as Promise<GeoCollection>),
+        fetch(GEOJSON_URL).then((r) => r.json() as Promise<GeoCollection>),
+      ])
+        .then(([world, data]) => {
+          if (!mapRef.current || !map.isStyleLoaded()) return
           baseRef.current = data
-          map.addSource('regions', {
+          if (!map.getSource('world')) {
+            map.addSource('world', { type: 'geojson', data: world })
+          }
+          if (!map.getLayer('countries-fill')) map.addLayer({
+            id: 'countries-fill',
+            type: 'fill',
+            source: 'world',
+            paint: {
+              'fill-color': countryColorExpr() as never,
+              'fill-opacity': 1,
+            },
+          })
+          if (!map.getSource('regions')) map.addSource('regions', {
             type: 'geojson',
             data: applyValues(data, valuesRef.current),
           })
-          map.addLayer({
+          if (!map.getLayer('regions-fill')) map.addLayer({
             id: 'regions-fill',
             type: 'fill',
             source: 'regions',
@@ -106,13 +139,23 @@ export default function MapView({
               'fill-opacity': 0.85,
             },
           })
-          map.addLayer({
+          if (!map.getLayer('regions-line')) map.addLayer({
             id: 'regions-line',
             type: 'line',
             source: 'regions',
             paint: {
               'line-color': '#0b0e14',
               'line-width': 0.7,
+            },
+          })
+          // Границы стран поверх регионов: серые для всех, белые для РФ и Украины.
+          if (!map.getLayer('countries-line')) map.addLayer({
+            id: 'countries-line',
+            type: 'line',
+            source: 'world',
+            paint: {
+              'line-color': highlightBorderExpr() as never,
+              'line-width': ['case', ['in', ['get', 'ISO_A3'], ['literal', ['RUS', 'UKR']]], 2.5, 0.5],
             },
           })
           if (interactive) {
@@ -135,6 +178,7 @@ export default function MapView({
               }
             })
           }
+          readyRef.current?.(map)
         })
         .catch(() => undefined)
     })

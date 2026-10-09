@@ -13,40 +13,43 @@ import type {
 } from '../types'
 import { DEMO_CITIES, DEMO_PERIODS, DEMO_REGIONS, demoCityMoods, demoCityTable, demoCompare, demoMapPoints, demoRegionCompare, demoRegionHistory } from '../mocks/demo'
 
-const BASE_URL: string = import.meta.env.VITE_API_URL ?? 'http://localhost:8000'
-const USE_MOCKS: boolean = String(import.meta.env.VITE_USE_MOCKS ?? 'false') === 'true'
+// В production запросы идут через nginx reverse proxy на том же origin.
+// Это исключает обращение браузера к недоступному localhost:8000.
+const BASE_URL: string = import.meta.env.VITE_API_URL ?? ''
+export const USE_MOCKS: boolean = String(import.meta.env.VITE_USE_MOCKS ?? 'false') === 'true'
 
-async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(`${BASE_URL}${path}`, { headers: { 'Content-Type': 'application/json', ...(init?.headers ?? {}) }, ...init })
+async function requestWithSignal<T>(path: string, signal: AbortSignal, init?: RequestInit): Promise<T> {
+  const res = await fetch(`${BASE_URL}${path}`, { headers: { 'Content-Type': 'application/json', ...(init?.headers ?? {}) }, ...init, signal })
   if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`)
   return (await res.json()) as T
 }
 
 export const GEOJSON_URL = '/data/geo/russia-regions.geojson'
+export const WORLD_GEOJSON_URL = '/data/geo/world-countries.geojson'
 const empty = <T,>(value: T) => Promise.resolve(value)
 
 export const api = {
-  getRegions: () => USE_MOCKS ? empty<Region[]>(DEMO_REGIONS) : request<Region[]>('/api/regions'),
-  getYears: () => USE_MOCKS ? empty([...new Set(DEMO_PERIODS.map((p) => p.year))]) : request<number[]>('/api/years'),
-  getPeriods: () => USE_MOCKS ? empty(DEMO_PERIODS) : request<TimePeriod[]>('/api/periods'),
-  getCities: () => USE_MOCKS ? empty(DEMO_CITIES) : request<City[]>('/api/cities'),
-  getMapPoints: (year: number, month?: number | null) => USE_MOCKS ? empty(demoMapPoints({ year, month: month ?? null })) : request<MapPoint[]>(`/api/map/${year}${month != null ? `?month=${month}` : ''}`),
-  getRegionHistory: (regionId: string) => USE_MOCKS ? empty(demoRegionHistory(regionId)) : request<HistoryPoint[]>(`/api/regions/${encodeURIComponent(regionId)}/history`),
-  getCityTable: (year: number, month?: number | null) => USE_MOCKS
+  getRegions: (signal?: AbortSignal) => USE_MOCKS ? empty<Region[]>(DEMO_REGIONS) : requestWithSignal<Region[]>('/api/regions', signal!),
+  getYears: (signal?: AbortSignal) => USE_MOCKS ? empty([...new Set(DEMO_PERIODS.map((p) => p.year))]) : requestWithSignal<number[]>('/api/years', signal!),
+  getPeriods: (signal?: AbortSignal) => USE_MOCKS ? empty(DEMO_PERIODS) : requestWithSignal<TimePeriod[]>('/api/periods', signal!),
+  getCities: (signal?: AbortSignal) => USE_MOCKS ? empty(DEMO_CITIES) : requestWithSignal<City[]>('/api/cities', signal!),
+  getMapPoints: (year: number, month?: number | null, signal?: AbortSignal) => USE_MOCKS ? empty(demoMapPoints({ year, month: month ?? null })) : requestWithSignal<MapPoint[]>(`/api/map/${year}${month != null ? `?month=${month}` : ''}`, signal!),
+  getRegionHistory: (regionId: string, signal?: AbortSignal) => USE_MOCKS ? empty(demoRegionHistory(regionId)) : requestWithSignal<HistoryPoint[]>(`/api/regions/${encodeURIComponent(regionId)}/history`, signal!),
+  getCityTable: (year: number, month?: number | null, signal?: AbortSignal) => USE_MOCKS
     ? empty(demoCityTable({ year, month: month ?? null }))
-    : request<CityDataRow[]>(`/api/data/cities?year=${year}${month != null ? `&month=${month}` : ''}`),
-  getCityCompare: (a: TimePeriod, b: TimePeriod) => USE_MOCKS
+    : requestWithSignal<CityDataRow[]>(`/api/data/cities?year=${year}${month != null ? `&month=${month}` : ''}`, signal!),
+  getCityCompare: (a: TimePeriod, b: TimePeriod, signal?: AbortSignal) => USE_MOCKS
     ? empty(demoCompare(a, b))
-    : request<CityCompareRow[]>(`/api/compare/cities?year_a=${a.year}${a.month != null ? `&month_a=${a.month}` : ''}&year_b=${b.year}${b.month != null ? `&month_b=${b.month}` : ''}`),
-  getRegionCompare: (a: TimePeriod, b: TimePeriod) => USE_MOCKS
+    : requestWithSignal<CityCompareRow[]>(`/api/compare/cities?year_a=${a.year}${a.month != null ? `&month_a=${a.month}` : ''}&year_b=${b.year}${b.month != null ? `&month_b=${b.month}` : ''}`, signal!),
+  getRegionCompare: (a: TimePeriod, b: TimePeriod, signal?: AbortSignal) => USE_MOCKS
     ? empty(demoRegionCompare(a, b))
-    : request<CompareRow[]>(`/api/compare?year_a=${a.year}&year_b=${b.year}`),
-  getCityMoods: (year: number, month?: number | null) => USE_MOCKS
+    : requestWithSignal<CompareRow[]>(`/api/compare?year_a=${a.year}&year_b=${b.year}`, signal!),
+  getCityMoods: (year: number, month?: number | null, signal?: AbortSignal) => USE_MOCKS
     ? empty(demoCityMoods({ year, month: month ?? null }))
-    : request<CityMood[]>(`/api/cities/moods?year=${year}${month != null ? `&month=${month}` : ''}`),
-  getCityHistory: (cityId: string) => request<HistoryPoint[]>(`/api/cities/${encodeURIComponent(cityId)}/history`),
-  getData: (year: number, month?: number | null) => request<DataRow[]>(`/api/data?year=${year}${month != null ? `&month=${month}` : ''}`),
-  getCompare: (yearA: number, yearB: number, monthA?: number | null, monthB?: number | null) => request<CompareRow[]>(`/api/compare?year_a=${yearA}&year_b=${yearB}${monthA != null ? `&month_a=${monthA}` : ''}${monthB != null ? `&month_b=${monthB}` : ''}`),
-  getRegionForecast: (regionId: string, horizon = 3) => request<ForecastResult>(`/api/forecast/${encodeURIComponent(regionId)}?horizon=${horizon}`),
-  getRussiaForecast: (horizon = 3) => request<ForecastResult>(`/api/forecast/russia?horizon=${horizon}`),
+    : requestWithSignal<CityMood[]>(`/api/cities/moods?year=${year}${month != null ? `&month=${month}` : ''}`, signal!),
+  getCityHistory: (cityId: string, signal?: AbortSignal) => requestWithSignal<HistoryPoint[]>(`/api/cities/${encodeURIComponent(cityId)}/history`, signal!),
+  getData: (year: number, month?: number | null, signal?: AbortSignal) => requestWithSignal<DataRow[]>(`/api/data?year=${year}${month != null ? `&month=${month}` : ''}`, signal!),
+  getCompare: (yearA: number, yearB: number, monthA?: number | null, monthB?: number | null, signal?: AbortSignal) => requestWithSignal<CompareRow[]>(`/api/compare?year_a=${yearA}&year_b=${yearB}${monthA != null ? `&month_a=${monthA}` : ''}${monthB != null ? `&month_b=${monthB}` : ''}`, signal!),
+  getRegionForecast: (regionId: string, horizon = 3, signal?: AbortSignal) => requestWithSignal<ForecastResult>(`/api/forecast/${encodeURIComponent(regionId)}?horizon=${horizon}`, signal!),
+  getRussiaForecast: (horizon = 3, signal?: AbortSignal) => requestWithSignal<ForecastResult>(`/api/forecast/russia?horizon=${horizon}`, signal!),
 }

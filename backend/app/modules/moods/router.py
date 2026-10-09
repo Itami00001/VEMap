@@ -19,13 +19,16 @@ def list_years(db: Session = Depends(get_db)):
 
 @router.get("/map/{year}", response_model=list[MapPointOut])
 def map_for_year(year: int, month: int | None = Query(default=None), db: Session = Depends(get_db)):
-    # v1.1: month принят для совместимости. Помесячных записей в БД пока нет
-    # (структура ждёт владельца данных) — запрос с month возвращает [].
     if month is not None:
-        return []
+        # Помесячный агрегат городов (вариант C): UA-города исключены внутри.
+        from app.modules.cities import service as city_service
+
+        return city_service.get_region_aggregates(db, year, month)
     points = mood_service.get_map_points(db, year, SCORING_VERSION)
     if not points:
         return []
+    for p in points:
+        p.source = f"survey:{SCORING_VERSION}"
     return points
 
 

@@ -7,6 +7,8 @@ from app.modules.admin.logs import AuditLog  # noqa: F401
 from app.modules.admin.router import router as admin_router
 from app.modules.auth.router import router as auth_router
 from app.modules.cities.router import router as cities_router
+from app.modules.cities.model import City  # noqa: F401
+from app.modules.cities.mood_model import CityMoodRecord  # noqa: F401
 from app.modules.forecast.models import ForecastRun  # noqa: F401
 from app.modules.forecast.router import router as forecast_router
 from app.modules.moods.router import router as moods_router

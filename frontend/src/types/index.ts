@@ -88,8 +88,11 @@ export interface ImportStageResponse {
 export interface City {
   city_id: string
   name_ru: string
-  region_id: string
+  region_id: string | null
   region_name: string
+  country?: string
+  lat?: number
+  lon?: number
 }
 
 export interface TimePeriod {
@@ -100,7 +103,7 @@ export interface TimePeriod {
 export interface CityDataRow {
   city_id: string
   name_ru: string
-  region_id: string
+  region_id: string | null
   region_name: string
   mood_index: number | null
   responses_count: number | null
@@ -116,7 +119,7 @@ export interface CityMood {
 export interface CityCompareRow {
   city_id: string
   name_ru: string
-  region_id: string
+  region_id: string | null
   mood_a: number | null
   mood_b: number | null
   delta: number | null

@@ -3,6 +3,7 @@ import { api } from '../services/api'
 import type { CityDataRow, TimePeriod } from '../types'
 import Filters from '../features/data/Filters'
 import RegionTable from '../features/data/RegionTable'
+import DemoBadge from '../features/map/DemoBadge'
 
 export default function DataPage() {
   const [periods, setPeriods] = useState<TimePeriod[]>([])
@@ -14,19 +15,29 @@ export default function DataPage() {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    api.getPeriods()
+    const controller = new AbortController()
+    api.getPeriods(controller.signal)
       .then((items) => {
         setPeriods(items)
         setPeriod(items.at(-1) ?? null)
       })
-      .catch((e: unknown) => setError(e instanceof Error ? e.message : String(e)))
+      .catch((e: unknown) => {
+        if (e instanceof DOMException && e.name === 'AbortError') return
+        setError(e instanceof Error ? e.message : String(e))
+      })
+    return () => controller.abort()
   }, [])
 
   useEffect(() => {
     if (!period) return
-    api.getCityTable(period.year, period.month)
+    const controller = new AbortController()
+    api.getCityTable(period.year, period.month, controller.signal)
       .then(setRows)
-      .catch((e: unknown) => setError(e instanceof Error ? e.message : String(e)))
+      .catch((e: unknown) => {
+        if (e instanceof DOMException && e.name === 'AbortError') return
+        setError(e instanceof Error ? e.message : String(e))
+      })
+    return () => controller.abort()
   }, [period])
 
   const view = useMemo(() => {
@@ -62,7 +73,7 @@ export default function DataPage() {
       <div className="page-head">
         <div>
           <h1>Данные</h1>
-          <p>Публичные значения Mood Index по городам. <span className="muted">DEMO DATA</span></p>
+          <p>Публичные значения Mood Index по городам. <DemoBadge /></p>
         </div>
       </div>
       {error && <div className="alert error">Ошибка загрузки данных: {error}</div>}

@@ -20,7 +20,7 @@ export default function Layout() {
       </main>
       <footer className="site-footer">
         <span>VEMAP — аналитическая платформа настроений регионов России</span>
-        <span>Текущие данные: DEMO DATA (демонстрационные, не реальные)</span>
+        <span>Текущие данные: DEMO DATA — тестовые данные</span>
       </footer>
     </div>
   )

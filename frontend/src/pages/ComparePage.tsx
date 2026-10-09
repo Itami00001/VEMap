@@ -3,6 +3,7 @@ import { api } from '../services/api'
 import type { CityCompareRow, MapPoint, Region, TimePeriod } from '../types'
 import CompareYears from '../features/data/CompareYears'
 import MapView from '../features/map/MapView'
+import DemoBadge from '../features/map/DemoBadge'
 
 export default function ComparePage() {
   const [periods, setPeriods] = useState<TimePeriod[]>([])
@@ -16,33 +17,43 @@ export default function ComparePage() {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    api.getPeriods()
+    const controller = new AbortController()
+    api.getPeriods(controller.signal)
       .then((items) => {
         setPeriods(items)
         setPeriodA(items[0] ?? null)
         setPeriodB(items.at(-1) ?? null)
       })
-      .catch((e: unknown) => setError(e instanceof Error ? e.message : String(e)))
-    api.getRegions().then(setRegions).catch(() => undefined)
+      .catch((e: unknown) => {
+        if (e instanceof DOMException && e.name === 'AbortError') return
+        setError(e instanceof Error ? e.message : String(e))
+      })
+    api.getRegions(controller.signal).then(setRegions).catch(() => undefined)
+    return () => controller.abort()
   }, [])
 
   useEffect(() => {
     if (!periodA || !periodB) return
-    api.getCityCompare(periodA, periodB).then(setRows).catch((e: unknown) => setError(e instanceof Error ? e.message : String(e)))
-    api.getRegionCompare(periodA, periodB)
+    const controller = new AbortController()
+    api.getCityCompare(periodA, periodB, controller.signal).then(setRows).catch((e: unknown) => {
+      if (e instanceof DOMException && e.name === 'AbortError') return
+      setError(e instanceof Error ? e.message : String(e))
+    })
+    api.getRegionCompare(periodA, periodB, controller.signal)
       .then((ds) => {
         const map: Record<string, number | null> = {}
         for (const d of ds) map[d.region_id] = d.delta
         setDelta(map)
       })
       .catch(() => undefined)
-    api.getMapPoints(periodB.year, periodB.month)
+    api.getMapPoints(periodB.year, periodB.month, controller.signal)
       .then((pts) => {
         const map: Record<string, MapPoint> = {}
         for (const p of pts) map[p.region_id] = p
         setMapB(map)
       })
       .catch(() => undefined)
+    return () => controller.abort()
   }, [periodA, periodB])
 
   const values = useMemo(() => {
@@ -60,7 +71,7 @@ export default function ComparePage() {
       <div className="page-head">
         <div>
           <h1>Сравнение периодов</h1>
-          <p>Изменение Mood Index между двумя существующими периодами. <span className="muted">DEMO DATA</span></p>
+          <p>Изменение Mood Index между двумя существующими периодами. <DemoBadge /></p>
         </div>
       </div>
       {error && <div className="alert error">Ошибка загрузки данных: {error}</div>}

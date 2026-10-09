@@ -1,6 +1,6 @@
 import type { AdminMoodRecord, ImportStageResponse, Survey } from '../types'
 
-const BASE_URL: string = import.meta.env.VITE_API_URL ?? 'http://localhost:8000'
+const BASE_URL: string = import.meta.env.VITE_API_URL ?? ''
 const TOKEN_KEY = 'mm_admin_token'
 
 export function getAdminToken(): string | null {

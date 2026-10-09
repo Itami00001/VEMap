@@ -1,5 +1,8 @@
-// DEMO-данные для режима VITE_USE_MOCKS=true (step07 v1.1).
-// Не реальные наблюдения. Города — стартовый список ТЗ v1.1 §8.
+// DEMO-данные для режима VITE_USE_MOCKS=true.
+// 1905-01 — РЕАЛЬНЫЕ значения из data/examples/draft_for_webdev.csv
+//   (mood_index = sentiment_norm * 100, responses_count = n_lines).
+// 1905-02..04 — СИНТЕЗИРОВАНЫ детерминированным сдвигом (БЕЗ random!),
+//   только чтобы ползунку было куда двигаться. В UI помечены DEMO DATA.
 
 import type { City, CityDataRow, CityMood, HistoryPoint, MapPoint, Region, TimePeriod } from '../types'
 
@@ -8,6 +11,10 @@ export const DEMO_REGIONS: Region[] = [
   { region_id: 'RU-SPE', region_code: 'RU-SPE', name_ru: 'Санкт-Петербург', name_en: 'Saint Petersburg', name_crh: 'Санкт-Петербург', federal_district: 'Северо-Западный' },
   { region_id: 'RU-CR', region_code: 'RU-CR', name_ru: 'Республика Крым', name_en: 'Crimea', name_crh: 'Qırım', federal_district: 'Южный' },
   { region_id: 'RU-SEV', region_code: 'RU-SEV', name_ru: 'Севастополь', name_en: 'Sevastopol', name_crh: 'Aqyar', federal_district: 'Южный' },
+  { region_id: 'RU-KRS', region_code: 'RU-KRS', name_ru: 'Курская область', name_en: 'Kursk Oblast', name_crh: 'Курская область', federal_district: 'Центральный' },
+  { region_id: 'RU-VOR', region_code: 'RU-VOR', name_ru: 'Воронежская область', name_en: 'Voronezh Oblast', name_crh: 'Воронежская область', federal_district: 'Центральный' },
+  { region_id: 'RU-SAR', region_code: 'RU-SAR', name_ru: 'Саратовская область', name_en: 'Saratov Oblast', name_crh: 'Саратовская область', federal_district: 'Приволжский' },
+  { region_id: 'RU-YAR', region_code: 'RU-YAR', name_ru: 'Ярославская область', name_en: 'Yaroslavl Oblast', name_crh: 'Ярославская область', federal_district: 'Центральный' },
 ]
 
 export const DEMO_CITIES: City[] = [
@@ -19,20 +26,76 @@ export const DEMO_CITIES: City[] = [
   { city_id: 'kerch', name_ru: 'Керчь', region_id: 'RU-CR', region_name: 'Республика Крым' },
   { city_id: 'evpatoria', name_ru: 'Евпатория', region_id: 'RU-CR', region_name: 'Республика Крым' },
   { city_id: 'belogorsk', name_ru: 'Белогорск', region_id: 'RU-CR', region_name: 'Республика Крым' },
+  { city_id: 'kursk', name_ru: 'Курск', region_id: 'RU-KRS', region_name: 'Курская область' },
+  { city_id: 'voronezh', name_ru: 'Воронеж', region_id: 'RU-VOR', region_name: 'Воронежская область' },
+  { city_id: 'saratov', name_ru: 'Саратов', region_id: 'RU-SAR', region_name: 'Саратовская область' },
+  { city_id: 'yaroslavl', name_ru: 'Ярославль', region_id: 'RU-YAR', region_name: 'Ярославская область' },
+  { city_id: 'kyiv', name_ru: 'Киев', region_id: null, region_name: 'Украина' },
+  { city_id: 'kharkiv', name_ru: 'Харьков', region_id: null, region_name: 'Украина' },
+  { city_id: 'mykolaiv', name_ru: 'Николаев', region_id: null, region_name: 'Украина' },
 ]
 
 export const DEMO_PERIODS: TimePeriod[] = [
-  { year: 2024, month: 1 },
-  { year: 2024, month: 5 },
-  { year: 2025, month: 6 },
+  { year: 1905, month: 1 },
+  { year: 1905, month: 2 },
+  { year: 1905, month: 3 },
+  { year: 1905, month: 4 },
 ]
 
 function key(p: TimePeriod): string {
   return `${p.year}-${p.month ?? 'y'}`
 }
 
-// Агрегат по регионам для карты (сумма городов региона, DEMO).
+// База 1905-01: реальные sentiment_norm / n_lines из CSV.
+// Порядок фиксирован — индекс используется детерминированным сдвигом ниже.
+const CSV_1905_01: Array<{ city_id: string; region_id: string | null; norm: number; n: number }> = [
+  { city_id: 'moskva', region_id: 'RU-MOW', norm: 0.786, n: 9319 },
+  { city_id: 'spb', region_id: 'RU-SPE', norm: 0.75, n: 859 },
+  { city_id: 'kursk', region_id: 'RU-KRS', norm: 0.75, n: 41 },
+  { city_id: 'voronezh', region_id: 'RU-VOR', norm: 0.15, n: 1162 },
+  { city_id: 'saratov', region_id: 'RU-SAR', norm: 1.0, n: 2898 },
+  { city_id: 'yaroslavl', region_id: 'RU-YAR', norm: 0.375, n: 2544 },
+  { city_id: 'kyiv', region_id: null, norm: 0.3, n: 1408 },
+  { city_id: 'kharkiv', region_id: null, norm: 0.5, n: 2492 },
+  { city_id: 'mykolaiv', region_id: null, norm: 0.0, n: 718 },
+]
+
+// Детерминированный сдвиг нормы для синтезированных месяцев k = 1..3.
+// delta = (((i * 5 + k * 3) % 5) - 2) * 0.025  →  {-0.05, -0.025, 0, +0.025, +0.05}.
+// Никакого random(): один и тот же вход всегда даёт один и тот же выход.
+function synthNorm(base: number, i: number, k: number): number {
+  const delta = (((i * 5 + k * 3) % 5) - 2) * 0.025
+  return Math.round(Math.min(1, Math.max(0, base + delta)) * 1000) / 1000
+}
+
+function moodOf(norm: number): number {
+  return Math.round(norm * 100 * 10) / 10
+}
+
+function build1905(): { cities: Record<string, CityMood[]>; regions: Record<string, MapPoint[]> } {
+  const cities: Record<string, CityMood[]> = {}
+  const regions: Record<string, MapPoint[]> = {}
+  for (let k = 0; k <= 3; k++) {
+    const pkey = `1905-${k + 1}`
+    cities[pkey] = CSV_1905_01.map((c, i) => ({
+      city_id: c.city_id,
+      mood_index: moodOf(synthNorm(c.norm, i, k)),
+      responses_count: c.n,
+    }))
+    const byRegion = new Map<string, CityMood>()
+    CSV_1905_01.forEach((c, i) => {
+      if (c.region_id) byRegion.set(c.region_id, { city_id: c.city_id, mood_index: moodOf(synthNorm(c.norm, i, k)), responses_count: c.n })
+    })
+    regions[pkey] = [...byRegion.entries()].map(([region_id, m]) => ({ region_id, mood_index: m.mood_index, responses_count: m.responses_count }))
+  }
+  return { cities, regions }
+}
+
+const GEN1905 = build1905()
+
+// Агрегат по регионам для карты (1905 — из городов выше; 2024+ — старые DEMO).
 const DEMO_MAP: Record<string, MapPoint[]> = {
+  ...GEN1905.regions,
   '2024-1': [
     { region_id: 'RU-MOW', mood_index: 68.2, responses_count: 42 },
     { region_id: 'RU-SPE', mood_index: 64.5, responses_count: 31 },
@@ -57,8 +120,9 @@ export function demoMapPoints(period: TimePeriod): MapPoint[] {
   return DEMO_MAP[key(period)] ?? []
 }
 
-// DEMO-значения по городам за период (согласованы с агрегатом региона выше).
+// Значения по городам за период (1905-01 — реал из CSV, 02–04 — синтез выше).
 const DEMO_CITY_MOODS: Record<string, CityMood[]> = {
+  ...GEN1905.cities,
   '2024-1': [
     { city_id: 'moskva', mood_index: 68.2, responses_count: 42 },
     { city_id: 'spb', mood_index: 64.5, responses_count: 31 },

@@ -16,18 +16,17 @@ services:
       - "8001:8000"
     environment:
       DATABASE_URL: postgresql://mapmood:mapmood@postgres:5432/mapmood
-      JWT_SECRET: dev-jwt-secret
-      ADMIN_EMAIL: admin@mapmood.local
-      ADMIN_PASSWORD: changeme
+      JWT_SECRET: ${JWT_SECRET}
+      ADMIN_EMAIL: ${ADMIN_EMAIL}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
     depends_on:
       - postgres
 
   frontend:
-    build:
-      context: ./frontend
-      args:
-        VITE_API_URL: http://localhost:8001
-        VITE_USE_MOCKS: "true"
+    # Образ собирается из локального dist (см. frontend/Dockerfile):
+    # сначала `npm run build` в frontend/ (VITE_* запекаются из окружения),
+    # затем `docker compose build frontend`.
+    build: ./frontend
     ports:
       - "5173:80"
     depends_on:

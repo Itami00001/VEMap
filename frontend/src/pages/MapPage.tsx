@@ -1,27 +1,41 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
+import type * as maplibregl from 'maplibre-gl'
 import { api } from '../services/api'
-import type { MapPoint, Region } from '../types'
+import type { City, CityMood, MapPoint, Region } from '../types'
+import CityMarkers from '../features/map/CityMarkers'
 import MapView from '../features/map/MapView'
 import RegionPopup from '../features/map/RegionPopup'
 import { RegionDetails } from '../features/map/RegionPopup'
 import { moodLegend } from '../features/map/legend'
 import { useMapData } from '../features/map/useMapData'
 import TimeSlider from '../features/map/TimeSlider'
+import DemoBadge from '../features/map/DemoBadge'
 
 export default function MapPage() {
   const { periods, period, setPeriod, points, loading, error } = useMapData()
   const [regions, setRegions] = useState<Region[]>([])
+  const [cities, setCities] = useState<City[]>([])
+  const [cityMoods, setCityMoods] = useState<CityMood[]>([])
+  const [map, setMap] = useState<maplibregl.Map | null>(null)
   const [popup, setPopup] = useState<{ regionId: string; x: number; y: number } | null>(null)
+  const [cityId, setCityId] = useState<string | null>(null)
   const [searchParams, setSearchParams] = useSearchParams()
   const shellRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    api
-      .getRegions()
-      .then(setRegions)
-      .catch(() => undefined)
+    const controller = new AbortController()
+    api.getRegions(controller.signal).then(setRegions).catch(() => undefined)
+    api.getCities(controller.signal).then(setCities).catch(() => undefined)
+    return () => controller.abort()
   }, [])
+
+  useEffect(() => {
+    if (!period) return
+    const controller = new AbortController()
+    api.getCityMoods(period.year, period.month, controller.signal).then(setCityMoods).catch(() => setCityMoods([]))
+    return () => controller.abort()
+  }, [period])
 
   const regionFromUrl = searchParams.get('region')
   const region = regions.find((r) => r.region_id === regionFromUrl)
@@ -47,6 +61,8 @@ export default function MapPage() {
 
   const legend = moodLegend()
   const popupRegion = regions.find((r) => r.region_id === popup?.regionId)
+  const city = cities.find((item) => item.city_id === cityId)
+  const cityMood = cityMoods.find((item) => item.city_id === cityId)
 
   return (
     <div className="page">
@@ -56,7 +72,7 @@ export default function MapPage() {
           <p>
             Mood Index по регионам России (агрегат городов). Период:{' '}
             {period ? `${period.year}-${String(period.month ?? 0).padStart(2, '0')}` : '—'}.
-            Кликните по региону для деталей. <span className="muted">DEMO DATA</span>
+            Кликните по региону для деталей. <DemoBadge />
           </p>
         </div>
       </div>
@@ -69,8 +85,12 @@ export default function MapPage() {
           values={values}
           mode="mood"
           onRegionClick={handleRegionClick}
-          onBackgroundClick={() => setPopup(null)}
+          onBackgroundClick={() => { setPopup(null); setCityId(null) }}
+          onMapReady={setMap}
         />
+        <div className="map-overlay-cities">
+          <CityMarkers map={map} period={period} onCityClick={(id) => { setPopup(null); setSearchParams({ city: id }, { replace: true }); setCityId(id) }} />
+        </div>
         <div className="map-overlay-top">
           <TimeSlider periods={periods} value={period} onChange={setPeriod} />
           <div className="map-legend">
@@ -88,6 +108,17 @@ export default function MapPage() {
             <span className="muted">серый — нет данных</span>
           </div>
         </div>
+
+        {cityId && (
+          <div className="region-popup city-details-popup" style={{ top: 60, right: 12, left: 'auto' }}>
+            <button type="button" className="close" onClick={() => { setCityId(null); setSearchParams({}, { replace: true }) }} aria-label="Закрыть">✕</button>
+            <h3>{city?.name_ru ?? cityId}</h3>
+            <div className="popup-metric"><span>Настроение</span><b>{cityMood ? cityMood.mood_index.toFixed(1) : '—'}</b></div>
+            <div className="popup-metric"><span>Публикаций</span><b>{cityMood?.responses_count ?? '—'}</b></div>
+            <div className="popup-metric"><span>Категория</span><b>{cityMood ? cityMood.mood_index >= 66.7 ? 'позитивное' : cityMood.mood_index >= 33.3 ? 'нейтральное' : 'негативное' : 'нет данных'}</b></div>
+            <div className="popup-metric"><span>Период</span><b>{period ? `${period.year}-${String(period.month ?? 0).padStart(2, '0')}` : '—'}</b></div>
+          </div>
+        )}
 
         {popup && popupRegion && (
           <RegionPopup

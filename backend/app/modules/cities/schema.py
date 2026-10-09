@@ -22,7 +22,7 @@ class CityMoodOut(BaseModel):
 class CityDataRowOut(BaseModel):
     city_id: str
     name_ru: str
-    region_id: str
+    region_id: str | None
     region_name: str
     mood_index: float | None
     responses_count: int | None
@@ -32,7 +32,7 @@ class CityDataRowOut(BaseModel):
 class CityCompareRowOut(BaseModel):
     city_id: str
     name_ru: str
-    region_id: str
+    region_id: str | None
     mood_a: float | None
     mood_b: float | None
     delta: float | None

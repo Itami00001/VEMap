@@ -19,6 +19,7 @@ class MapPointOut(BaseModel):
     region_id: str
     mood_index: float
     responses_count: int
+    source: str | None = None
 
 
 class HistoryPointOut(BaseModel):
