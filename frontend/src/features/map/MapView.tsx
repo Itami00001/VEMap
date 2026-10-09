@@ -43,9 +43,11 @@ function fillColorExpr(mode: MapMode): Expression {
   return ['case', ['==', ['get', 'value'], null], '#39404e', stops]
 }
 
-// Подложка стран: все — серые.
-function countryColorExpr(): string {
-  return '#2a2f36'
+// Подложка стран: РФ — свой цвет, Украина — свой, остальные — серые.
+// Крым в world-файле входит в полигон Украины и перекрывается слоем
+// russia-regions (RU-CR, RU-SEV) выше.
+function countryColorExpr(): Expression {
+  return ['match', ['get', 'ISO_A3'], 'RUS', '#2b3a52', 'UKR', '#4a3a5c', '#2a2f36']
 }
 
 // Яркие границы для РФ, Украины, Крыма, Севастополя.
@@ -103,6 +105,8 @@ export default function MapView({
       center: [105, 61],
       zoom: 3,
       interactive,
+      // Атрибуция отключена: AttributionControl со шторкой не нужен.
+      attributionControl: false,
     })
     mapRef.current = map
 
@@ -144,8 +148,9 @@ export default function MapView({
             type: 'line',
             source: 'regions',
             paint: {
-              'line-color': '#0b0e14',
-              'line-width': 0.7,
+              // Крым и Севастополь — широкие белые границы, остальные — тонкие серые.
+              'line-color': ['case', ['in', ['get', 'region_id'], ['literal', ['RU-CR', 'RU-SEV']]], '#ffffff', '#6b7484'],
+              'line-width': ['case', ['in', ['get', 'region_id'], ['literal', ['RU-CR', 'RU-SEV']]], 2.5, 0.5],
             },
           })
           // Границы стран поверх регионов: серые для всех, белые для РФ и Украины.
@@ -188,7 +193,9 @@ export default function MapView({
       mapRef.current = null
       baseRef.current = null
     }
-  }, [interactive])
+    // Карта создаётся один раз за жизнь компонента: interactive — опция
+    // конструктора maplibre (не реактивна), ре-рендеры карту не трогают.
+  }, [])
 
   useEffect(() => {
     const map = mapRef.current

@@ -11,6 +11,7 @@ import { moodLegend } from '../features/map/legend'
 import { useMapData } from '../features/map/useMapData'
 import TimeSlider from '../features/map/TimeSlider'
 import DemoBadge from '../features/map/DemoBadge'
+import CityPanel from '../features/map/CityPanel'
 
 export default function MapPage() {
   const { periods, period, setPeriod, points, loading, error } = useMapData()
@@ -36,6 +37,11 @@ export default function MapPage() {
     api.getCityMoods(period.year, period.month, controller.signal).then(setCityMoods).catch(() => setCityMoods([]))
     return () => controller.abort()
   }, [period])
+
+  const closeCity = () => {
+    setCityId(null)
+    setSearchParams({}, { replace: true })
+  }
 
   const regionFromUrl = searchParams.get('region')
   const region = regions.find((r) => r.region_id === regionFromUrl)
@@ -109,17 +115,6 @@ export default function MapPage() {
           </div>
         </div>
 
-        {cityId && (
-          <div className="region-popup city-details-popup" style={{ top: 60, right: 12, left: 'auto' }}>
-            <button type="button" className="close" onClick={() => { setCityId(null); setSearchParams({}, { replace: true }) }} aria-label="Закрыть">✕</button>
-            <h3>{city?.name_ru ?? cityId}</h3>
-            <div className="popup-metric"><span>Настроение</span><b>{cityMood ? cityMood.mood_index.toFixed(1) : '—'}</b></div>
-            <div className="popup-metric"><span>Публикаций</span><b>{cityMood?.responses_count ?? '—'}</b></div>
-            <div className="popup-metric"><span>Категория</span><b>{cityMood ? cityMood.mood_index >= 66.7 ? 'позитивное' : cityMood.mood_index >= 33.3 ? 'нейтральное' : 'негативное' : 'нет данных'}</b></div>
-            <div className="popup-metric"><span>Период</span><b>{period ? `${period.year}-${String(period.month ?? 0).padStart(2, '0')}` : '—'}</b></div>
-          </div>
-        )}
-
         {popup && popupRegion && (
           <RegionPopup
             x={popup.x}
@@ -147,6 +142,10 @@ export default function MapPage() {
           </div>
         )}
       </div>
+
+      {cityId && (
+        <CityPanel city={city} cityId={cityId} mood={cityMood ?? null} onClose={closeCity} />
+      )}
     </div>
   )
 }
