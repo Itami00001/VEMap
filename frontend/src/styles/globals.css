@@ -1001,9 +1001,9 @@ table.data th.num {
 
 .maplibregl-canvas { outline: none; }
 .city-popup .maplibregl-popup-content {
-  max-width: 280px;
-  padding: 10px 14px;
-  font-size: 13px;
+  max-width: 260px;
+  padding: 8px 12px;
+  font-size: 12px;
   background: #1a1f28;
   color: var(--text);
   border: 1px solid var(--border);

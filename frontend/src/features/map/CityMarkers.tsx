@@ -26,7 +26,6 @@ function escapeHtml(value: string): string {
 
 export default function CityMarkers({ map, period, onCityClick }: CityMarkersProps) {
   const popupRef = useRef<maplibregl.Popup | null>(null)
-  const selectedRef = useRef<string | null>(null)
   const onCityClickRef = useRef(onCityClick)
   onCityClickRef.current = onCityClick
 
@@ -59,15 +58,17 @@ export default function CityMarkers({ map, period, onCityClick }: CityMarkersPro
         },
       })
     }
-    const show = (feature: maplibregl.MapGeoJSONFeature, persistent: boolean) => {
+    // Hover-тултип: компактный, без крестика, убирается на mouseleave.
+    // На клик popup НЕ создаётся — данные уходят в CityPanel.
+    const show = (feature: maplibregl.MapGeoJSONFeature) => {
       const p = feature.properties ?? {}
       const coords = (feature.geometry as { coordinates: [number, number] }).coordinates
       popupRef.current?.remove()
-      popupRef.current = new maplibregl.Popup({ closeButton: persistent, closeOnClick: false, className: 'city-popup' }).setLngLat(coords).setHTML(tipHtml(escapeHtml(String(p.name)), Number(p.mood) || null, Number(p.count) || null)).addTo(map)
+      popupRef.current = new maplibregl.Popup({ closeButton: false, closeOnClick: false, className: 'city-popup' }).setLngLat(coords).setHTML(tipHtml(escapeHtml(String(p.name)), Number(p.mood) || null, Number(p.count) || null)).addTo(map)
     }
-    const move = (e: MapLayerMouseEvent) => { map.getCanvas().style.cursor = 'pointer'; map.setPaintProperty('cities-hover', 'circle-opacity', 1); show(e.features?.[0] as maplibregl.MapGeoJSONFeature, false) }
-    const leave = () => { map.getCanvas().style.cursor = ''; map.setPaintProperty('cities-hover', 'circle-opacity', 0); if (!selectedRef.current) popupRef.current?.remove() }
-    const click = (e: MapLayerMouseEvent) => { const feature = e.features?.[0]; if (!feature) return; selectedRef.current = String(feature.properties?.city_id); show(feature, true); onCityClickRef.current?.(String(feature.properties?.city_id)); e.originalEvent.stopPropagation() }
+    const move = (e: MapLayerMouseEvent) => { map.getCanvas().style.cursor = 'pointer'; map.setPaintProperty('cities-hover', 'circle-opacity', 1); show(e.features?.[0] as maplibregl.MapGeoJSONFeature) }
+    const leave = () => { map.getCanvas().style.cursor = ''; map.setPaintProperty('cities-hover', 'circle-opacity', 0); popupRef.current?.remove() }
+    const click = (e: MapLayerMouseEvent) => { const feature = e.features?.[0]; if (!feature) return; onCityClickRef.current?.(String(feature.properties?.city_id)); e.originalEvent.stopPropagation() }
     map.on('mouseenter', 'cities-circle', move)
     map.on('mouseleave', 'cities-circle', leave)
     map.on('click', 'cities-circle', click)
@@ -103,7 +104,7 @@ export default function CityMarkers({ map, period, onCityClick }: CityMarkersPro
     }
     if (map.isStyleLoaded()) initialize()
     else map.once('load', initialize)
-    return () => { map.off('load', initialize); map.off('mouseenter', 'cities-circle', move); map.off('mouseleave', 'cities-circle', leave); map.off('click', 'cities-circle', click); popupRef.current?.remove(); selectedRef.current = null }
+    return () => { map.off('load', initialize); map.off('mouseenter', 'cities-circle', move); map.off('mouseleave', 'cities-circle', leave); map.off('click', 'cities-circle', click); popupRef.current?.remove() }
   }, [map, period])
 
   return null
