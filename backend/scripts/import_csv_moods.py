@@ -1,9 +1,16 @@
 """Idempotent import of newspaper CSV moods (scoring_version 2.0).
 
 Usage:
-    python scripts/import_csv_moods.py [path/to.csv]
-Default: data/examples/draft_for_webdev.csv (columns:
-city, year, month, sentiment, sentiment_norm, n_lines).
+    python scripts/import_csv_moods.py [path/to.csv ...] [path/to/dir ...]
+Default: data/examples/ directory (all *.csv, sorted; README files skipped).
+
+File quirks handled: leading '# ...' comment lines are ignored;
+files without a header row get the canonical column order.
+Columns: city, year, month, sentiment, sentiment_norm, n_lines.
+
+Empty sentiment_norm -> temporary norm (sentiment + 1) / 2
+(see data/examples/test-data-README.md §4).
+Existing city/year/month/version rows are skipped (unique index).
 
 Unknown city name -> error, nothing is imported silently.
 """
@@ -19,9 +26,43 @@ from app.modules.cities.mood_model import CityMoodRecord
 from app.modules.regions.model import Region  # noqa: F401 (FK target metadata)
 
 ROOT = Path(__file__).resolve().parents[2]
-CSV_FILE = ROOT / "data" / "examples" / "draft_for_webdev.csv"
-TEST_FILE = ROOT / "data" / "examples" / "test-data.csv"
+EXAMPLES_DIR = ROOT / "data" / "examples"
+CSV_FILE = EXAMPLES_DIR / "draft_for_webdev.csv"
+TEST_FILE = EXAMPLES_DIR / "test-data.csv"
 DEFAULT_FILES = [CSV_FILE, TEST_FILE]
+
+COLUMNS = ["city", "year", "month", "sentiment", "sentiment_norm", "n_lines"]
+
+
+def resolve_paths(args: list[str]) -> list[Path]:
+    """Argv paths (files or dirs) -> sorted *.csv files, README skipped."""
+    if not args:
+        return [p for p in DEFAULT_FILES if p.exists()]
+    out: list[Path] = []
+    for a in args:
+        p = Path(a)
+        if p.is_dir():
+            for f in sorted(p.glob("*.csv")):
+                if "readme" in f.name.lower():
+                    print(f"Skip README-like file: {f.name}")
+                    continue
+                out.append(f)
+        elif p.exists():
+            out.append(p)
+        else:
+            print(f"Skip missing path: {p}")
+    return out
+
+
+def read_rows(path: Path) -> list[dict]:
+    """Read CSV skipping '#' comments; header optional (canonical order fallback)."""
+    with open(path, encoding="utf-8-sig") as f:
+        lines = [ln for ln in f.read().splitlines() if ln.strip() and not ln.lstrip().startswith("#")]
+    if not lines:
+        return []
+    if [c.strip() for c in lines[0].split(",")] == COLUMNS:
+        return list(csv.DictReader(lines))
+    return list(csv.DictReader(lines, fieldnames=COLUMNS))
 
 # Сырое имя (lower) -> каноника. См. docs/import-spec.md §4.
 CANONICAL: dict[str, dict] = {
@@ -51,8 +92,7 @@ def load(path: Path) -> None:
     Base.metadata.create_all(bind=engine)
     db = SessionLocal()
     try:
-        with open(path, encoding="utf-8-sig") as f:
-            rows = list(csv.DictReader(f))
+        rows = read_rows(path)
         cities = cities_new = records_new = 0
         for row in rows:
             raw = (row.get("city") or "").strip()
@@ -108,10 +148,6 @@ def load(path: Path) -> None:
 
 
 if __name__ == "__main__":
-    paths = [Path(a) for a in sys.argv[1:]] or DEFAULT_FILES
-    for p in paths:
-        if not p.exists():
-            print(f"Skip missing file: {p}")
-            continue
+    for p in resolve_paths(sys.argv[1:]):
         print(f"Importing {p} ...")
         load(p)
