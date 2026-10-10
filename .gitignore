@@ -20,3 +20,6 @@ docs/
 delete/
 Untitled Workspace/
 .editorconfig
+
+# Historical geo: raw CShapes dump is local only, processed files are committed
+data/geo/historical/raw/

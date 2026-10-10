@@ -85,7 +85,7 @@ export default function ComparePage() {
         onMode={setMode}
       />
       <div className="map-shell" style={{ marginBottom: 18 }}>
-        <MapView values={values} mode={mode === 'delta' ? 'delta' : 'mood'} interactive={false} />
+        <MapView values={values} mode={mode === 'delta' ? 'delta' : 'mood'} interactive={false} year={periodB?.year ?? null} />
         <div className="map-overlay-top">
           <span className="muted" style={{ fontSize: 12 }}>
             {mode === 'delta' ? 'Синий — рост, красный — падение, серый — нет данных' : 'Абсолютные значения периода B, серый — нет данных'}

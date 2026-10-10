@@ -90,6 +90,7 @@ export default function MapPage() {
         <MapView
           values={values}
           mode="mood"
+          year={period?.year ?? null}
           onRegionClick={handleRegionClick}
           onBackgroundClick={() => { setPopup(null); setCityId(null) }}
           onMapReady={setMap}

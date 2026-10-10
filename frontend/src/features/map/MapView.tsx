@@ -1,7 +1,9 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import * as maplibregl from 'maplibre-gl'
 import type { MapLayerMouseEvent, StyleSpecification } from 'maplibre-gl'
 import { GEOJSON_URL, WORLD_GEOJSON_URL } from '../../services/api'
+import HistoricalBordersLayer from './historical/HistoricalBordersLayer'
+import { useHistoricalBorders } from './historical/useHistoricalBorders'
 
 // Воркер maplibre-gl v6 резолвится относительно бандла (./maplibre-gl-worker.mjs),
 // который Vite не эмитит -> 404 text/html -> карта мертва.
@@ -17,6 +19,7 @@ export interface MapViewProps {
   mode?: MapMode
   mini?: boolean
   interactive?: boolean
+  year?: number | null
   onRegionClick?: (regionId: string, point: { x: number; y: number }) => void
   onBackgroundClick?: () => void
   onMapReady?: (map: maplibregl.Map) => void
@@ -88,12 +91,15 @@ export default function MapView({
   mode = 'mood',
   mini = false,
   interactive = true,
+  year = null,
   onRegionClick,
   onBackgroundClick,
   onMapReady,
 }: MapViewProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<maplibregl.Map | null>(null)
+  const [mapInstance, setMapInstance] = useState<maplibregl.Map | null>(null)
+  const empireUrl = useHistoricalBorders(year)
   const baseRef = useRef<GeoCollection | null>(null)
   const valuesRef = useRef(values)
   const modeRef = useRef(mode)
@@ -194,6 +200,7 @@ export default function MapView({
             })
           }
           readyRef.current?.(map)
+          setMapInstance(map)
         })
         .catch(() => undefined)
     })
@@ -202,9 +209,8 @@ export default function MapView({
       map.remove()
       mapRef.current = null
       baseRef.current = null
+      setMapInstance(null)
     }
-    // Карта создаётся один раз за жизнь компонента: interactive — опция
-    // конструктора maplibre (не реактивна), ре-рендеры карту не трогают.
   }, [])
 
   useEffect(() => {
@@ -217,5 +223,10 @@ export default function MapView({
     map.setPaintProperty('regions-fill', 'fill-color', fillColorExpr(mode) as never)
   }, [values, mode])
 
-  return <div ref={containerRef} className={`map-canvas${mini ? ' mini' : ''}`} />
+  return (
+    <>
+      <div ref={containerRef} className={`map-canvas${mini ? ' mini' : ''}`} />
+      <HistoricalBordersLayer map={mapInstance} url={empireUrl} />
+    </>
+  )
 }
