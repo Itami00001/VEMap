@@ -43,10 +43,11 @@ function fillColorExpr(mode: MapMode): Expression {
   return ['case', ['==', ['get', 'value'], null], '#39404e', stops]
 }
 
-// Подложка стран: один серый для всех. Целевые страны (RUS, UKR, Крым)
-// выделяются другими слоями — regions-fill/regions-line и countries-line.
-function countryColorExpr(): string {
-  return '#2a2f36'
+// Подложка стран: РФ и Украина — небесно-голубые, остальные — серые.
+// Крым (RU-CR, RU-SEV) красится слоем regions-fill (там есть данные),
+// отдельный highlight-слой не нужен.
+function countryColorExpr(): Expression {
+  return ['match', ['get', 'ISO_A3'], ['RUS', 'UKR'], '#7ec8e3', '#2a2f36']
 }
 
 // Яркие границы для РФ, Украины, Крыма, Севастополя.
