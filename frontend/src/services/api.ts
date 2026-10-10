@@ -19,9 +19,24 @@ const BASE_URL: string = import.meta.env.VITE_API_URL ?? ''
 export const USE_MOCKS: boolean = String(import.meta.env.VITE_USE_MOCKS ?? 'false') === 'true'
 
 async function requestWithSignal<T>(path: string, signal: AbortSignal, init?: RequestInit): Promise<T> {
-  const res = await fetch(`${BASE_URL}${path}`, { headers: { 'Content-Type': 'application/json', ...(init?.headers ?? {}) }, ...init, signal })
-  if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`)
-  return (await res.json()) as T
+  const url = `${BASE_URL}${path}`
+  const method = init?.method ?? 'GET'
+  const q = url.indexOf('?')
+  const params = q >= 0 ? url.slice(q + 1) : ''
+  console.log('[VEMap] fetch', url, { method, params })
+  const start = performance.now()
+  try {
+    const res = await fetch(url, { headers: { 'Content-Type': 'application/json', ...(init?.headers ?? {}) }, ...init, signal })
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`)
+    const data = (await res.json()) as T
+    console.log('[VEMap] response', url, res.status, `${Math.round(performance.now() - start)}ms`)
+    return data
+  } catch (e: unknown) {
+    if (!(e instanceof DOMException && e.name === 'AbortError')) {
+      console.log('[VEMap] error', url, e instanceof Error ? e.message : String(e))
+    }
+    throw e
+  }
 }
 
 export const GEOJSON_URL = '/data/geo/russia-regions.geojson'

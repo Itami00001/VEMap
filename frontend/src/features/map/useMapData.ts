@@ -16,6 +16,7 @@ export function useMapData() {
       setPeriods(items)
       setPeriod(items.at(-1) ?? null)
       setLoading(false)
+      console.log('[VEMap] periods loaded', items.length, items[0], items.at(-1))
     }).catch((e: unknown) => {
       if (e instanceof DOMException && e.name === 'AbortError') return
       setError(e instanceof Error ? e.message : String(e))
@@ -23,6 +24,10 @@ export function useMapData() {
     })
     return () => controller.abort()
   }, [])
+
+  useEffect(() => {
+    if (period) console.log('[VEMap] period selected', { year: period.year, month: period.month })
+  }, [period])
 
   useEffect(() => {
     if (!period) return

@@ -100,6 +100,10 @@ export default function MapView({
   const mapRef = useRef<maplibregl.Map | null>(null)
   const [mapInstance, setMapInstance] = useState<maplibregl.Map | null>(null)
   const empireUrl = useHistoricalBorders(year)
+
+  useEffect(() => {
+    console.log('[VEMap] historical layer', { year, url: empireUrl })
+  }, [empireUrl])
   const baseRef = useRef<GeoCollection | null>(null)
   const valuesRef = useRef(values)
   const modeRef = useRef(mode)
