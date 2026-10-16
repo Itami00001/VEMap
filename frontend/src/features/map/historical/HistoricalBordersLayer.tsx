@@ -13,7 +13,8 @@ const FADE_MS = 200
 
 const cache = new Map<string, unknown>()
 
-// Слой исторической границы: выше countries-fill, ниже regions-fill.
+// Слой исторической границы: заливка под regions-fill, линия поверх
+// регионов (иначе её хоронит regions-fill и смена 1904↔1905 не видна).
 // Смена года — cross-fade 200ms через paint-переходы.
 export default function HistoricalBordersLayer({ map, url }: HistoricalBordersLayerProps) {
   useEffect(() => {
@@ -54,7 +55,6 @@ export default function HistoricalBordersLayer({ map, url }: HistoricalBordersLa
               'line-opacity-transition': { duration: FADE_MS, delay: 0 },
             },
           },
-          'regions-fill',
         )
       }
     }
