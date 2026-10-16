@@ -14,8 +14,11 @@ export const HISTORICAL_BORDERS: HistoricalRange[] = [
 
 export const HISTORICAL_FALLBACK_URL = '/data/geo/historical/empire-1905.geojson'
 
-export function historicalUrlForYear(year: number | null): string {
-  if (year == null) return HISTORICAL_FALLBACK_URL
+export function historicalUrlForYear(year: number | null): string | null {
+  // year === null (period ещё не загружен): НЕ грузим fallback,
+  // ждём настоящий год — иначе эффект не перезапустится
+  // (null→fallback и 2026→fallback — одна и та же строка).
+  if (year == null) return null
   const hit = HISTORICAL_BORDERS.find((r) => year >= r.fromYear && year <= r.toYear)
   return hit ? hit.geojsonUrl : HISTORICAL_FALLBACK_URL
 }
