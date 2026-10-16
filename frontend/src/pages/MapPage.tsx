@@ -63,6 +63,22 @@ export default function MapPage() {
     return v
   }, [points, regions])
 
+  // Настроение Украины — взвешенное по n_lines среднее UA-городов.
+  // Нет записей за период → null → страна серая.
+  const ukraineMood = useMemo(() => {
+    const byId = new Map(cities.map((c) => [c.city_id, c]))
+    let sw = 0
+    let sm = 0
+    for (const m of cityMoods) {
+      const c = byId.get(m.city_id)
+      if (c?.country === 'UA' && m.responses_count > 0) {
+        sw += m.responses_count
+        sm += m.mood_index * m.responses_count
+      }
+    }
+    return sw > 0 ? Math.round((sm / sw) * 100) / 100 : null
+  }, [cities, cityMoods])
+
   const handleRegionClick = (regionId: string, clientPoint: { x: number; y: number }) => {
     const rect = shellRef.current?.getBoundingClientRect()
     if (!rect) return
@@ -99,6 +115,7 @@ export default function MapPage() {
           values={values}
           mode="mood"
           year={period?.year ?? null}
+          ukraineMood={ukraineMood}
           onRegionClick={handleRegionClick}
           onBackgroundClick={() => { setPopup(null); setCityId(null) }}
           onMapReady={setMap}

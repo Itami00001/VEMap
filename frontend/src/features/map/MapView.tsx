@@ -20,6 +20,7 @@ export interface MapViewProps {
   mini?: boolean
   interactive?: boolean
   year?: number | null
+  ukraineMood?: number | null
   onRegionClick?: (regionId: string, point: { x: number; y: number }) => void
   onBackgroundClick?: () => void
   onMapReady?: (map: maplibregl.Map) => void
@@ -38,19 +39,28 @@ interface GeoCollection {
 
 type Expression = unknown[]
 
+// Яркие стопы единой шкалы (значение 0–100): красный → голубой → зелёный.
+const MOOD_STOPS: Expression = [0, '#c0392b', 25, '#9f8187', 50, '#7ec8e3', 75, '#56caaa', 100, '#2ecc71']
+
 function fillColorExpr(mode: MapMode): Expression {
+  // Единая яркая шкала с точками: 0 красный → 0.5 голубой → 1 зелёный.
+  // Без старения: цвет яркий в любом году. null → серый «нет данных».
   const stops: Expression =
     mode === 'mood'
-      ? ['interpolate', ['linear'], ['get', 'value'], 0, '#c0392b', 25, '#e67e22', 50, '#f1c40f', 75, '#7cb342', 100, '#2ecc71']
+      ? ['interpolate', ['linear'], ['get', 'value'], ...MOOD_STOPS]
       : ['interpolate', ['linear'], ['get', 'value'], -10, '#d64545', 0, '#3d4657', 10, '#4f8cff']
   return ['case', ['==', ['get', 'value'], null], '#39404e', stops]
 }
 
-// Подложка стран: РФ и Украина — небесно-голубые, остальные — серые.
-// Крым (RU-CR, RU-SEV) красится слоем regions-fill (там есть данные),
-// отдельный highlight-слой не нужен.
+// Подложка стран: Украина — настроением своих городов (свойство ukr),
+// нет данных → серая. РФ — голубая, остальные — серые.
 function countryColorExpr(): Expression {
-  return ['match', ['get', 'ISO_A3'], ['RUS', 'UKR'], '#7ec8e3', '#2a2f36']
+  return [
+    'case',
+    ['==', ['get', 'ISO_A3'], 'UKR'],
+    ['case', ['==', ['get', 'ukr'], null], '#39404e', ['interpolate', ['linear'], ['get', 'ukr'], ...MOOD_STOPS]],
+    ['match', ['get', 'ISO_A3'], ['RUS'], '#7ec8e3', '#2a2f36'],
+  ]
 }
 
 // Яркие границы для РФ, Украины, Крыма, Севастополя.
@@ -86,12 +96,26 @@ function applyValues(base: GeoCollection, values: Record<string, number | null |
   }
 }
 
+function applyUkraine(base: GeoCollection, mood: number | null): GeoCollection {
+  return {
+    type: 'FeatureCollection',
+    features: base.features.map((f) => ({
+      ...f,
+      properties: {
+        ...f.properties,
+        ukr: f.properties.ISO_A3 === 'UKR' ? mood : null,
+      },
+    })),
+  }
+}
+
 export default function MapView({
   values,
   mode = 'mood',
   mini = false,
   interactive = true,
   year = null,
+  ukraineMood = null,
   onRegionClick,
   onBackgroundClick,
   onMapReady,
@@ -105,14 +129,17 @@ export default function MapView({
     console.log('[VEMap] historical layer', { year, url: empireUrl })
   }, [empireUrl])
   const baseRef = useRef<GeoCollection | null>(null)
+  const worldRef = useRef<GeoCollection | null>(null)
   const valuesRef = useRef(values)
   const modeRef = useRef(mode)
+  const ukraineRef = useRef(ukraineMood)
   const clickRef = useRef(onRegionClick)
   const bgClickRef = useRef(onBackgroundClick)
   const readyRef = useRef(onMapReady)
 
   valuesRef.current = values
   modeRef.current = mode
+  ukraineRef.current = ukraineMood
   clickRef.current = onRegionClick
   bgClickRef.current = onBackgroundClick
   readyRef.current = onMapReady
@@ -138,8 +165,9 @@ export default function MapView({
         .then(([world, data]) => {
           if (!mapRef.current || !map.isStyleLoaded()) return
           baseRef.current = data
+          worldRef.current = world
           if (!map.getSource('world')) {
-            map.addSource('world', { type: 'geojson', data: world })
+            map.addSource('world', { type: 'geojson', data: applyUkraine(world, ukraineRef.current) })
           }
           if (!map.getLayer('countries-fill')) map.addLayer({
             id: 'countries-fill',
@@ -213,6 +241,7 @@ export default function MapView({
       map.remove()
       mapRef.current = null
       baseRef.current = null
+      worldRef.current = null
       setMapInstance(null)
     }
   }, [])
@@ -226,6 +255,15 @@ export default function MapView({
     source.setData(applyValues(base, values))
     map.setPaintProperty('regions-fill', 'fill-color', fillColorExpr(mode) as never)
   }, [values, mode])
+
+  useEffect(() => {
+    const map = mapRef.current
+    const world = worldRef.current
+    if (!map || !world) return
+    const source = map.getSource('world') as maplibregl.GeoJSONSource | undefined
+    if (!source) return
+    source.setData(applyUkraine(world, ukraineMood))
+  }, [ukraineMood])
 
   return (
     <>

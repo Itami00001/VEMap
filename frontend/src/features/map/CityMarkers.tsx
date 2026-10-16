@@ -4,7 +4,7 @@ import type { MapLayerMouseEvent } from 'maplibre-gl'
 import { api } from '../../services/api'
 import { CITIES } from '../../data/cities'
 import type { TimePeriod } from '../../types'
-import { moodColor } from './color'
+import { sentimentColor } from './color'
 
 export interface CityMarkersProps {
   map: maplibregl.Map | null
@@ -20,7 +20,13 @@ function tipHtml(name: string, mood: number | null, n: number | null): string {
 }
 
 function escapeHtml(value: string): string {
-  const map: Record<string, string> = { '&': '&', '<': '<', '>': '>', '\u0027': '\u0027', '\u0022': '\u0022' }
+  const map: Record<string, string> = {
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    "'": "&#39;",
+    '"': "&quot;",
+  }
   return value.replace(/[&<>'"]/g, (char) => map[char] ?? char)
 }
 
@@ -79,8 +85,8 @@ export default function CityMarkers({ map, period, onCityClick }: CityMarkersPro
         const features = CITIES.filter((c) => c.lat != null && c.lon != null).map((city) => {
           const m = byId.get(city.city_id)
           const mood = m?.mood_index ?? null
+          // Яркий цвет без старения: точки всегда по шкале настроения.
           const norm = mood != null ? mood / 100 : 0
-          const year = period.year
           return {
             type: 'Feature' as const,
             geometry: { type: 'Point' as const, coordinates: [city.lon!, city.lat!] },
@@ -89,14 +95,15 @@ export default function CityMarkers({ map, period, onCityClick }: CityMarkersPro
               name: city.name_ru,
               mood,
               count: m?.responses_count ?? null,
-              color: mood == null ? '#39404e' : moodColor(norm, year),
+              color: mood == null ? '#39404e' : sentimentColor(norm),
               radius: MARKER_RADIUS,
             },
           }
         })
         ;(map.getSource('cities-source') as maplibregl.GeoJSONSource).setData({ type: 'FeatureCollection', features })
         console.log('[VEMap] cities update', { count: features.length, year: period.year, month: period.month })
-        console.log('[VEMap] sample colors', features.slice(0, 3).map((f) => ({ city_id: f.properties.city_id, mood: f.properties.mood, color: f.properties.color })))
+        const withMood = features.filter((f) => f.properties.mood != null)
+        console.log('[VEMap] sample colors', withMood.slice(0, 3).map((f) => ({ city_id: f.properties.city_id, mood: f.properties.mood, color: f.properties.color })))
       }).catch(() => undefined)
     }
     const initialize = () => {
