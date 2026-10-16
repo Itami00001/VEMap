@@ -59,6 +59,14 @@ export default function HistoricalBordersLayer({ map, url }: HistoricalBordersLa
       }
     }
 
+    const safeEnsureLayers = () => {
+      try {
+        ensureLayers()
+      } catch (e: unknown) {
+        console.log('[VEMap] empire layers failed', url, e instanceof Error ? e.message : String(e))
+      }
+    }
+
     const apply = (data: unknown) => {
       if (cancelled || !map.getSource('empire')) return
       ;(map.getSource('empire') as maplibregl.GeoJSONSource).setData(data as never)
@@ -68,6 +76,7 @@ export default function HistoricalBordersLayer({ map, url }: HistoricalBordersLa
         if (cancelled) return
         map.setPaintProperty('empire-fill', 'fill-opacity', FILL_OPACITY)
         map.setPaintProperty('empire-line', 'line-opacity', LINE_OPACITY)
+        console.log('[VEMap] empire applied', url)
       })
     }
 
@@ -97,12 +106,12 @@ export default function HistoricalBordersLayer({ map, url }: HistoricalBordersLa
     if (!map.isStyleLoaded()) {
       map.once('load', () => {
         if (cancelled) return
-        ensureLayers()
+        safeEnsureLayers()
         loadData()
       })
       return () => { cancelled = true }
     }
-    ensureLayers()
+    safeEnsureLayers()
     loadData()
     return () => { cancelled = true }
   }, [map, url])
