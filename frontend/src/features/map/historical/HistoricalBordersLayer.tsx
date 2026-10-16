@@ -3,11 +3,12 @@ import * as maplibregl from 'maplibre-gl'
 
 export interface HistoricalBordersLayerProps {
   map: maplibregl.Map | null
-  url: string
+  url: string | null
 }
 
-const FILL_OPACITY = 0.06
-const LINE_OPACITY = 0.9
+const FILL_OPACITY = 0.15
+const LINE_OPACITY = 1
+const LINE_WIDTH = 2
 const FADE_MS = 200
 
 const cache = new Map<string, unknown>()
@@ -16,7 +17,7 @@ const cache = new Map<string, unknown>()
 // Смена года — cross-fade 200ms через paint-переходы.
 export default function HistoricalBordersLayer({ map, url }: HistoricalBordersLayerProps) {
   useEffect(() => {
-    if (!map) return
+    if (!map || !url) return
     let cancelled = false
 
     const ensureLayers = () => {
@@ -44,9 +45,11 @@ export default function HistoricalBordersLayer({ map, url }: HistoricalBordersLa
             id: 'empire-line',
             type: 'line',
             source: 'empire',
+            // Целевые страны (РИ/РФ+Крым, Украина внутри неё) —
+            // яркая белая обводка поверх серых стран.
             paint: {
-              'line-color': '#e8ecf4',
-              'line-width': 1,
+              'line-color': '#ffffff',
+              'line-width': LINE_WIDTH,
               'line-opacity': 0,
               'line-opacity-transition': { duration: FADE_MS, delay: 0 },
             },
@@ -68,20 +71,39 @@ export default function HistoricalBordersLayer({ map, url }: HistoricalBordersLa
       })
     }
 
+    const loadData = () => {
+      const hit = cache.get(url)
+      if (hit) {
+        apply(hit)
+        return
+      }
+      console.log('[VEMap] empire fetch start', url)
+      fetch(url)
+        .then((r) => {
+          if (!r.ok) throw new Error(`HTTP ${r.status}`)
+          return r.json()
+        })
+        .then((data: unknown) => {
+          cache.set(url, data)
+          const n = (data as { features?: unknown[] }).features?.length ?? 0
+          console.log('[VEMap] empire fetch done', url, `features: ${n}`)
+          apply(data)
+        })
+        .catch((e: unknown) => {
+          console.log('[VEMap] empire fetch failed', url, e instanceof Error ? e.message : String(e))
+        })
+    }
+
     if (!map.isStyleLoaded()) {
       map.once('load', () => {
         if (cancelled) return
         ensureLayers()
-        const hit = cache.get(url)
-        if (hit) apply(hit)
-        else fetch(url).then((r) => r.json()).then((data: unknown) => { cache.set(url, data); apply(data) }).catch(() => undefined)
+        loadData()
       })
       return () => { cancelled = true }
     }
     ensureLayers()
-    const hit = cache.get(url)
-    if (hit) apply(hit)
-    else fetch(url).then((r) => r.json()).then((data: unknown) => { cache.set(url, data); apply(data) }).catch(() => undefined)
+    loadData()
     return () => { cancelled = true }
   }, [map, url])
 
