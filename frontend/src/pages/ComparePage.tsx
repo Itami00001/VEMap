@@ -1,8 +1,9 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { api } from '../services/api'
 import type { CityCompareRow, MapPoint, Region, TimePeriod } from '../types'
 import CompareYears from '../features/data/CompareYears'
 import MapView from '../features/map/MapView'
+import RegionPopup from '../features/map/RegionPopup'
 import DemoBadge from '../features/map/DemoBadge'
 
 export default function ComparePage() {
@@ -15,6 +16,8 @@ export default function ComparePage() {
   const [mapB, setMapB] = useState<Record<string, MapPoint>>({})
   const [delta, setDelta] = useState<Record<string, number | null>>({})
   const [error, setError] = useState<string | null>(null)
+  const [popup, setPopup] = useState<{ regionId: string; x: number; y: number } | null>(null)
+  const shellRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const controller = new AbortController()
@@ -84,13 +87,36 @@ export default function ComparePage() {
         mode={mode}
         onMode={setMode}
       />
-      <div className="map-shell" style={{ marginBottom: 18 }}>
-        <MapView values={values} mode={mode === 'delta' ? 'delta' : 'mood'} interactive={false} year={periodB?.year ?? null} />
+      <div className="map-shell" style={{ marginBottom: 18 }} ref={shellRef}>
+        <MapView
+          values={values}
+          mode={mode === 'delta' ? 'delta' : 'mood'}
+          interactive
+          year={periodB?.year ?? null}
+          onRegionClick={(regionId, pt) => {
+            const rect = shellRef.current?.getBoundingClientRect()
+            if (!rect) return
+            setPopup({ regionId, x: pt.x - rect.left, y: pt.y - rect.top })
+          }}
+          onBackgroundClick={() => setPopup(null)}
+        />
         <div className="map-overlay-top">
           <span className="muted" style={{ fontSize: 12 }}>
             {mode === 'delta' ? 'Синий — рост, красный — падение, серый — нет данных' : 'Абсолютные значения периода B, серый — нет данных'}
           </span>
         </div>
+        {popup && (
+          <RegionPopup
+            x={popup.x}
+            y={popup.y}
+            containerWidth={shellRef.current?.clientWidth ?? 800}
+            containerHeight={shellRef.current?.clientHeight ?? 560}
+            onClose={() => setPopup(null)}
+            region={regions.find((r) => r.region_id === popup.regionId)}
+            period={periodB}
+            point={mapB[popup.regionId] ?? null}
+          />
+        )}
       </div>
       <table className="data-table">
         <thead>

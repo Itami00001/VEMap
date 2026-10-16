@@ -19,7 +19,9 @@ export default function DataPage() {
     api.getPeriods(controller.signal)
       .then((items) => {
         setPeriods(items)
-        setPeriod(items.at(-1) ?? null)
+        // Старт с самого богатого периода (1905-01, все 14 городов),
+        // иначе дефолт-последний показывает только Крым.
+        setPeriod(items.find((p) => p.year === 1905 && p.month === 1) ?? items.at(-1) ?? null)
       })
       .catch((e: unknown) => {
         if (e instanceof DOMException && e.name === 'AbortError') return

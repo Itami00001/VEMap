@@ -8,6 +8,7 @@ from app.modules.cities.schema import TimePeriodOut
 from app.modules.moods import service as mood_service
 from app.modules.moods.router import SCORING_VERSION
 from app.modules.moods.schema import MapPointOut
+from app.modules.regions.model import Region
 
 CITY_SCORING_VERSION = "2.0"
 CITY_SOURCE = "cities:2.0"
@@ -105,33 +106,36 @@ def get_city_history(db: Session, city_id: str) -> list[dict]:
 
 
 def get_city_data_rows(db: Session, year: int, month: int | None) -> list[dict]:
-    """Таблица городов за период с изменением к предыдущему."""
-    current = get_city_moods(db, year, month)
-    if not current:
-        return []
+    """Таблица ВСЕХ городов за период; без записей — null (прочерк).
 
+    change_from_prev — к предыдущему месяцу (или году, если месяц 1/None).
+    """
+    current = {c["city_id"]: c for c in get_city_moods(db, year, month)}
     prev_month = month - 1 if month and month > 1 else None
     prev_year = year if prev_month is not None else year - 1
-    prev = get_city_moods(db, prev_year, prev_month)
-    prev_map = {p["city_id"]: p["mood_index"] for p in prev}
+    prev = {p["city_id"]: p["mood_index"] for p in get_city_moods(db, prev_year, prev_month)}
 
-    # Build region_name lookup from regions table
-    from app.modules.regions.model import Region
+    cities = db.query(City).order_by(City.name_ru).all()
     region_names = {r.region_id: r.name_ru for r in db.query(Region).all()}
 
     out = []
-    for c in current:
-        prev_mood = prev_map.get(c["city_id"])
-        change = round(c["mood_index"] - prev_mood, 2) if prev_mood is not None else None
-        region_name = region_names.get(c["region_id"], c["country"]) if c["region_id"] else c["country"]
+    for city in cities:
+        cur = current.get(city.city_id)
+        mood = cur["mood_index"] if cur else None
+        prev_mood = prev.get(city.city_id)
+        change = round(mood - prev_mood, 2) if mood is not None and prev_mood is not None else None
+        if city.region_id is None:
+            region_name = "Украина" if city.country == "UA" else (city.country or "")
+        else:
+            region_name = region_names.get(city.region_id, "")
         out.append(
             {
-                "city_id": c["city_id"],
-                "name_ru": c["name_ru"],
-                "region_id": c["region_id"],
+                "city_id": city.city_id,
+                "name_ru": city.name_ru,
+                "region_id": city.region_id,
                 "region_name": region_name,
-                "mood_index": c["mood_index"],
-                "responses_count": c["responses_count"],
+                "mood_index": mood,
+                "responses_count": cur["responses_count"] if cur else None,
                 "change_from_prev": change,
             }
         )
