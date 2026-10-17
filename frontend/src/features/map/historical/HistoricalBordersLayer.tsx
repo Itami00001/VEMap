@@ -48,8 +48,24 @@ function digest(data: unknown) {
 // базовых слоёв, но ПОД маркеры городов. Смена года — fade 200ms.
 export default function HistoricalBordersLayer({ map, url }: HistoricalBordersLayerProps) {
   useEffect(() => {
-    if (!map || !url) return
+    if (!map) return
     let cancelled = false
+
+    // url === null (год без снимка: 1917/1991/2026) — ОБЯЗАТЕЛЬНО чистим
+    // источник и гасим линию. Раньше был early-return, из-за чего источник
+    // сохранял геометрию предыдущего года («карта запоминает» прошлую
+    // границу: в 1917/2026 оставался разрез Сахалина и контуры империи).
+    const clear = () => {
+      const src = map.getSource('empire') as maplibregl.GeoJSONSource | undefined
+      if (src) src.setData({ type: 'FeatureCollection', features: [] })
+      if (map.getLayer('empire-line')) map.setPaintProperty('empire-line', 'line-opacity', 0)
+      console.log('[VEMap] empire cleared (no snapshot for year)')
+    }
+
+    if (!url) {
+      clear()
+      return
+    }
 
     // Порядок (снизу вверх): базовые линии → empire-line → cities-*.
     // Если города уже нарисованы — переносим линию под них.
