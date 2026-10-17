@@ -12,13 +12,12 @@ export const HISTORICAL_BORDERS: HistoricalRange[] = [
   { fromYear: 1905, toYear: 1905, geojsonUrl: '/data/geo/historical/empire-1905.geojson', label: 'Российская империя — север Сахалина (1905)' },
 ]
 
-export const HISTORICAL_FALLBACK_URL = '/data/geo/historical/empire-1905.geojson'
-
 export function historicalUrlForYear(year: number | null): string | null {
-  // year === null (period ещё не загружен): НЕ грузим fallback,
-  // ждём настоящий год — иначе эффект не перезапустится
-  // (null→fallback и 2026→fallback — одна и та же строка).
+  // year === null (period ещё не загружен): не рисуем ничего.
+  // Нет снимка для года (1917/1991/2026) — тоже null: показываем
+  // современные границы. Раньше здесь был fallback на 1905, из-за чего
+  // 1917/1991/2026 рисовались как Российская империя 1905 года.
   if (year == null) return null
   const hit = HISTORICAL_BORDERS.find((r) => year >= r.fromYear && year <= r.toYear)
-  return hit ? hit.geojsonUrl : HISTORICAL_FALLBACK_URL
+  return hit ? hit.geojsonUrl : null
 }

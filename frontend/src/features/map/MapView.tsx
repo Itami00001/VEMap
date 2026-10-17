@@ -73,6 +73,30 @@ function highlightBorderExpr(): Expression {
   ]
 }
 
+// Когда показан исторический слой, современные «белые» подсветки
+// приглушаются до серого: белой остаётся только граница выбранного года.
+// Иначе три белые линии (countries-line, regions-line, empire-line)
+// сливаются и современные границы РФ/УК режут империю.
+function countriesLinePaint(empireActive: boolean) {
+  return {
+    color: (empireActive ? '#6b7484' : highlightBorderExpr()) as never,
+    width: (empireActive
+      ? 0.5
+      : ['case', ['in', ['get', 'ISO_A3'], ['literal', ['RUS', 'UKR']]], 2.5, 0.5]) as never,
+  }
+}
+
+function regionsLinePaint(empireActive: boolean) {
+  return {
+    color: (empireActive
+      ? '#6b7484'
+      : ['case', ['in', ['get', 'region_id'], ['literal', ['RU-CR', 'RU-SEV']]], '#ffffff', '#6b7484']) as never,
+    width: (empireActive
+      ? 0.5
+      : ['case', ['in', ['get', 'region_id'], ['literal', ['RU-CR', 'RU-SEV']]], 2.5, 0.5]) as never,
+  }
+}
+
 // Пустая подложка вместо внешнего demotiles-стиля: только тёмная вода.
 // Сушу рисует исключительно наш countries-fill (серый) — interference
 // базовых слоёв (landcover/landuse/boundary) исключена в принципе.
@@ -130,6 +154,7 @@ export default function MapView({
   }, [empireUrl])
   const baseRef = useRef<GeoCollection | null>(null)
   const worldRef = useRef<GeoCollection | null>(null)
+  const empireActiveRef = useRef(empireUrl != null)
   const valuesRef = useRef(values)
   const modeRef = useRef(mode)
   const ukraineRef = useRef(ukraineMood)
@@ -139,6 +164,7 @@ export default function MapView({
 
   valuesRef.current = values
   modeRef.current = mode
+  empireActiveRef.current = empireUrl != null
   ukraineRef.current = ukraineMood
   clickRef.current = onRegionClick
   bgClickRef.current = onBackgroundClick
@@ -195,10 +221,11 @@ export default function MapView({
             id: 'regions-line',
             type: 'line',
             source: 'regions',
+            // Крым/Севастополь — белые, прочие — тонкие серые; при
+            // активном историческом слое белый выключается (см. helper).
             paint: {
-              // Крым и Севастополь — широкие белые границы, остальные — тонкие серые.
-              'line-color': ['case', ['in', ['get', 'region_id'], ['literal', ['RU-CR', 'RU-SEV']]], '#ffffff', '#6b7484'],
-              'line-width': ['case', ['in', ['get', 'region_id'], ['literal', ['RU-CR', 'RU-SEV']]], 2.5, 0.5],
+              'line-color': regionsLinePaint(empireActiveRef.current).color,
+              'line-width': regionsLinePaint(empireActiveRef.current).width,
             },
           })
           // Границы стран поверх регионов: серые для всех, белые для РФ и Украины.
@@ -206,10 +233,21 @@ export default function MapView({
             id: 'countries-line',
             type: 'line',
             source: 'world',
+            // РФ/Украина — белые; при активном историческом слое
+            // приглушаются, чтобы белой осталась только граница года.
             paint: {
-              'line-color': highlightBorderExpr() as never,
-              'line-width': ['case', ['in', ['get', 'ISO_A3'], ['literal', ['RUS', 'UKR']]], 2.5, 0.5],
+              'line-color': countriesLinePaint(empireActiveRef.current).color,
+              'line-width': countriesLinePaint(empireActiveRef.current).width,
             },
+          })
+          // Диагностика: где реально белые линии и сколько объектов в
+          // источниках. regions-fill покрывает ТОЛЬКО РФ (+Крым), Украина
+          // едет отдельным свойством ukr на world-слое.
+          console.log('[VEMap] base layers', {
+            layerOrder: (map.getStyle().layers ?? []).map((l) => l.id).join(' > '),
+            worldFeatures: world.features.length,
+            regionFeatures: data.features.length,
+            highlight: 'countries-line: RUS,UKR white 2.5 | regions-line: RU-CR,RU-SEV white 2.5',
           })
           if (interactive) {
             map.on('click', 'regions-fill', (e: MapLayerMouseEvent) => {
@@ -264,6 +302,22 @@ export default function MapView({
     if (!source) return
     source.setData(applyUkraine(world, ukraineMood))
   }, [ukraineMood])
+
+  // Исторический слой включился выключился → перекрасить современные
+  // линии: белые подсветки РФ/УК/Крыма гаснут, белой остаётся граница года.
+  useEffect(() => {
+    const map = mapRef.current
+    if (!map || !map.getLayer('countries-line')) return
+    const active = empireUrl != null
+    const c = countriesLinePaint(active)
+    const r = regionsLinePaint(active)
+    map.setPaintProperty('countries-line', 'line-color', c.color)
+    map.setPaintProperty('countries-line', 'line-width', c.width)
+    if (map.getLayer('regions-line')) {
+      map.setPaintProperty('regions-line', 'line-color', r.color)
+      map.setPaintProperty('regions-line', 'line-width', r.width)
+    }
+  }, [empireUrl, mapInstance])
 
   return (
     <>

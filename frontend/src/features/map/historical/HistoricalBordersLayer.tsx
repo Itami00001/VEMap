@@ -6,57 +6,77 @@ export interface HistoricalBordersLayerProps {
   url: string | null
 }
 
-const FILL_OPACITY = 0.15
 const LINE_OPACITY = 1
 const LINE_WIDTH = 2
 const FADE_MS = 200
 
 const cache = new Map<string, unknown>()
 
-// Слой исторической границы: заливка под regions-fill, линия поверх
-// регионов (иначе её хоронит regions-fill и смена 1904↔1905 не видна).
-// Смена года — cross-fade 200ms через paint-переходы.
+// Отпечаток геометрии снимка: число фич/полигонов/точек и центр масс.
+// Секундная проверка, что 1904 и 1905 — РАЗНЫЕ данные и слой получил
+// новую геометрию (а не остался на старой из-за отмены/кэша).
+function digest(data: unknown) {
+  const fs =
+    (data as { features?: { geometry?: { type?: string; coordinates?: unknown } }[] })?.features ?? []
+  let polys = 0
+  let pts = 0
+  let sx = 0
+  let sy = 0
+  for (const f of fs) {
+    const g = f.geometry
+    if (!g) continue
+    const list: number[][][][] =
+      g.type === 'MultiPolygon'
+        ? (g.coordinates as number[][][][])
+        : g.type === 'Polygon'
+          ? [g.coordinates as number[][][]]
+          : []
+    polys += list.length
+    for (const poly of list)
+      for (const ring of poly)
+        for (const p of ring) {
+          pts++
+          sx += p[0]
+          sy += p[1]
+        }
+  }
+  return { features: fs.length, polys, pts, cx: pts ? +(sx / pts).toFixed(4) : 0, cy: pts ? +(sy / pts).toFixed(4) : 0 }
+}
+
+// Слой исторической границы — только контур (без заливки: белая заливка
+// давала чужой оттенок территории внутри границы). Линия ставится поверх
+// базовых слоёв, но ПОД маркеры городов. Смена года — fade 200ms.
 export default function HistoricalBordersLayer({ map, url }: HistoricalBordersLayerProps) {
   useEffect(() => {
     if (!map || !url) return
     let cancelled = false
 
+    // Порядок (снизу вверх): базовые линии → empire-line → cities-*.
+    // Если города уже нарисованы — переносим линию под них.
+    const placeLine = () => {
+      if (map.getLayer('empire-line') && map.getLayer('cities-circle')) {
+        map.moveLayer('empire-line', 'cities-circle')
+      }
+    }
+
     const ensureLayers = () => {
       if (!map.getSource('empire')) {
         map.addSource('empire', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } })
       }
-      if (!map.getLayer('empire-fill')) {
-        map.addLayer(
-          {
-            id: 'empire-fill',
-            type: 'fill',
-            source: 'empire',
-            paint: {
-              'fill-color': '#ffffff',
-              'fill-opacity': 0,
-              'fill-opacity-transition': { duration: FADE_MS, delay: 0 },
-            },
-          },
-          'regions-fill',
-        )
-      }
       if (!map.getLayer('empire-line')) {
-        map.addLayer(
-          {
-            id: 'empire-line',
-            type: 'line',
-            source: 'empire',
-            // Целевые страны (РИ/РФ+Крым, Украина внутри неё) —
-            // яркая белая обводка поверх серых стран.
-            paint: {
-              'line-color': '#ffffff',
-              'line-width': LINE_WIDTH,
-              'line-opacity': 0,
-              'line-opacity-transition': { duration: FADE_MS, delay: 0 },
-            },
+        map.addLayer({
+          id: 'empire-line',
+          type: 'line',
+          source: 'empire',
+          paint: {
+            'line-color': '#ffffff',
+            'line-width': LINE_WIDTH,
+            'line-opacity': 0,
+            'line-opacity-transition': { duration: FADE_MS, delay: 0 },
           },
-        )
+        })
       }
+      placeLine()
     }
 
     const safeEnsureLayers = () => {
@@ -70,13 +90,25 @@ export default function HistoricalBordersLayer({ map, url }: HistoricalBordersLa
     const apply = (data: unknown) => {
       if (cancelled || !map.getSource('empire')) return
       ;(map.getSource('empire') as maplibregl.GeoJSONSource).setData(data as never)
-      map.setPaintProperty('empire-fill', 'fill-opacity', 0)
+      placeLine()
       map.setPaintProperty('empire-line', 'line-opacity', 0)
+      const props =
+        (data as { features?: { properties?: Record<string, unknown> }[] }).features?.[0]?.properties ?? {}
+      console.log('[VEMap] empire snapshot', {
+        url,
+        name: props.name,
+        year_from: props.year_from,
+        year_to: props.year_to,
+        ...digest(data),
+      })
       requestAnimationFrame(() => {
         if (cancelled) return
-        map.setPaintProperty('empire-fill', 'fill-opacity', FILL_OPACITY)
+        placeLine()
         map.setPaintProperty('empire-line', 'line-opacity', LINE_OPACITY)
-        console.log('[VEMap] empire applied', url)
+        // Порядок всех слоёв снизу вверх — покажет, не закрали ли
+        // историческую линию современные countries-line/regions-line.
+        const order = (map.getStyle().layers ?? []).map((l) => l.id)
+        console.log('[VEMap] empire applied', url, '| layer order:', order.join(' > '))
       })
     }
 

@@ -38,14 +38,6 @@ export default function MapPage() {
     return () => controller.abort()
   }, [period])
 
-  useEffect(() => {
-    console.log('[VEMap] cityId changed', cityId)
-  }, [cityId])
-
-  useEffect(() => {
-    console.log('[VEMap] year/month changed', { year: period?.year ?? null, month: period?.month ?? null })
-  }, [period])
-
   const closeCity = () => {
     setCityId(null)
     setSearchParams({}, { replace: true })

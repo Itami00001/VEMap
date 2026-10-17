@@ -26,10 +26,6 @@ export function useMapData() {
   }, [])
 
   useEffect(() => {
-    if (period) console.log('[VEMap] period selected', { year: period.year, month: period.month })
-  }, [period])
-
-  useEffect(() => {
     if (!period) return
     const key = `${period.year}-${period.month ?? 'y'}`
     const cached = cache.current.get(key)

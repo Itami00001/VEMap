@@ -102,8 +102,6 @@ export default function CityMarkers({ map, period, onCityClick }: CityMarkersPro
         })
         ;(map.getSource('cities-source') as maplibregl.GeoJSONSource).setData({ type: 'FeatureCollection', features })
         console.log('[VEMap] cities update', { count: features.length, year: period.year, month: period.month })
-        const withMood = features.filter((f) => f.properties.mood != null)
-        console.log('[VEMap] sample colors', withMood.slice(0, 3).map((f) => ({ city_id: f.properties.city_id, mood: f.properties.mood, color: f.properties.color })))
       }).catch(() => undefined)
     }
     const initialize = () => {
