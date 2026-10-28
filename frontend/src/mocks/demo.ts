@@ -4,7 +4,7 @@
 // 1905-02..04 — СИНТЕЗИРОВАНЫ детерминированным сдвигом (БЕЗ random!),
 //   только чтобы ползунку было куда двигаться. В UI помечены DEMO DATA.
 
-import type { City, CityDataRow, CityMood, HistoryPoint, MapPoint, Region, TimePeriod } from '../types'
+import type { City, CityDataRow, CityMood, CompareRow, DataRow, HistoryPoint, MapPoint, Region, TimePeriod } from '../types'
 
 export const DEMO_REGIONS: Region[] = [
   { region_id: 'RU-MOW', region_code: 'RU-MOW', name_ru: 'Москва', name_en: 'Moscow', name_crh: 'Москва', federal_district: 'Центральный' },
@@ -169,6 +169,16 @@ export function demoRegionHistory(regionId: string): HistoryPoint[] {
   return out
 }
 
+// DEMO-история города: точки по всем периодам.
+export function demoCityHistory(cityId: string): HistoryPoint[] {
+  const out: HistoryPoint[] = []
+  for (const p of DEMO_PERIODS) {
+    const pt = (DEMO_CITY_MOODS[key(p)] ?? []).find((m) => m.city_id === cityId)
+    if (pt) out.push({ year: p.year, month: p.month, mood_index: pt.mood_index, responses_count: pt.responses_count })
+  }
+  return out
+}
+
 // DEMO-таблица по городам за период + изменение к предыдущему существующему периоду.
 export function demoCityTable(period: TimePeriod): CityDataRow[] {
   const idx = DEMO_PERIODS.findIndex((p) => p.year === period.year && (p.month ?? null) === (period.month ?? null))
@@ -217,6 +227,38 @@ export function demoRegionCompare(a: TimePeriod, b: TimePeriod): { region_id: st
     const vb = mb.get(r.region_id) ?? null
     return {
       region_id: r.region_id,
+      delta: va != null && vb != null ? Math.round((vb - va) * 10) / 10 : null,
+    }
+  })
+}
+
+// DEMO-данные по регионам за период (для DataPage).
+export function demoRegionData(period: TimePeriod): DataRow[] {
+  const pts = demoMapPoints(period)
+  return DEMO_REGIONS.map((r) => {
+    const pt = pts.find((m) => m.region_id === r.region_id)
+    return {
+      region_id: r.region_id,
+      name_ru: r.name_ru,
+      mood_index: pt ? pt.mood_index : null,
+      responses_count: pt ? pt.responses_count : null,
+      change_from_prev: null as number | null, // Упрощено для демо
+    }
+  })
+}
+
+// DEMO-сравнение регионов между двумя периодами.
+export function demoRegionCompareFull(a: TimePeriod, b: TimePeriod): CompareRow[] {
+  const ma = new Map(demoMapPoints(a).map((m) => [m.region_id, m.mood_index]))
+  const mb = new Map(demoMapPoints(b).map((m) => [m.region_id, m.mood_index]))
+  return DEMO_REGIONS.map((r) => {
+    const va = ma.get(r.region_id) ?? null
+    const vb = mb.get(r.region_id) ?? null
+    return {
+      region_id: r.region_id,
+      name_ru: r.name_ru,
+      mood_a: va as number | null,
+      mood_b: vb as number | null,
       delta: va != null && vb != null ? Math.round((vb - va) * 10) / 10 : null,
     }
   })
