@@ -1,4 +1,4 @@
-import { createBrowserRouter } from 'react-router-dom'
+import { createHashRouter } from 'react-router-dom'
 import Layout from './Layout'
 import AboutPage from '../pages/AboutPage'
 import ComparePage from '../pages/ComparePage'
@@ -9,7 +9,7 @@ import MapPage from '../pages/MapPage'
 import AdminDashboard from '../pages/admin/AdminDashboard'
 import AdminLogin from '../pages/admin/AdminLogin'
 
-export const router = createBrowserRouter([
+export const router = createHashRouter([
   { path: '/', element: <Layout />, children: [
     { index: true, element: <Landing /> },
     { path: 'map', element: <MapPage /> },

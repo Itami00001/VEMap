@@ -36,7 +36,7 @@ function getNewspaperPath(city: City | undefined, period: TimePeriod | null): st
   const filename = NEWSPAPER_MAPPING[key]
   if (!filename) return null
   
-  return `/data/examples/terjiman/${period.year}/${filename}`
+  return `${import.meta.env.BASE_URL}data/examples/terjiman/${period.year}/${filename}`
 }
 
 export default function CityPanel({ city, cityId, mood, period, onClose }: CityPanelProps) {
