@@ -162,7 +162,7 @@ export default function MapPage() {
       </div>
 
       {cityId && (
-        <CityPanel city={city} cityId={cityId} mood={cityMood ?? null} onClose={closeCity} />
+        <CityPanel city={city} cityId={cityId} mood={cityMood ?? null} period={period} onClose={closeCity} />
       )}
     </div>
   )
