@@ -1,4 +1,5 @@
 import type { AdminMoodRecord, ImportStageResponse, Survey } from '../types'
+import { USE_MOCKS } from './api'
 
 const BASE_URL: string = import.meta.env.VITE_API_URL ?? ''
 const TOKEN_KEY = 'mm_admin_token'
@@ -16,6 +17,10 @@ export function clearAdminToken(): void {
 }
 
 async function adminRequest<T>(path: string, init?: RequestInit): Promise<T> {
+  if (USE_MOCKS) {
+    throw new Error('Admin functions not available in demo mode')
+  }
+  
   const token = getAdminToken()
   const res = await fetch(`${BASE_URL}${path}`, {
     headers: {

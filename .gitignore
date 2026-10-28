@@ -23,3 +23,8 @@ Untitled Workspace/
 
 # Historical geo: raw CShapes dump is local only, processed files are committed
 data/geo/historical/raw/
+
+# Large newspaper files - exclude from git but keep for local/Docker development
+data/examples/terjiman/
+frontend/public/data/examples/terjiman/
+.omo/
