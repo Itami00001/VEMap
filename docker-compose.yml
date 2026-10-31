@@ -14,6 +14,8 @@ services:
     build: ./backend
     ports:
       - "8001:8000"
+    volumes:
+      - ./data:/app/data
     environment:
       DATABASE_URL: postgresql://mapmood:mapmood@postgres:5432/mapmood
       JWT_SECRET: ${JWT_SECRET}
