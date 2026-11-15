@@ -12,37 +12,6 @@ const FADE_MS = 200
 
 const cache = new Map<string, unknown>()
 
-// Отпечаток геометрии снимка: число фич/полигонов/точек и центр масс.
-// Секундная проверка, что 1904 и 1905 — РАЗНЫЕ данные и слой получил
-// новую геометрию (а не остался на старой из-за отмены/кэша).
-function digest(data: unknown) {
-  const fs =
-    (data as { features?: { geometry?: { type?: string; coordinates?: unknown } }[] })?.features ?? []
-  let polys = 0
-  let pts = 0
-  let sx = 0
-  let sy = 0
-  for (const f of fs) {
-    const g = f.geometry
-    if (!g) continue
-    const list: number[][][][] =
-      g.type === 'MultiPolygon'
-        ? (g.coordinates as number[][][][])
-        : g.type === 'Polygon'
-          ? [g.coordinates as number[][][]]
-          : []
-    polys += list.length
-    for (const poly of list)
-      for (const ring of poly)
-        for (const p of ring) {
-          pts++
-          sx += p[0]
-          sy += p[1]
-        }
-  }
-  return { features: fs.length, polys, pts, cx: pts ? +(sx / pts).toFixed(4) : 0, cy: pts ? +(sy / pts).toFixed(4) : 0 }
-}
-
 // Слой исторической границы — только контур (без заливки: белая заливка
 // давала чужой оттенок территории внутри границы). Линия ставится поверх
 // базовых слоёв, но ПОД маркеры городов. Смена года — fade 200ms.
@@ -59,7 +28,6 @@ export default function HistoricalBordersLayer({ map, url }: HistoricalBordersLa
       const src = map.getSource('empire') as maplibregl.GeoJSONSource | undefined
       if (src) src.setData({ type: 'FeatureCollection', features: [] })
       if (map.getLayer('empire-line')) map.setPaintProperty('empire-line', 'line-opacity', 0)
-      console.log('[VEMap] empire cleared (no snapshot for year)')
     }
 
     if (!url) {
@@ -70,8 +38,8 @@ export default function HistoricalBordersLayer({ map, url }: HistoricalBordersLa
     // Порядок (снизу вверх): базовые линии → empire-line → cities-*.
     // Если города уже нарисованы — переносим линию под них.
     const placeLine = () => {
-      if (map.getLayer('empire-line') && map.getLayer('cities-circle')) {
-        map.moveLayer('empire-line', 'cities-circle')
+      if (map.getLayer('empire-line') && map.getLayer('cities-glow')) {
+        map.moveLayer('empire-line', 'cities-glow')
       }
     }
 
@@ -99,7 +67,7 @@ export default function HistoricalBordersLayer({ map, url }: HistoricalBordersLa
       try {
         ensureLayers()
       } catch (e: unknown) {
-        console.log('[VEMap] empire layers failed', url, e instanceof Error ? e.message : String(e))
+        console.warn('[VEMap] empire layers failed', url, e instanceof Error ? e.message : String(e))
       }
     }
 
@@ -108,23 +76,10 @@ export default function HistoricalBordersLayer({ map, url }: HistoricalBordersLa
       ;(map.getSource('empire') as maplibregl.GeoJSONSource).setData(data as never)
       placeLine()
       map.setPaintProperty('empire-line', 'line-opacity', 0)
-      const props =
-        (data as { features?: { properties?: Record<string, unknown> }[] }).features?.[0]?.properties ?? {}
-      console.log('[VEMap] empire snapshot', {
-        url,
-        name: props.name,
-        year_from: props.year_from,
-        year_to: props.year_to,
-        ...digest(data),
-      })
       requestAnimationFrame(() => {
         if (cancelled) return
         placeLine()
         map.setPaintProperty('empire-line', 'line-opacity', LINE_OPACITY)
-        // Порядок всех слоёв снизу вверх — покажет, не закрали ли
-        // историческую линию современные countries-line/regions-line.
-        const order = (map.getStyle().layers ?? []).map((l) => l.id)
-        console.log('[VEMap] empire applied', url, '| layer order:', order.join(' > '))
       })
     }
 
@@ -134,7 +89,6 @@ export default function HistoricalBordersLayer({ map, url }: HistoricalBordersLa
         apply(hit)
         return
       }
-      console.log('[VEMap] empire fetch start', url)
       fetch(url)
         .then((r) => {
           if (!r.ok) throw new Error(`HTTP ${r.status}`)
@@ -142,12 +96,10 @@ export default function HistoricalBordersLayer({ map, url }: HistoricalBordersLa
         })
         .then((data: unknown) => {
           cache.set(url, data)
-          const n = (data as { features?: unknown[] }).features?.length ?? 0
-          console.log('[VEMap] empire fetch done', url, `features: ${n}`)
           apply(data)
         })
         .catch((e: unknown) => {
-          console.log('[VEMap] empire fetch failed', url, e instanceof Error ? e.message : String(e))
+          console.warn('[VEMap] empire fetch failed', url, e instanceof Error ? e.message : String(e))
         })
     }
 

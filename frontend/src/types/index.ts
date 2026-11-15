@@ -114,6 +114,7 @@ export interface CityMood {
   city_id: string
   mood_index: number
   responses_count: number
+  sources?: { source_pdf: string; source_page: number; available: boolean }[]
 }
 
 export interface CityCompareRow {

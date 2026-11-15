@@ -1,7 +1,21 @@
-# Frontend собирается ЛОКАЛЬНО (npm run build), т.к. node-стадия
-# в docker виснет на npm install в этом окружении.
-# Перед сборкой образа: npm run build (VITE_* запекаются из окружения).
+# Frontend собирается внутри Docker (multi-stage), локальный node не нужен.
+FROM node:20-alpine AS build
+
+WORKDIR /app
+
+# Сначала зависимости — для кэширования слоёв
+COPY package.json package-lock.json ./
+RUN npm ci
+
+# Исходники и env-файлы (.env, .env.production и т.д.)
+COPY . .
+
+# VITE_* запекаются на этапе сборки
+RUN npm run build
+
 FROM nginx:alpine
-COPY dist /usr/share/nginx/html
+
+COPY --from=build /app/dist /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/default.conf
+
 EXPOSE 80

@@ -1,1 +1,10 @@
 node_modules
+dist
+public/data/examples
+.env
+.env.*
+!.env.production
+*.key
+*.pem
+*.p12
+*.pfx

@@ -16,6 +16,63 @@ import { DEMO_CITIES, DEMO_PERIODS, DEMO_REGIONS, demoCityMoods, demoCityTable, 
 // В production запросы идут через nginx reverse proxy на том же origin.
 // Это исключает обращение браузера к недоступному localhost:8000.
 const BASE_URL: string = import.meta.env.VITE_API_URL ?? ''
+export const newspaperUrl = (filename: string, page: number) =>
+  `${BASE_URL}/api/newspapers/${encodeURIComponent(filename)}#page=${page}`
+
+export interface NewspaperChatMessage {
+  role: 'user' | 'assistant'
+  content: string
+}
+
+export interface NewspaperSource {
+  source_pdf: string
+  source_page: number
+}
+
+export interface NewspaperCity {
+  city_id: string
+  name_ru: string
+  sources: NewspaperSource[]
+}
+
+export interface ChatProvider {
+  id: string
+  label: string
+  available: boolean
+  reason: string | null
+}
+
+export class NewspaperChatError extends Error {
+  readonly status: number
+
+  constructor(status: number, message: string) {
+    super(message)
+    this.status = status
+  }
+}
+
+export async function askNewspaper(
+  question: string,
+  sourcePdf: string,
+  provider: string,
+  history: NewspaperChatMessage[],
+  signal: AbortSignal,
+): Promise<string> {
+  const response = await fetch(`${BASE_URL}/api/chat`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ question, source_pdf: sourcePdf, provider, history }),
+    signal,
+  })
+  const data = await response.json().catch(() => null)
+  if (!response.ok || typeof data?.answer !== 'string') {
+    throw new NewspaperChatError(
+      response.status,
+      typeof data?.detail === 'string' ? data.detail : 'Не удалось получить ответ от сервера чата.',
+    )
+  }
+  return data.answer
+}
 export const USE_MOCKS: boolean = String(import.meta.env.VITE_USE_MOCKS ?? 'false') === 'true'
 
 async function requestWithSignal<T>(path: string, signal: AbortSignal, init?: RequestInit): Promise<T> {
@@ -38,6 +95,8 @@ export const WORLD_GEOJSON_URL = `${import.meta.env.BASE_URL}data/geo/world-coun
 const empty = <T,>(value: T) => Promise.resolve(value)
 
 export const api = {
+  getChatProviders: (signal: AbortSignal) => requestWithSignal<ChatProvider[]>('/api/chat/providers', signal),
+  getNewspapers: (signal: AbortSignal) => requestWithSignal<NewspaperCity[]>('/api/newspapers', signal),
   getRegions: (signal?: AbortSignal) => USE_MOCKS ? empty<Region[]>(DEMO_REGIONS) : requestWithSignal<Region[]>('/api/regions', signal!),
   getYears: (signal?: AbortSignal) => USE_MOCKS ? empty([...new Set(DEMO_PERIODS.map((p) => p.year))]) : requestWithSignal<number[]>('/api/years', signal!),
   getPeriods: (signal?: AbortSignal) => USE_MOCKS ? empty(DEMO_PERIODS) : requestWithSignal<TimePeriod[]>('/api/periods', signal!),

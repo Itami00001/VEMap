@@ -1,10 +1,20 @@
+import { lazy, Suspense, useState } from 'react'
+import { newspaperUrl } from '../../services/api'
+import { formatPeriod } from './TimeSlider'
 import type { City, CityMood, TimePeriod } from '../../types'
+import type { NewspaperSource } from '../../services/api'
+
+const NewspaperReader = lazy(() => import('./NewspaperReader'))
 
 export interface CityPanelProps {
   city: City | undefined
   cityId: string
   mood: CityMood | null
   period: TimePeriod | null
+  loading: boolean
+  error: boolean
+  activeSource: string | null
+  onOpenSource: (filename: string) => void
   onClose: () => void
 }
 
@@ -15,33 +25,11 @@ function closeness(mood: number | null): string {
   return 'bad'
 }
 
-// Крымские города
-const CRIMEAN_CITIES = new Set([
-  'Симферополь', 'Ялта', 'Керчь', 'Евпатория', 'Белогорск', 'Севастополь'
-])
-
-// Сопоставление периодов с файлами газет "Терджиман" (только подтверждённые соответствия)
-const NEWSPAPER_MAPPING: Record<string, string> = {
-  '1917-1': '000200_000018_RU_NLR_BIBL_A_012653926-Терджиман_1917_№_1_(1_янв).pdf',
-  '1917-4': '000200_000018_RU_NLR_BIBL_A_012653976-Терджиман_1917_№_70_(1_апр).pdf',
-  '1917-7': '000200_000018_RU_NLR_BIBL_A_012653983-Терджиман_1917_№_135_(2_июля).pdf',
-  '1917-10': '000200_000018_RU_NLR_BIBL_A_012654037-Терджиман_1917_№_194_(5_окт).pdf',
-}
-
-function getNewspaperPath(city: City | undefined, period: TimePeriod | null): string | null {
-  if (!city || !period) return null
-  if (!CRIMEAN_CITIES.has(city.name_ru)) return null
-  
-  const key = `${period.year}-${period.month}`
-  const filename = NEWSPAPER_MAPPING[key]
-  if (!filename) return null
-  
-  return `${import.meta.env.BASE_URL}data/examples/terjiman/${period.year}/${filename}`
-}
-
-export default function CityPanel({ city, cityId, mood, period, onClose }: CityPanelProps) {
-  const newspaperPath = getNewspaperPath(city, period)
-  const isCrimean = city && CRIMEAN_CITIES.has(city.name_ru)
+export default function CityPanel({ city, cityId, mood, period, loading, error, activeSource, onOpenSource, onClose }: CityPanelProps) {
+  const [expanded, setExpanded] = useState(false)
+  const [selected, setSelected] = useState<NewspaperSource | null>(null)
+  const hasData = mood !== null && period !== null && !loading && !error
+  const periodLabel = period ? formatPeriod(period) : ''
 
   return (
     <aside className="city-panel city-panel--bottom">
@@ -50,6 +38,12 @@ export default function CityPanel({ city, cityId, mood, period, onClose }: CityP
       </button>
       <div className="city-panel-row">
         <h3>{city?.name_ru ?? cityId}</h3>
+        <button type="button" className="btn city-period-button" disabled={!hasData}
+          aria-expanded={hasData && expanded} onClick={() => setExpanded(!expanded)}>
+          {loading ? 'Загрузка…' : error ? 'Ошибка загрузки' : hasData ? `Информация за ${periodLabel}` : 'Нет данных'}
+        </button>
+      </div>
+      {hasData && expanded && <div className="city-panel-row">
         <div className="popup-metric">
           <span>Mood</span>
           <b>{mood ? mood.mood_index.toFixed(1) : '—'}</b>
@@ -62,29 +56,37 @@ export default function CityPanel({ city, cityId, mood, period, onClose }: CityP
           <span>Closer to</span>
           <b>{closeness(mood?.mood_index ?? null)}</b>
         </div>
-      </div>
+      </div>}
       
-      {isCrimean && (
+      {hasData && expanded && (
         <div className="city-panel-newspaper">
-          {newspaperPath ? (
-            <div className="newspaper-viewer">
-              <h4>Газета «Терджиман»</h4>
-              <div className="newspaper-content">
-                <object 
-                  data={newspaperPath} 
-                  type="application/pdf"
-                  className="newspaper-iframe"
-                  title="Газета Терджиман"
-                >
-                  <p>Ваш браузер не поддерживает просмотр PDF. <a href={newspaperPath} target="_blank" rel="noopener noreferrer">Скачать файл</a></p>
-                </object>
-              </div>
-            </div>
+          {mood?.sources?.length ? (
+            <ul>
+              {mood.sources.map(({ source_pdf, source_page, available }) => (
+                <li key={source_pdf + ':' + source_page}>
+                  {available ? (
+                    <button type="button" className="btn newspaper-source-button"
+                      aria-pressed={selected?.source_pdf === source_pdf && selected.source_page === source_page}
+                      onClick={() => {
+                        setSelected({ source_pdf, source_page })
+                        onOpenSource(source_pdf)
+                      }}>
+                      Открыть источник · {source_pdf}, стр. {source_page}
+                    </button>
+                  ) : (
+                    <span className="muted">PDF недоступен · {source_pdf}, стр. {source_page}</span>
+                  )}
+                  {activeSource === source_pdf && <span className="muted"> · выбран для чата</span>}
+                </li>
+              ))}
+            </ul>
           ) : (
-            <div className="newspaper-missing">
-              <p>Для выбранного периода газета отсутствует</p>
-            </div>
+            <p className="muted">Для этого периода источник не указан</p>
           )}
+          {selected && <Suspense fallback={<p role="status">Загружаем просмотрщик…</p>}>
+            <NewspaperReader key={`${selected.source_pdf}:${selected.source_page}`}
+              url={newspaperUrl(selected.source_pdf, selected.source_page)} initialPage={selected.source_page} />
+          </Suspense>}
         </div>
       )}
     </aside>

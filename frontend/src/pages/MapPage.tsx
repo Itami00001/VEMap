@@ -1,26 +1,30 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useOutletContext, useSearchParams } from 'react-router-dom'
 import type * as maplibregl from 'maplibre-gl'
 import { api } from '../services/api'
-import type { City, CityMood, MapPoint, Region } from '../types'
+import type { City, MapPoint, Region } from '../types'
 import CityMarkers from '../features/map/CityMarkers'
-import MapView from '../features/map/MapView'
+import MapView, { BoundaryNote } from '../features/map/MapView'
 import RegionPopup from '../features/map/RegionPopup'
 import { RegionDetails } from '../features/map/RegionPopup'
 import { moodLegend } from '../features/map/legend'
 import { useMapData } from '../features/map/useMapData'
-import TimeSlider from '../features/map/TimeSlider'
+import TimeSlider, { formatPeriod } from '../features/map/TimeSlider'
 import DemoBadge from '../features/map/DemoBadge'
 import CityPanel from '../features/map/CityPanel'
+import type { LayoutContext } from '../app/Layout'
+
+const MAP_CENTER: [number, number] = [36, 49]
 
 export default function MapPage() {
-  const { periods, period, setPeriod, points, loading, error } = useMapData()
+  const { periods, period, setPeriod, points, cityMoods, loading, error } = useMapData()
   const [regions, setRegions] = useState<Region[]>([])
   const [cities, setCities] = useState<City[]>([])
-  const [cityMoods, setCityMoods] = useState<CityMood[]>([])
   const [map, setMap] = useState<maplibregl.Map | null>(null)
   const [popup, setPopup] = useState<{ regionId: string; x: number; y: number } | null>(null)
   const [cityId, setCityId] = useState<string | null>(null)
+  const [sourcePdf, setSourcePdf] = useState<string | null>(null)
+  const { setChatSource } = useOutletContext<LayoutContext>()
   const [searchParams, setSearchParams] = useSearchParams()
   const shellRef = useRef<HTMLDivElement>(null)
 
@@ -31,15 +35,9 @@ export default function MapPage() {
     return () => controller.abort()
   }, [])
 
-  useEffect(() => {
-    if (!period) return
-    const controller = new AbortController()
-    api.getCityMoods(period.year, period.month, controller.signal).then(setCityMoods).catch(() => setCityMoods([]))
-    return () => controller.abort()
-  }, [period])
-
   const closeCity = () => {
     setCityId(null)
+    setSourcePdf(null)
     setSearchParams({}, { replace: true })
   }
 
@@ -55,22 +53,6 @@ export default function MapPage() {
     return v
   }, [points, regions])
 
-  // Настроение Украины — взвешенное по n_lines среднее UA-городов.
-  // Нет записей за период → null → страна серая.
-  const ukraineMood = useMemo(() => {
-    const byId = new Map(cities.map((c) => [c.city_id, c]))
-    let sw = 0
-    let sm = 0
-    for (const m of cityMoods) {
-      const c = byId.get(m.city_id)
-      if (c?.country === 'UA' && m.responses_count > 0) {
-        sw += m.responses_count
-        sm += m.mood_index * m.responses_count
-      }
-    }
-    return sw > 0 ? Math.round((sm / sw) * 100) / 100 : null
-  }, [cities, cityMoods])
-
   const handleRegionClick = (regionId: string, clientPoint: { x: number; y: number }) => {
     const rect = shellRef.current?.getBoundingClientRect()
     if (!rect) return
@@ -85,6 +67,12 @@ export default function MapPage() {
   const popupRegion = regions.find((r) => r.region_id === popup?.regionId)
   const city = cities.find((item) => item.city_id === cityId)
   const cityMood = cityMoods.find((item) => item.city_id === cityId)
+  const activeSource = cityMood?.sources?.some((source) => source.available && source.source_pdf === sourcePdf)
+    ? sourcePdf : null
+  useEffect(() => {
+    setChatSource(cityId && activeSource ? { cityId, filename: activeSource } : null)
+    return () => setChatSource(null)
+  }, [activeSource, cityId, setChatSource])
 
   return (
     <div className="page">
@@ -93,7 +81,7 @@ export default function MapPage() {
           <h1>Карта настроений</h1>
           <p>
             Mood Index по регионам России (агрегат городов). Период:{' '}
-            {period ? `${period.year}-${String(period.month ?? 0).padStart(2, '0')}` : '—'}.
+            {period ? formatPeriod(period) : '—'}.
             Кликните по региону для деталей. <DemoBadge />
           </p>
         </div>
@@ -102,21 +90,31 @@ export default function MapPage() {
       {error && <div className="alert error">Ошибка загрузки данных: {error}</div>}
       {loading && <div className="loading">Загрузка данных…</div>}
 
-      <div className="map-shell" ref={shellRef}>
+      <div className="map-shell map-shell--main" ref={shellRef}>
         <MapView
           values={values}
           mode="mood"
+          initialCenter={MAP_CENTER}
           year={period?.year ?? null}
-          ukraineMood={ukraineMood}
+          month={period?.month ?? null}
           onRegionClick={handleRegionClick}
-          onBackgroundClick={() => { setPopup(null); setCityId(null) }}
+          onBackgroundClick={() => { setPopup(null); closeCity() }}
           onMapReady={setMap}
         />
         <div className="map-overlay-cities">
-          <CityMarkers map={map} period={period} onCityClick={(id) => { setPopup(null); setSearchParams({ city: id }, { replace: true }); setCityId(id) }} />
+          <CityMarkers map={map} cities={cities} cityMoods={cityMoods} loading={loading} error={error !== null}
+            onCityClick={(id) => {
+              setPopup(null)
+              setSearchParams({ city: id }, { replace: true })
+              if (id !== cityId) setSourcePdf(null)
+              setCityId(id)
+            }} />
         </div>
         <div className="map-overlay-top">
-          <TimeSlider periods={periods} value={period} onChange={setPeriod} />
+          <TimeSlider periods={periods} value={period} onChange={(next) => {
+            if (next.year !== period?.year || next.month !== period?.month) setSourcePdf(null)
+            setPeriod(next)
+          }} />
           <div className="map-legend">
             <span>Mood Index</span>
             <div className="legend-scale">
@@ -160,9 +158,12 @@ export default function MapPage() {
           </div>
         )}
       </div>
+      <BoundaryNote period={period} />
 
       {cityId && (
-        <CityPanel city={city} cityId={cityId} mood={cityMood ?? null} period={period} onClose={closeCity} />
+        <CityPanel key={`${cityId}-${period?.year}-${period?.month}`} city={city} cityId={cityId}
+          mood={cityMood ?? null} period={period} loading={loading} error={error !== null}
+          activeSource={activeSource} onOpenSource={setSourcePdf} onClose={closeCity} />
       )}
     </div>
   )

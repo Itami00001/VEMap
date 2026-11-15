@@ -12,10 +12,11 @@ from app.modules.regions.model import Region
 
 CITY_SCORING_VERSION = "2.0"
 CITY_SOURCE = "cities:2.0"
+MONTHLY_CALENDAR = {1900: range(1, 13)}
 
 
 def get_periods(db: Session) -> list[TimePeriodOut]:
-    """Все существующие периоды: помесячные городские + годовые опросные."""
+    """Периоды наблюдений и месяцы из календаря исторического корпуса."""
     rows = (
         db.query(CityMoodRecord.year, CityMoodRecord.month)
         .filter(CityMoodRecord.is_public.is_(True))
@@ -23,11 +24,13 @@ def get_periods(db: Session) -> list[TimePeriodOut]:
         .order_by(CityMoodRecord.year, CityMoodRecord.month)
         .all()
     )
-    out = [TimePeriodOut(year=y, month=m) for y, m in rows]
-    for y in mood_service.get_available_years(db, SCORING_VERSION):
-        out.append(TimePeriodOut(year=y, month=None))
-    out.sort(key=lambda p: (p.year, p.month if p.month is not None else 0))
-    return out
+    periods = {(year, month) for year, month in rows}
+    periods.update((year, month) for year, months in MONTHLY_CALENDAR.items() for month in months)
+    periods.update((year, None) for year in mood_service.get_available_years(db, SCORING_VERSION))
+    return [
+        TimePeriodOut(year=year, month=month)
+        for year, month in sorted(periods, key=lambda period: (period[0], period[1] or 0))
+    ]
 
 
 def get_region_aggregates(db: Session, year: int, month: int) -> list[MapPointOut]:
@@ -81,6 +84,7 @@ def get_city_moods(db: Session, year: int, month: int | None) -> list[dict]:
     return [
         {
             "city_id": rec.city_id,
+            "month": rec.month,
             "name_ru": name_ru,
             "region_id": region_id,
             "country": country,

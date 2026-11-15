@@ -9,6 +9,11 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mapmood -d mapmood"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   backend:
     build: ./backend
@@ -16,18 +21,24 @@ services:
       - "8001:8000"
     volumes:
       - ./data:/app/data
+      - ./data:/data
     environment:
       DATABASE_URL: postgresql://mapmood:mapmood@postgres:5432/mapmood
       JWT_SECRET: ${JWT_SECRET}
       ADMIN_EMAIL: ${ADMIN_EMAIL}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+      GROQ_API_KEY: ${GROQ_API_KEY:-}
+      GROQ_MODEL: ${GROQ_MODEL:-qwen/qwen3.8-27b}
+      YANDEX_API_KEY: ${YANDEX_API_KEY:-}
+      YANDEX_FOLDER_ID: ${YANDEX_FOLDER_ID:-}
+      YANDEX_MODEL: ${YANDEX_MODEL:-yandexgpt/latest}
+      GOOGLE_API_KEY: ${GOOGLE_API_KEY:-}
+      GOOGLE_MODEL: ${GOOGLE_MODEL:-gemini-3.5-flash-lite}
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
 
   frontend:
-    # Образ собирается из локального dist (см. frontend/Dockerfile):
-    # сначала `npm run build` в frontend/ (VITE_* запекаются из окружения),
-    # затем `docker compose build frontend`.
     build: ./frontend
     ports:
       - "5173:80"

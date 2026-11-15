@@ -4,6 +4,8 @@ import type { MapLayerMouseEvent, StyleSpecification } from 'maplibre-gl'
 import { GEOJSON_URL, WORLD_GEOJSON_URL } from '../../services/api'
 import HistoricalBordersLayer from './historical/HistoricalBordersLayer'
 import { useHistoricalBorders } from './historical/useHistoricalBorders'
+import { CITY_CLUSTER_LAYER } from './CityMarkers'
+import type { TimePeriod } from '../../types'
 
 // Воркер maplibre-gl v6 резолвится относительно бандла (./maplibre-gl-worker.mjs),
 // который Vite не эмитит -> 404 text/html -> карта мертва.
@@ -13,6 +15,7 @@ import { useHistoricalBorders } from './historical/useHistoricalBorders'
 maplibregl.setWorkerUrl('/maplibre-gl-worker.mjs')
 
 export type MapMode = 'mood' | 'delta'
+const DEFAULT_CENTER: [number, number] = [105, 61]
 
 export interface MapViewProps {
   values: Record<string, number | null | undefined>
@@ -20,7 +23,8 @@ export interface MapViewProps {
   mini?: boolean
   interactive?: boolean
   year?: number | null
-  ukraineMood?: number | null
+  month?: number | null
+  initialCenter?: [number, number]
   onRegionClick?: (regionId: string, point: { x: number; y: number }) => void
   onBackgroundClick?: () => void
   onMapReady?: (map: maplibregl.Map) => void
@@ -39,82 +43,68 @@ interface GeoCollection {
 
 type Expression = unknown[]
 
+function showsRussianClaims(year: number | null, month: number | null) {
+  return year !== null && (year > 2022 || (year === 2022 && (month ?? 12) >= 10))
+}
+
+export function BoundaryNote({ period }: { period: TimePeriod | null }) {
+  if (!period || !showsRussianClaims(period.year, period.month)) return null
+  return (
+    <p className="map-boundary-note muted">
+      Пунктир — административные контуры по законодательству РФ. Линия фактического контроля не показана.{' '}
+      <a href="https://mandates.un.org/mandate/A/RES/ES-11/4" target="_blank" rel="noreferrer">Резолюция ГА ООН ES-11/4</a>
+      {' · '}Контуры: <a href="https://www.geoboundaries.org/api/current/gbOpen/UKR/ADM1/" target="_blank" rel="noreferrer">geoBoundaries</a>,{' '}
+      <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap</a> (ODbL).
+    </p>
+  )
+}
+
 // Яркие стопы единой шкалы (значение 0–100): красный → голубой → зелёный.
 const MOOD_STOPS: Expression = [0, '#c0392b', 25, '#9f8187', 50, '#7ec8e3', 75, '#56caaa', 100, '#2ecc71']
+const RUSSIA_FILL = '#416d73'
+const UKRAINE_FILL = '#83754b'
+const CRIMEA_REGIONS = ['RU-CR', 'RU-SEV']
 
 function fillColorExpr(mode: MapMode): Expression {
   // Единая яркая шкала с точками: 0 красный → 0.5 голубой → 1 зелёный.
-  // Без старения: цвет яркий в любом году. null → серый «нет данных».
   const stops: Expression =
     mode === 'mood'
       ? ['interpolate', ['linear'], ['get', 'value'], ...MOOD_STOPS]
       : ['interpolate', ['linear'], ['get', 'value'], -10, '#d64545', 0, '#3d4657', 10, '#4f8cff']
-  return ['case', ['==', ['get', 'value'], null], '#39404e', stops]
-}
-
-// Приглушённый серый прочих стран мира: подложка есть, но не отвлекает.
-const DIM_BORDER = '#2e343b'
-// Внутренние границы регионов РФ — чуть светлее (РФ — целевая страна).
-const REGION_BORDER = '#6b7484'
-
-// Подложка стран: Украина — настроением своих городов (свойство ukr),
-// нет данных → серая. РФ — голубая, весь прочий мир — максимально
-// приглушённый серый (ярко выделяем только РФ, УК и Крым).
-function countryColorExpr(): Expression {
   return [
     'case',
-    ['==', ['get', 'ISO_A3'], 'UKR'],
-    ['case', ['==', ['get', 'ukr'], null], '#39404e', ['interpolate', ['linear'], ['get', 'ukr'], ...MOOD_STOPS]],
-    ['match', ['get', 'ISO_A3'], ['RUS'], '#7ec8e3', '#171c22'],
+    ['in', ['get', 'region_id'], ['literal', CRIMEA_REGIONS]], RUSSIA_FILL,
+    ['==', ['get', 'value'], null], 'transparent',
+    stops,
   ]
 }
 
-// dimModern=true (исторический снимок 1904/1905/1917): современные белые
-// подсветки РФ/УК/Крыма гаснут — белой остаётся только граница года.
-// dimModern=false (1991/2026 или без снимка): РФ/УК/Крым белые.
-function countriesLinePaint(dimModern: boolean) {
-  return {
-    color: [
-      'case',
-      ['==', ['get', 'ISO_A3'], 'UKR'],
-      dimModern ? DIM_BORDER : '#ffffff',
-      ['==', ['get', 'ISO_A3'], 'RUS'],
-      dimModern ? DIM_BORDER : '#ffffff',
-      DIM_BORDER,
-    ] as never,
-    width: [
-      'case',
-      ['in', ['get', 'ISO_A3'], ['literal', ['RUS', 'UKR']]],
-      dimModern ? 0.5 : 2.5,
-      0.5,
-    ] as never,
-  }
-}
+const DIM_BORDER = '#2e343b'
+// Внутренние границы регионов РФ — чуть светлее (РФ — целевая страна).
+const REGION_BORDER = '#6b7484'
 
 function regionsLinePaint(dimModern: boolean) {
   return {
     color: [
       'case',
-      ['in', ['get', 'region_id'], ['literal', ['RU-CR', 'RU-SEV']]],
+      ['in', ['get', 'region_id'], ['literal', CRIMEA_REGIONS]],
       dimModern ? DIM_BORDER : '#ffffff',
       REGION_BORDER,
     ] as never,
     width: [
       'case',
-      ['in', ['get', 'region_id'], ['literal', ['RU-CR', 'RU-SEV']]],
+      ['in', ['get', 'region_id'], ['literal', CRIMEA_REGIONS]],
       dimModern ? 0.5 : 2.5,
       0.5,
     ] as never,
   }
 }
 
-// Пустая подложка вместо внешнего demotiles-стиля: только тёмная вода.
-// Сушу рисует исключительно наш countries-fill (серый) — interference
-// базовых слоёв (landcover/landuse/boundary) исключена в принципе.
+// Вода задаётся фоном, суша рисуется слоем countries-fill.
 const EMPTY_STYLE: StyleSpecification = {
   version: 8,
   sources: {},
-  layers: [{ id: 'background', type: 'background', paint: { 'background-color': '#0d1b2a' } }],
+  layers: [{ id: 'background', type: 'background', paint: { 'background-color': '#273857' } }],
 }
 
 function applyValues(base: GeoCollection, values: Record<string, number | null | undefined>): GeoCollection {
@@ -131,26 +121,14 @@ function applyValues(base: GeoCollection, values: Record<string, number | null |
   }
 }
 
-function applyUkraine(base: GeoCollection, mood: number | null): GeoCollection {
-  return {
-    type: 'FeatureCollection',
-    features: base.features.map((f) => ({
-      ...f,
-      properties: {
-        ...f.properties,
-        ukr: f.properties.ISO_A3 === 'UKR' ? mood : null,
-      },
-    })),
-  }
-}
-
 export default function MapView({
   values,
   mode = 'mood',
   mini = false,
   interactive = true,
   year = null,
-  ukraineMood = null,
+  month = null,
+  initialCenter = DEFAULT_CENTER,
   onRegionClick,
   onBackgroundClick,
   onMapReady,
@@ -160,19 +138,13 @@ export default function MapView({
   const [mapInstance, setMapInstance] = useState<maplibregl.Map | null>(null)
   const empireRange = useHistoricalBorders(year)
   const empireUrl = empireRange?.geojsonUrl ?? null
-  // Снимок 1991/2026 совпадает с современным контуром РФ — не приглушаем
-  // современные белые линии РФ/УК/Крыма.
+  // Для имперского снимка приглушаем региональные линии Крыма.
   const dimModern = empireUrl != null && !empireRange?.keepModernHighlight
 
-  useEffect(() => {
-    console.log('[VEMap] historical layer', { year, url: empireUrl, dimModern })
-  }, [empireUrl, dimModern])
   const baseRef = useRef<GeoCollection | null>(null)
-  const worldRef = useRef<GeoCollection | null>(null)
   const dimModernRef = useRef(dimModern)
   const valuesRef = useRef(values)
   const modeRef = useRef(mode)
-  const ukraineRef = useRef(ukraineMood)
   const clickRef = useRef(onRegionClick)
   const bgClickRef = useRef(onBackgroundClick)
   const readyRef = useRef(onMapReady)
@@ -180,7 +152,6 @@ export default function MapView({
   valuesRef.current = values
   modeRef.current = mode
   dimModernRef.current = dimModern
-  ukraineRef.current = ukraineMood
   clickRef.current = onRegionClick
   bgClickRef.current = onBackgroundClick
   readyRef.current = onMapReady
@@ -190,13 +161,15 @@ export default function MapView({
     const map = new maplibregl.Map({
       container: containerRef.current,
       style: EMPTY_STYLE,
-      center: [105, 61],
+      center: initialCenter,
       zoom: 3,
       interactive,
       // Атрибуция отключена: AttributionControl со шторкой не нужен.
       attributionControl: false,
     })
     mapRef.current = map
+    const observer = new ResizeObserver(() => map.resize())
+    observer.observe(containerRef.current)
 
     map.on('load', () => {
       Promise.all([
@@ -206,18 +179,53 @@ export default function MapView({
         .then(([world, data]) => {
           if (!mapRef.current || !map.isStyleLoaded()) return
           baseRef.current = data
-          worldRef.current = world
           if (!map.getSource('world')) {
-            map.addSource('world', { type: 'geojson', data: applyUkraine(world, ukraineRef.current) })
+            map.addSource('world', { type: 'geojson', data: world })
           }
           if (!map.getLayer('countries-fill')) map.addLayer({
             id: 'countries-fill',
             type: 'fill',
             source: 'world',
             paint: {
-              'fill-color': countryColorExpr() as never,
-              'fill-opacity': 1,
+              'fill-color': [
+                'match', ['get', 'ISO_A3'],
+                'RUS', RUSSIA_FILL,
+                'UKR', UKRAINE_FILL,
+                '#424953',
+              ],
             },
+          })
+          if (!map.getLayer('countries-line')) map.addLayer({
+            id: 'countries-line',
+            type: 'line',
+            source: 'world',
+            paint: {
+              'line-color': [
+                'match', ['get', 'ISO_A3'],
+                'RUS', '#ffffff',
+                'UKR', '#f1d778',
+                '#697482',
+              ],
+              'line-width': ['match', ['get', 'ISO_A3'], ['RUS', 'UKR'], 2, 1],
+            },
+          })
+          map.addSource('russian-claims', {
+            type: 'geojson',
+            data: `${import.meta.env.BASE_URL}data/geo/russian-claims-2022.geojson`,
+          })
+          map.addLayer({
+            id: 'russian-claims-fill',
+            type: 'fill',
+            source: 'russian-claims',
+            layout: { visibility: 'none' },
+            paint: { 'fill-color': RUSSIA_FILL },
+          })
+          map.addLayer({
+            id: 'russian-claims-line',
+            type: 'line',
+            source: 'russian-claims',
+            layout: { visibility: 'none' },
+            paint: { 'line-color': '#d1e3e6', 'line-width': 1.2, 'line-dasharray': [3, 2] },
           })
           if (!map.getSource('regions')) map.addSource('regions', {
             type: 'geojson',
@@ -229,7 +237,9 @@ export default function MapView({
             source: 'regions',
             paint: {
               'fill-color': fillColorExpr(modeRef.current) as never,
-              'fill-opacity': 0.85,
+              'fill-opacity': [
+                'case', ['in', ['get', 'region_id'], ['literal', CRIMEA_REGIONS]], 1, 0.85,
+              ],
             },
           })
           if (!map.getLayer('regions-line')) map.addLayer({
@@ -243,32 +253,13 @@ export default function MapView({
               'line-width': regionsLinePaint(dimModernRef.current).width,
             },
           })
-          // Границы стран поверх регионов: серые для всех, белые для РФ и Украины.
-          if (!map.getLayer('countries-line')) map.addLayer({
-            id: 'countries-line',
-            type: 'line',
-            source: 'world',
-            // РФ/Украина — белые; при активном историческом слое
-            // приглушаются, чтобы белой осталась только граница года.
-            paint: {
-              'line-color': countriesLinePaint(dimModernRef.current).color,
-              'line-width': countriesLinePaint(dimModernRef.current).width,
-            },
-          })
-          // Диагностика: где реально белые линии и сколько объектов в
-          // источниках. regions-fill покрывает ТОЛЬКО РФ (+Крым), Украина
-          // едет отдельным свойством ukr на world-слое.
-            const highlight = dimModernRef.current
-              ? 'dim: modern RUS/UKR/CR borders greyed (imperial snapshot)'
-              : 'bright: countries-line RUS,UKR white 2.5 | regions-line RU-CR,RU-SEV white 2.5'
-            console.log('[VEMap] base layers', {
-              layerOrder: (map.getStyle().layers ?? []).map((l) => l.id).join(' > '),
-              worldFeatures: world.features.length,
-              regionFeatures: data.features.length,
-              highlight,
-            })
           if (interactive) {
+            const clickedCity = (e: MapLayerMouseEvent) => {
+              const layers = ['cities-circle', CITY_CLUSTER_LAYER].filter((layer) => map.getLayer(layer))
+              return layers.length > 0 && map.queryRenderedFeatures(e.point, { layers }).length > 0
+            }
             map.on('click', 'regions-fill', (e: MapLayerMouseEvent) => {
+              if (clickedCity(e)) return
               const rid = e.features?.[0]?.properties?.region_id
               if (typeof rid === 'string' && e.originalEvent) {
                 clickRef.current?.(rid, { x: e.originalEvent.clientX, y: e.originalEvent.clientY })
@@ -281,6 +272,7 @@ export default function MapView({
               map.getCanvas().style.cursor = ''
             })
             map.on('click', (e: maplibregl.MapMouseEvent) => {
+              if (clickedCity(e)) return
               const feats = map.queryRenderedFeatures(e.point, { layers: ['regions-fill'] })
               if (feats.length === 0) {
                 bgClickRef.current?.()
@@ -294,13 +286,13 @@ export default function MapView({
     })
 
     return () => {
+      observer.disconnect()
       map.remove()
       mapRef.current = null
       baseRef.current = null
-      worldRef.current = null
       setMapInstance(null)
     }
-  }, [])
+  }, [initialCenter])
 
   useEffect(() => {
     const map = mapRef.current
@@ -313,25 +305,18 @@ export default function MapView({
   }, [values, mode])
 
   useEffect(() => {
-    const map = mapRef.current
-    const world = worldRef.current
-    if (!map || !world) return
-    const source = map.getSource('world') as maplibregl.GeoJSONSource | undefined
-    if (!source) return
-    source.setData(applyUkraine(world, ukraineMood))
-  }, [ukraineMood])
+    if (!mapInstance) return
+    const visibility = showsRussianClaims(year, month) ? 'visible' : 'none'
+    mapInstance.setLayoutProperty('russian-claims-fill', 'visibility', visibility)
+    mapInstance.setLayoutProperty('russian-claims-line', 'visibility', visibility)
+  }, [mapInstance, year, month])
 
-  // Исторический слой включился/выключился или сменился тип снимка →
-  // перекрасить современные линии: белые подсветки РФ/УК/Крыма гаснут
-  // для имперских снимков, белой остаётся граница года.
+  // Стиль региональных линий зависит от исторического слоя.
   useEffect(() => {
     const map = mapRef.current
-    if (!map || !map.getLayer('countries-line')) return
+    if (!map || !map.getLayer('regions-line')) return
     const active = dimModern
-    const c = countriesLinePaint(active)
     const r = regionsLinePaint(active)
-    map.setPaintProperty('countries-line', 'line-color', c.color)
-    map.setPaintProperty('countries-line', 'line-width', c.width)
     if (map.getLayer('regions-line')) {
       map.setPaintProperty('regions-line', 'line-color', r.color)
       map.setPaintProperty('regions-line', 'line-width', r.width)

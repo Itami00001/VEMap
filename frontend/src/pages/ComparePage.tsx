@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { api } from '../services/api'
 import type { CityCompareRow, MapPoint, Region, TimePeriod } from '../types'
 import CompareYears from '../features/data/CompareYears'
-import MapView from '../features/map/MapView'
+import MapView, { BoundaryNote } from '../features/map/MapView'
 import RegionPopup from '../features/map/RegionPopup'
 import DemoBadge from '../features/map/DemoBadge'
 
@@ -93,6 +93,7 @@ export default function ComparePage() {
           mode={mode === 'delta' ? 'delta' : 'mood'}
           interactive
           year={periodB?.year ?? null}
+          month={periodB?.month ?? null}
           onRegionClick={(regionId, pt) => {
             const rect = shellRef.current?.getBoundingClientRect()
             if (!rect) return
@@ -118,6 +119,7 @@ export default function ComparePage() {
           />
         )}
       </div>
+      <BoundaryNote period={periodB} />
       <table className="data-table">
         <thead>
           <tr>
