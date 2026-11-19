@@ -2,7 +2,7 @@ import { lazy, Suspense, useState } from 'react'
 import { newspaperUrl } from '../../services/api'
 import { formatPeriod } from './TimeSlider'
 import type { City, CityMood, TimePeriod } from '../../types'
-import type { NewspaperSource } from '../../services/api'
+import type { NewspaperSource } from '../../types'
 
 const NewspaperReader = lazy(() => import('./NewspaperReader'))
 
@@ -62,30 +62,31 @@ export default function CityPanel({ city, cityId, mood, period, loading, error, 
         <div className="city-panel-newspaper">
           {mood?.sources?.length ? (
             <ul>
-              {mood.sources.map(({ source_pdf, source_page, available }) => (
-                <li key={source_pdf + ':' + source_page}>
+              {mood.sources.map((source) => {
+                const { id, title, source_page, available } = source
+                return <li key={id + ':' + source_page}>
                   {available ? (
                     <button type="button" className="btn newspaper-source-button"
-                      aria-pressed={selected?.source_pdf === source_pdf && selected.source_page === source_page}
+                      aria-pressed={selected?.id === id && selected.source_page === source_page}
                       onClick={() => {
-                        setSelected({ source_pdf, source_page })
-                        onOpenSource(source_pdf)
+                        setSelected(source)
+                        onOpenSource(id)
                       }}>
-                      Открыть источник · {source_pdf}, стр. {source_page}
+                      Открыть источник · {title}, стр. {source_page}
                     </button>
                   ) : (
-                    <span className="muted">PDF недоступен · {source_pdf}, стр. {source_page}</span>
+                    <span className="muted">PDF недоступен · {title}, стр. {source_page}</span>
                   )}
-                  {activeSource === source_pdf && <span className="muted"> · выбран для чата</span>}
+                  {activeSource === id && <span className="muted"> · выбран для чата</span>}
                 </li>
-              ))}
+              })}
             </ul>
           ) : (
             <p className="muted">Для этого периода источник не указан</p>
           )}
           {selected && <Suspense fallback={<p role="status">Загружаем просмотрщик…</p>}>
-            <NewspaperReader key={`${selected.source_pdf}:${selected.source_page}`}
-              url={newspaperUrl(selected.source_pdf, selected.source_page)} initialPage={selected.source_page} />
+            <NewspaperReader key={`${selected.id}:${selected.source_page}`}
+              url={newspaperUrl(selected.id, selected.source_page)} initialPage={selected.source_page} />
           </Suspense>}
         </div>
       )}

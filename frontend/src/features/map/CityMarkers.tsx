@@ -10,6 +10,7 @@ export interface CityMarkersProps {
   cityMoods: CityMood[]
   loading: boolean
   error: boolean
+  animationPaused?: boolean
   onCityClick?: (cityId: string) => void
 }
 
@@ -37,9 +38,11 @@ function escapeHtml(value: string): string {
   return value.replace(/[&<>'"]/g, (char) => map[char] ?? char)
 }
 
-export default function CityMarkers({ map, cities, cityMoods, loading, error, onCityClick }: CityMarkersProps) {
+export default function CityMarkers({ map, cities, cityMoods, loading, error, animationPaused, onCityClick }: CityMarkersProps) {
   const onCityClickRef = useRef(onCityClick)
+  const animationPausedRef = useRef(animationPaused)
   onCityClickRef.current = onCityClick
+  animationPausedRef.current = animationPaused
 
   useLayoutEffect(() => {
     if (!map) return
@@ -68,8 +71,10 @@ export default function CityMarkers({ map, cities, cityMoods, loading, error, on
     let frame = 0
     const motion = window.matchMedia('(prefers-reduced-motion: reduce)')
 
+    let lastPaint = -Infinity
     const pulse = (time: number) => {
-      if (!motion.matches) {
+      if (!animationPausedRef.current && !motion.matches && time - lastPaint >= 30) {
+        lastPaint = time
         const phase = (1 - Math.cos(time * 2 * Math.PI / 1600)) / 2
         map.setPaintProperty('cities-glow', 'circle-radius', MARKER_RADIUS + 4 + 18 * phase)
         map.setPaintProperty('cities-glow', 'circle-opacity', 0.95 - 0.65 * phase)

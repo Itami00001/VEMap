@@ -1,13 +1,17 @@
-import { useEffect, useRef, useState } from 'react'
+import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import type { FormEvent } from 'react'
-import { api, askNewspaper, NewspaperChatError } from '../../services/api'
-import type { ChatProvider, NewspaperChatMessage, NewspaperCity } from '../../services/api'
+import { api, askNewspaper, NewspaperChatError, newspaperUrl } from '../../services/api'
+import type { ChatProvider, NewspaperChatMessage, NewspaperCatalog } from '../../services/api'
+
+const NewspaperReader = lazy(() => import('./NewspaperReader'))
+const ChatMarkdown = lazy(() => import('./ChatMarkdown'))
+const ARCHIVE = 'archive'
 
 interface NewspaperChatProps {
   open: boolean
   selection: { cityId: string; filename: string } | null
   onSelect: (selection: { cityId: string; filename: string } | null) => void
-  catalog: NewspaperCity[] | null
+  catalog: NewspaperCatalog | null
   catalogError: boolean
   onClose: () => void
 }
@@ -25,6 +29,10 @@ export default function NewspaperChat({ open, selection, onSelect, catalog, cata
   const [providers, setProviders] = useState<ChatProvider[] | null>(null)
   const [providersError, setProvidersError] = useState(false)
   const [providerId, setProviderId] = useState('groq')
+  const [citySearch, setCitySearch] = useState('')
+  const [issueSearch, setIssueSearch] = useState('')
+  const [compactFor, setCompactFor] = useState<string | null>(null)
+  const [actualModel, setActualModel] = useState<{ conversation: string; name: string } | null>(null)
   useEffect(() => {
     if (open) closeRef.current?.focus()
   }, [open])
@@ -46,8 +54,13 @@ export default function NewspaperChat({ open, selection, onSelect, catalog, cata
     })
     return () => controller.abort()
   }, [open])
-  const city = catalog?.find((item) => item.city_id === selection?.cityId)
+  const city = catalog?.cities.find((item) => item.city_id === selection?.cityId)
+  const sources = selection?.cityId === ARCHIVE ? catalog?.archive : city?.sources
+  const issue = sources?.find((item) => item.id === selection?.filename)
   const provider = providers?.find((item) => item.id === providerId)
+  const conversation = JSON.stringify([selection?.filename, providerId])
+  const compact = conversation === compactFor
+  const model = actualModel?.conversation === conversation ? actualModel.name : provider?.model
 
   return (
     <aside id="newspaper-chat" className={`newspaper-chat${open ? ' is-open' : ''}`}
@@ -55,12 +68,18 @@ export default function NewspaperChat({ open, selection, onSelect, catalog, cata
       onKeyDown={(event) => { if (event.key === 'Escape') onClose() }}>
       <header className="newspaper-chat-header">
         <ChatAvatar role="assistant" />
-        <h2 id="newspaper-chat-title">Чат с ИИ</h2>
+        <h2 id="newspaper-chat-title">Чат с {model || 'ИИ'}</h2>
         <button ref={closeRef} type="button" className="nav-icon" aria-label="Закрыть чат" onClick={onClose}>
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" /></svg>
         </button>
       </header>
-      <div className="newspaper-catalog">
+      {compact && (
+        <button type="button" className="btn chat-settings-button" aria-expanded={false}
+          aria-controls="chat-settings" onClick={() => setCompactFor(null)}>
+          <strong>Настройки</strong> · {provider?.label} · {city?.name_ru ?? 'Весь архив'} · {issue?.title}
+        </button>
+      )}
+      <div className="newspaper-catalog" id="chat-settings" hidden={compact}>
         <label>AI-провайдер
           <select value={providerId} disabled={!providers?.some((item) => item.available)}
             onChange={(event) => setProviderId(event.target.value)}>
@@ -72,42 +91,69 @@ export default function NewspaperChat({ open, selection, onSelect, catalog, cata
             ))}
           </select>
         </label>
+        <label>Найти город
+          <input type="search" value={citySearch} onChange={(event) => setCitySearch(event.target.value)}
+            placeholder="Название города" />
+        </label>
         <label>Город
-          <select value={selection?.cityId ?? ''} disabled={!catalog?.length}
-            onChange={(event) => onSelect(event.target.value ? { cityId: event.target.value, filename: '' } : null)}>
+          <select value={selection?.cityId ?? ''} disabled={!catalog}
+            onChange={(event) => {
+              setIssueSearch('')
+              onSelect(event.target.value ? { cityId: event.target.value, filename: '' } : null)
+            }}>
             <option value="">Выберите город</option>
-            {catalog?.map((item) => <option key={item.city_id} value={item.city_id}>{item.name_ru}</option>)}
+            <option value={ARCHIVE}>Весь архив</option>
+            {catalog?.cities.filter((item) => item.city_id === selection?.cityId ||
+              item.name_ru.toLowerCase().includes(citySearch.trim().toLowerCase()))
+              .map((item) => <option key={item.city_id} value={item.city_id}>{item.name_ru}</option>)}
           </select>
         </label>
+        {selection?.cityId === ARCHIVE && (
+          <label>Найти выпуск
+            <input type="search" value={issueSearch} onChange={(event) => setIssueSearch(event.target.value)}
+              placeholder="Название, дата или имя PDF" />
+          </label>
+        )}
         <label>Газета
-          <select value={selection?.filename ?? ''} disabled={!city?.sources.length}
-            onChange={(event) => { if (city) onSelect({ cityId: city.city_id, filename: event.target.value }) }}>
+          <select value={selection?.filename ?? ''} disabled={!sources?.length}
+            onChange={(event) => { if (selection) onSelect({ cityId: selection.cityId, filename: event.target.value }) }}>
             <option value="">Выберите выпуск</option>
-            {city?.sources.map((source) => <option key={source.source_pdf} value={source.source_pdf}>{source.source_pdf}</option>)}
+            {sources?.filter((source) => selection?.cityId !== ARCHIVE || source.id === issue?.id ||
+              (source.title + ' ' + source.source_pdf).toLowerCase().includes(issueSearch.trim().toLowerCase()))
+              .map((source) => (
+              <option key={source.id} value={source.id} disabled={!source.available}>
+                {source.title}{!source.available ? ' · PDF не найден' : source.transcript ? ' · есть расшифровка' : ''}
+              </option>
+            ))}
           </select>
         </label>
       </div>
+      {city && !city.sources.length && <p className="muted">Для этого города пока нет связанных выпусков. Откройте весь архив.</p>}
       {providersError && <p role="alert">Список провайдеров не загрузился. Откройте чат снова.</p>}
       {!providers && !providersError && <p role="status" className="muted">Проверяем настройки провайдеров…</p>}
       {provider && !provider.available && <p className="muted">{provider.label}: {provider.reason}</p>}
       {catalogError && <p role="alert">Каталог не загрузился. Закройте чат и откройте его снова.</p>}
       {!catalog && !catalogError && <p role="status" className="muted">Загружаем каталог…</p>}
-      {catalog?.length === 0 && <p className="muted">В архиве пока нет доступных выпусков.</p>}
-      <ChatConversation key={JSON.stringify([selection?.filename, providerId])}
-        open={open} sourcePdf={selection?.filename || null} provider={provider?.available ? provider : null} />
+      {catalog?.archive.length === 0 && <p className="muted">В архиве пока нет выпусков.</p>}
+      <ChatConversation key={conversation} open={open} sourcePdf={issue?.available ? issue.id : null}
+        provider={provider?.available ? provider : null}
+        onSend={() => setCompactFor(conversation)} onModel={(name) => setActualModel({ conversation, name })} />
     </aside>
   )
 }
 
-function ChatConversation({ open, sourcePdf, provider }: {
+function ChatConversation({ open, sourcePdf, provider, onSend, onModel }: {
   open: boolean; sourcePdf: string | null; provider: ChatProvider | null
+  onSend: () => void; onModel: (model: string) => void
 }) {
   const [messages, setMessages] = useState<NewspaperChatMessage[]>([])
   const [question, setQuestion] = useState('')
   const [pending, setPending] = useState(false)
+  const [page, setPage] = useState<number | null>(null)
   const [error, setError] = useState<{ title: string; detail: string } | null>(null)
   const requestRef = useRef<AbortController | null>(null)
   const historyRef = useRef<HTMLOListElement>(null)
+  const sentRef = useRef(false)
 
   useEffect(() => () => requestRef.current?.abort(), [])
 
@@ -127,10 +173,17 @@ function ChatConversation({ open, sourcePdf, provider }: {
     setQuestion('')
     const next: NewspaperChatMessage[] = [...messages, { role: 'user', content: text }]
     setMessages(next)
+    if (!sentRef.current) {
+      sentRef.current = true
+      onSend()
+    }
     try {
       const history = messages.slice(-8).map(({ role, content }) => ({ role, content: content.slice(0, 6000) }))
       const answer = await askNewspaper(text, sourcePdf, provider.id, history, controller.signal)
-      if (!controller.signal.aborted) setMessages([...next, { role: 'assistant', content: answer }])
+      if (!controller.signal.aborted) {
+        onModel(answer.model)
+        setMessages([...next, { role: 'assistant', content: answer.answer, pages: answer.pages }])
+      }
     } catch (failure) {
       if (controller.signal.aborted) return
       setMessages(messages)
@@ -165,14 +218,26 @@ function ChatConversation({ open, sourcePdf, provider }: {
       {sourcePdf ? (
         <>
           <ol ref={historyRef} className="newspaper-chat-history" aria-label="История сообщений" role="log">
-            {messages.map(({ role, content }, index) => (
+            {messages.map(({ role, content, pages }, index) => (
               <li key={index} className={`newspaper-chat-message ${role}`}>
                 <ChatAvatar role={role} />
-                <p aria-label={role === 'user' ? 'Вы' : 'ИИ'}>{content}</p>
+                {role === 'user' ? <p aria-label="Вы">{content}</p> : (
+                  <Suspense fallback={<p>Оформляем ответ…</p>}>
+                    <ChatMarkdown content={content} pages={pages} onPage={setPage} />
+                  </Suspense>
+                )}
               </li>
             ))}
             {pending && <li className="muted">Ожидаем ответ…</li>}
           </ol>
+          {page !== null && (
+            <section className="chat-source-preview" aria-label="Газетная страница">
+              <button className="btn" type="button" onClick={() => setPage(null)}>Закрыть PDF</button>
+              <Suspense fallback={<p role="status">Загружаем просмотрщик…</p>}>
+                <NewspaperReader key={page} url={newspaperUrl(sourcePdf, page)} initialPage={page} />
+              </Suspense>
+            </section>
+          )}
           {error && <div className="alert error" role="alert"><strong>{error.title}</strong><br />{error.detail}</div>}
           <form className="newspaper-chat-form" onSubmit={submit}>
             <label htmlFor="newspaper-question">Вопрос о выпуске</label>

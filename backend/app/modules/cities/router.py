@@ -1,13 +1,15 @@
 from collections import defaultdict
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 
 from app.core.dependencies import get_db
 from app.modules.cities import service as city_service
+from app.modules.cities.comparison import Comparison, compare_periods
 from app.modules.cities.model import City
-from app.modules.cities.source_model import CityMoodSource, newspaper_path
+from app.modules.cities.newspapers import ArchiveCity, NewspaperCatalog, find_issue, issues, list_catalog
+from app.modules.cities.source_model import CityMoodSource
 from app.modules.cities.schema import (
     CityCompareRowOut,
     CityDataRowOut,
@@ -63,15 +65,10 @@ def city_moods(year: int, month: int | None = None, db: Session = Depends(get_db
     rows = city_service.get_city_moods(db, year, month)
     query = db.query(CityMoodSource).filter(CityMoodSource.year == year, CityMoodSource.month == month)
     sources_by_period = defaultdict(list)
-    availability = {}
+    _, by_filename = issues(db)
     for source in query.order_by(CityMoodSource.source_pdf, CityMoodSource.source_page):
-        if source.source_pdf not in availability:
-            availability[source.source_pdf] = newspaper_path(source.source_pdf) is not None
-        sources_by_period[(source.city_id, source.month)].append({
-            "source_pdf": source.source_pdf,
-            "source_page": source.source_page,
-            "available": availability[source.source_pdf],
-        })
+        issue = by_filename[source.source_pdf]
+        sources_by_period[(source.city_id, source.month)].append(issue.as_output(source.source_page))
     for row in rows:
         row["sources"] = sources_by_period[(row["city_id"], row["month"])]
     return rows
@@ -79,31 +76,21 @@ def city_moods(year: int, month: int | None = None, db: Session = Depends(get_db
 
 @router.get("/newspapers/{filename}")
 def open_newspaper(filename: str, db: Session = Depends(get_db)):
-    source = db.query(CityMoodSource.source_pdf).filter(CityMoodSource.source_pdf == filename).first()
-    path = newspaper_path(filename) if source else None
+    issue = find_issue(db, filename)
+    path = issue.path if issue else None
     if path is None:
         raise HTTPException(status_code=404, detail="Newspaper PDF not found")
     return FileResponse(path, media_type="application/pdf", filename=path.name, content_disposition_type="inline")
 
 
-@router.get("/newspapers")
+@router.get("/newspapers", response_model=list[ArchiveCity])
 def list_newspapers(db: Session = Depends(get_db)):
-    rows = (
-        db.query(City.city_id, City.name_ru, CityMoodSource.source_pdf, CityMoodSource.source_page)
-        .join(CityMoodSource, CityMoodSource.city_id == City.city_id)
-        .order_by(City.name_ru, CityMoodSource.source_pdf, CityMoodSource.source_page)
-        .all()
-    )
-    availability = {}
-    catalog = {}
-    for city_id, name, filename, page in rows:
-        if filename not in availability:
-            availability[filename] = newspaper_path(filename) is not None
-        if not availability[filename]:
-            continue
-        city = catalog.setdefault(city_id, {"city_id": city_id, "name_ru": name, "sources": {}})
-        city["sources"].setdefault(filename, {"source_pdf": filename, "source_page": page})
-    return [{**city, "sources": list(city["sources"].values())} for city in catalog.values()]
+    return list_catalog(db).cities
+
+
+@router.get("/newspaper-catalog", response_model=NewspaperCatalog)
+def newspaper_catalog(db: Session = Depends(get_db)):
+    return list_catalog(db)
 
 
 @router.get("/cities/{city_id}/history")
@@ -125,4 +112,22 @@ def data_cities(year: int, month: int | None = None, db: Session = Depends(get_d
 def compare_cities(
     year_a: int, year_b: int, month_a: int | None = None, month_b: int | None = None, db: Session = Depends(get_db)
 ):
-    return city_service.get_city_compare_rows(db, year_a, year_b, month_a, month_b)
+    comparison = compare_periods(db, TimePeriodOut(year=year_a, month=month_a), TimePeriodOut(year=year_b, month=month_b))
+    return [
+        CityCompareRowOut(city_id=row.id, name_ru=row.name, region_id=row.region_id,
+                          mood_a=row.a.value if row.a else None, mood_b=row.b.value if row.b else None, delta=row.delta)
+        for row in comparison.cities
+    ]
+
+
+@router.get("/compare/periods", response_model=Comparison)
+def compare_workspace(
+    year_a: int | None = None, year_b: int | None = None,
+    month_a: int | None = Query(None, ge=1, le=12), month_b: int | None = Query(None, ge=1, le=12),
+    db: Session = Depends(get_db),
+):
+    if year_a is None and year_b is None and month_a is None and month_b is None:
+        return compare_periods(db)
+    if year_a is None or year_b is None:
+        raise HTTPException(400, "Укажите оба периода.")
+    return compare_periods(db, TimePeriodOut(year=year_a, month=month_a), TimePeriodOut(year=year_b, month=month_b))

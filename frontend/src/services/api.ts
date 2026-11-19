@@ -3,11 +3,14 @@ import type {
   CityCompareRow,
   CityDataRow,
   CityMood,
+  Comparison,
+  ComparisonRow,
   CompareRow,
   DataRow,
   ForecastResult,
   HistoryPoint,
   MapPoint,
+  NewspaperSource,
   Region,
   TimePeriod,
 } from '../types'
@@ -22,11 +25,7 @@ export const newspaperUrl = (filename: string, page: number) =>
 export interface NewspaperChatMessage {
   role: 'user' | 'assistant'
   content: string
-}
-
-export interface NewspaperSource {
-  source_pdf: string
-  source_page: number
+  pages?: number[]
 }
 
 export interface NewspaperCity {
@@ -35,11 +34,23 @@ export interface NewspaperCity {
   sources: NewspaperSource[]
 }
 
+export interface NewspaperCatalog {
+  cities: NewspaperCity[]
+  archive: NewspaperSource[]
+}
+
 export interface ChatProvider {
   id: string
   label: string
   available: boolean
   reason: string | null
+  model: string
+}
+
+interface ChatAnswer {
+  answer: string
+  model: string
+  pages: number[]
 }
 
 export class NewspaperChatError extends Error {
@@ -57,7 +68,7 @@ export async function askNewspaper(
   provider: string,
   history: NewspaperChatMessage[],
   signal: AbortSignal,
-): Promise<string> {
+): Promise<ChatAnswer> {
   const response = await fetch(`${BASE_URL}/api/chat`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -71,7 +82,7 @@ export async function askNewspaper(
       typeof data?.detail === 'string' ? data.detail : 'Не удалось получить ответ от сервера чата.',
     )
   }
-  return data.answer
+  return data
 }
 export const USE_MOCKS: boolean = String(import.meta.env.VITE_USE_MOCKS ?? 'false') === 'true'
 
@@ -94,9 +105,40 @@ export const GEOJSON_URL = `${import.meta.env.BASE_URL}data/geo/russia-regions.g
 export const WORLD_GEOJSON_URL = `${import.meta.env.BASE_URL}data/geo/world-countries.geojson`
 const empty = <T,>(value: T) => Promise.resolve(value)
 
+function demoComparison(a = DEMO_PERIODS[0], b = DEMO_PERIODS[1]): Comparison {
+  function row(id: string, name: string, aValue: number | null, bValue: number | null): ComparisonRow {
+    const observation = (value: number | null) => value === null ? null
+      : { value, count: null, method: 'Демонстрационные данные', unit: '', sources: [] }
+    const comparable = aValue !== null && bValue !== null && (a.month === null) === (b.month === null)
+    return { id, name, a: observation(aValue), b: observation(bValue),
+      delta: comparable ? Math.round((bValue - aValue) * 100) / 100 : null,
+      status: comparable ? 'comparable' : aValue === null ? 'only_b' : bValue === null ? 'only_a' : 'different_methods' }
+  }
+  return {
+    periods: DEMO_PERIODS, period_a: a, period_b: b,
+    cities: demoCompare(a, b).filter((item) => item.mood_a !== null || item.mood_b !== null).map((item) => {
+      const city = DEMO_CITIES.find((entry) => entry.city_id === item.city_id)
+      return { ...row(item.city_id, item.name_ru, item.mood_a, item.mood_b), lat: city?.lat, lon: city?.lon }
+    }),
+    regions: demoRegionCompareFull(a, b).filter((item) => item.mood_a !== null || item.mood_b !== null)
+      .map((item) => row(item.region_id, item.name_ru, item.mood_a, item.mood_b)),
+  }
+}
+
 export const api = {
+  getComparison: (signal: AbortSignal, a?: TimePeriod, b?: TimePeriod) => {
+    if (USE_MOCKS) return empty(demoComparison(a, b))
+    const query = new URLSearchParams()
+    if (a && b) {
+      query.set('year_a', String(a.year))
+      query.set('year_b', String(b.year))
+      if (a.month !== null) query.set('month_a', String(a.month))
+      if (b.month !== null) query.set('month_b', String(b.month))
+    }
+    return requestWithSignal<Comparison>(`/api/compare/periods?${query}`, signal)
+  },
   getChatProviders: (signal: AbortSignal) => requestWithSignal<ChatProvider[]>('/api/chat/providers', signal),
-  getNewspapers: (signal: AbortSignal) => requestWithSignal<NewspaperCity[]>('/api/newspapers', signal),
+  getNewspapers: (signal: AbortSignal) => requestWithSignal<NewspaperCatalog>('/api/newspaper-catalog', signal),
   getRegions: (signal?: AbortSignal) => USE_MOCKS ? empty<Region[]>(DEMO_REGIONS) : requestWithSignal<Region[]>('/api/regions', signal!),
   getYears: (signal?: AbortSignal) => USE_MOCKS ? empty([...new Set(DEMO_PERIODS.map((p) => p.year))]) : requestWithSignal<number[]>('/api/years', signal!),
   getPeriods: (signal?: AbortSignal) => USE_MOCKS ? empty(DEMO_PERIODS) : requestWithSignal<TimePeriod[]>('/api/periods', signal!),

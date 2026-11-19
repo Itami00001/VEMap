@@ -15,6 +15,13 @@ CITY_SOURCE = "cities:2.0"
 MONTHLY_CALENDAR = {1900: range(1, 13)}
 
 
+def weighted_mood(values: list[tuple[float, int]]) -> tuple[float, int]:
+    total = sum(count for _, count in values)
+    if total > 0:
+        return round(sum(value * count for value, count in values) / total, 2), total
+    return round(sum(value for value, _ in values) / len(values), 2), total
+
+
 def get_periods(db: Session) -> list[TimePeriodOut]:
     """Периоды наблюдений и месяцы из календаря исторического корпуса."""
     rows = (
@@ -55,16 +62,12 @@ def get_region_aggregates(db: Session, year: int, month: int) -> list[MapPointOu
     out: list[MapPointOut] = []
     for region_id, recs in sorted(by_region.items()):
         weighted = [(r.mood_index, r.n_lines or 0) for r in recs]
-        total_w = sum(w for _, w in weighted)
-        if total_w > 0:
-            mood = sum(m * w for m, w in weighted) / total_w
-        else:
-            mood = sum(m for m, _ in weighted) / len(weighted)
+        mood, count = weighted_mood(weighted)
         out.append(
             MapPointOut(
                 region_id=region_id,
-                mood_index=round(mood, 2),
-                responses_count=sum(w for _, w in weighted),
+                mood_index=mood,
+                responses_count=count,
                 source=CITY_SOURCE,
             )
         )
@@ -141,36 +144,6 @@ def get_city_data_rows(db: Session, year: int, month: int | None) -> list[dict]:
                 "mood_index": mood,
                 "responses_count": cur["responses_count"] if cur else None,
                 "change_from_prev": change,
-            }
-        )
-    return out
-
-
-def get_city_compare_rows(
-    db: Session, year_a: int, year_b: int, month_a: int | None, month_b: int | None
-) -> list[dict]:
-    """Сравнение двух периодов по городам."""
-    a = get_city_moods(db, year_a, month_a)
-    b = get_city_moods(db, year_b, month_b)
-    a_map = {c["city_id"]: c for c in a}
-    b_map = {c["city_id"]: c for c in b}
-    all_ids = set(a_map) | set(b_map)
-    out = []
-    for cid in all_ids:
-        ca = a_map.get(cid)
-        cb = b_map.get(cid)
-        mood_a = ca["mood_index"] if ca else None
-        mood_b = cb["mood_index"] if cb else None
-        delta = round(mood_b - mood_a, 2) if mood_a is not None and mood_b is not None else None
-        ref = ca or cb
-        out.append(
-            {
-                "city_id": cid,
-                "name_ru": ref["name_ru"] if ref else "",
-                "region_id": ref["region_id"] if ref else None,
-                "mood_a": mood_a,
-                "mood_b": mood_b,
-                "delta": delta,
             }
         )
     return out

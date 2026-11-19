@@ -24,7 +24,7 @@ export default function MapPage() {
   const [popup, setPopup] = useState<{ regionId: string; x: number; y: number } | null>(null)
   const [cityId, setCityId] = useState<string | null>(null)
   const [sourcePdf, setSourcePdf] = useState<string | null>(null)
-  const { setChatSource } = useOutletContext<LayoutContext>()
+  const { chatOpen, setChatSource } = useOutletContext<LayoutContext>()
   const [searchParams, setSearchParams] = useSearchParams()
   const shellRef = useRef<HTMLDivElement>(null)
 
@@ -67,7 +67,7 @@ export default function MapPage() {
   const popupRegion = regions.find((r) => r.region_id === popup?.regionId)
   const city = cities.find((item) => item.city_id === cityId)
   const cityMood = cityMoods.find((item) => item.city_id === cityId)
-  const activeSource = cityMood?.sources?.some((source) => source.available && source.source_pdf === sourcePdf)
+  const activeSource = cityMood?.sources?.some((source) => source.available && source.id === sourcePdf)
     ? sourcePdf : null
   useEffect(() => {
     setChatSource(cityId && activeSource ? { cityId, filename: activeSource } : null)
@@ -103,6 +103,7 @@ export default function MapPage() {
         />
         <div className="map-overlay-cities">
           <CityMarkers map={map} cities={cities} cityMoods={cityMoods} loading={loading} error={error !== null}
+            animationPaused={chatOpen}
             onCityClick={(id) => {
               setPopup(null)
               setSearchParams({ city: id }, { replace: true })

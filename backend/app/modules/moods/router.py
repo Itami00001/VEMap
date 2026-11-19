@@ -60,7 +60,17 @@ def compare_years(
     month_b: int | None = Query(default=None),
     db: Session = Depends(get_db),
 ):
-    # v1.1: см. комментарий выше — запрос с month_* возвращает [].
     if month_a is not None or month_b is not None:
-        return []
+        from app.modules.cities.comparison import compare_periods
+        from app.modules.cities.schema import TimePeriodOut
+
+        comparison = compare_periods(
+            db, TimePeriodOut(year=year_a, month=month_a), TimePeriodOut(year=year_b, month=month_b),
+        )
+        return [
+            CompareRowOut(region_id=row.id, name_ru=row.name,
+                          mood_a=row.a.value if row.a else None, mood_b=row.b.value if row.b else None,
+                          delta=row.delta)
+            for row in comparison.regions
+        ]
     return mood_service.compare(db, year_a, year_b, SCORING_VERSION)

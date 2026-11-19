@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { newspaperUrl } from '../services/api'
 
 const sections = [
   { to: '/map', title: 'Карта', detail: 'Выбирайте город и период, открывайте газетные страницы.' },
@@ -14,9 +15,9 @@ const pipeline = [
 ]
 
 const features = [
-  { icon: '/map', title: 'Исторические границы', text: 'Географический фон меняется там, где есть подходящий снимок границ. Период в ползунке задаёт дату наблюдений. Под картой указаны источники современных спорных контуров.' },
-  { icon: '/data', title: 'Mood Index', text: 'Шкала от 0 до 100 помогает сопоставлять тональность материалов. Серый маркер показывает город без оценки, а при отдалении близкие города объединяются в кластеры.' },
-  { icon: 'chat', title: 'Чат с ИИ по выпуску', text: 'Выберите город и газету в чате или откройте источник на карте. Для длинного выпуска приложение подбирает страницы по словам вопроса и передаёт их модели с номерами.' },
+  { icon: '/map', title: 'Исторические границы', text: 'На карте дата наблюдений и дата географической подложки могут различаться. Если для периода есть исторический снимок границ, его дата указана под картой.', to: '/map', link: 'Перейти к карте' },
+  { icon: '/data', title: 'Mood Index', text: 'Шкала от 0 до 100 показывает тональность в выборке. В «Сравнении» видны оценки, объём материала и методика каждого периода. Изменение в пунктах доступно для сопоставимых наблюдений.', to: '/compare', link: 'Сравнить периоды' },
+  { icon: 'chat', title: 'Чат с ИИ по выпуску', text: 'Откройте выпуск на карте или найдите его в каталоге чата. Спросите, какие события описаны в тексте. Если в ответе есть ссылка на страницу, по ней можно открыть скан.', to: '/map', link: 'Найти выпуск на карте' },
 ]
 
 const technologies = [
@@ -27,6 +28,15 @@ const technologies = [
   ['Groq, Yandex AI Studio и Google AI Studio', 'Ответы по выбранному выпуску через выбранного провайдера.'],
   ['Docker Compose и Nginx', 'Сборка и запуск сервисов.'],
 ]
+
+const limits = [
+  ['Покрытие архива неравномерно', 'Для одних городов есть много фрагментов, для других — один или ни одного. Mood Index описывает содержание выборки. При сравнении учитывайте объём материала и методику расчёта.'],
+  ['Распознавание может ошибаться', 'Качество скана, дореформенная орфография и арабская графика влияют на OCR. Сверяйте цитаты, даты и имена по газетной странице.'],
+  ['У границ есть собственная дата', 'Исторические подложки доступны для отдельных дат. Дата и источник административных контуров указаны под картой.'],
+  ['Прогнозирование в разработке', 'Для прогноза нужны сопоставимые наблюдения за достаточно длинный срок и проверка качества модели. В разделе описана подготовка к этому этапу.'],
+]
+
+const featuredIssue = 'leaf_19000124_0001_searchable.pdf'
 
 function SectionIcon({ path }: { path: string }) {
   return (
@@ -84,33 +94,43 @@ export default function Landing() {
         </ol>
       </section>
 
-      <section className="archive-sections" aria-labelledby="archive-features-title">
+      <section className="archive-spotlight" aria-labelledby="archive-spotlight-title">
+        <div className="archive-reveal">
+          <p className="archive-kicker">Из коллекции VEMap</p>
+          <h2 id="archive-spotlight-title">Первая полоса, 1900 год</h2>
+          <p>На одной странице «Петербургского листка» соседствуют сообщения из Варшавы и новости из Южной Африки. Откройте выпуск, чтобы увидеть, в каком контексте газета упоминает эти места.</p>
+          <a className="btn" href={newspaperUrl(featuredIssue, 1)} target="_blank" rel="noreferrer">
+            Открыть первую страницу PDF
+          </a>
+        </div>
+        <figure className="archive-folio">
+          <img src="/archive-issue-1900.jpg" alt="Первая полоса газеты «Петербургский листок» с заголовком и колонками набора"
+            width={582} height={820} loading="lazy" decoding="async" />
+          <figcaption>«Петербургский листок», № 23, 24 января (5 февраля) 1900 года</figcaption>
+        </figure>
+      </section>
+
+      <section className="archive-editorial" aria-labelledby="archive-features-title">
         <h2 id="archive-features-title">Что можно исследовать</h2>
-        <div className="archive-section-grid">
-          {features.map(({ icon, title, text }) => (
-            <article className="archive-section-link" key={title}>
-              <SectionIcon path={icon} /><h3>{title}</h3><p>{text}</p>
-            </article>
-          ))}
-        </div>
+        {features.map(({ icon, title, text, to, link }) => (
+          <article className="archive-feature archive-reveal" key={title}>
+            <div className="archive-feature-title"><SectionIcon path={icon} /><h3>{title}</h3></div>
+            <div><p>{text}</p><Link to={to}>{link} <span aria-hidden="true">↗</span></Link></div>
+          </article>
+        ))}
       </section>
 
-      <section className="archive-sections" aria-labelledby="archive-tech-title">
-        <h2 id="archive-tech-title">На чём работает VEMap</h2>
-        <dl className="archive-tech">
-          {technologies.map(([name, text]) => <div key={name}><dt>{name}</dt><dd>{text}</dd></div>)}
-        </dl>
-      </section>
-
-      <section className="archive-sections" aria-labelledby="archive-limits-title">
+      <section className="archive-reading" aria-labelledby="archive-limits-title">
         <h2 id="archive-limits-title">Как читать данные проекта</h2>
-        <div className="archive-method">
-          <div><h3>Покрытие архива неравномерно</h3><p>Для одних городов есть много фрагментов, для других — один или ни одного. Mood Index характеризует содержание выборки и зависит от её состава. Сравнивая периоды, учитывайте объём материала и методику расчёта.</p></div>
-          <div><h3>Скан остаётся первоисточником</h3><p>Дореформенная орфография и плохое качество сканов снижают точность OCR. Чат может пропустить детали или ошибиться в толковании. Проверяйте цитаты, даты и имена по газетной странице.</p></div>
-          <div><h3>География зависит от доступных снимков</h3><p>Историческая подложка есть для отдельных дат. Административные контуры имеют свою датировку и источник. Линия фактического контроля не отображается.</p></div>
-          <div><h3>Прогнозирование в разработке</h3><p>Для прогноза нужны сопоставимые наблюдения за достаточно длинный срок и проверка качества модели. Пока раздел описывает подготовку к этому этапу.</p></div>
-        </div>
+        {limits.map(([title, text]) => (
+          <details key={title}><summary>{title}</summary><p>{text}</p></details>
+        ))}
         <Link className="archive-more" to="/about">Подробнее о методике и источниках</Link>
+      </section>
+
+      <section className="archive-stack" aria-labelledby="archive-tech-title">
+        <h2 id="archive-tech-title">На чём работает VEMap</h2>
+        <dl>{technologies.map(([name, text]) => <div key={name}><dt>{name}</dt><dd>{text}</dd></div>)}</dl>
       </section>
     </div>
   )

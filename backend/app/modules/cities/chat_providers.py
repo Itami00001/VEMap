@@ -18,6 +18,18 @@ class ProviderStatus(BaseModel):
     label: str
     available: bool
     reason: str | None = None
+    model: str
+
+
+@dataclass(frozen=True)
+class Completion:
+    text: str
+    model: str
+
+
+def model_label(model: str) -> str:
+    short = model.rstrip("/").split("/")
+    return short[-2] if len(short) > 1 and short[-1] in {"latest", "rc", "deprecated"} else short[-1]
 
 
 @dataclass(frozen=True)
@@ -25,7 +37,7 @@ class ChatProvider:
     label: str
     key: str
     model: str
-    generate: Callable[[str, str, Messages], str]
+    generate: Callable[[str, str, Messages], Completion]
     missing_setting: str | None = None
 
     @property
@@ -43,7 +55,7 @@ def request_completion(url: str, headers: dict[str, str], payload: dict) -> dict
     return response.json()
 
 
-def groq_completion(key: str, model: str, messages: Messages) -> str:
+def groq_completion(key: str, model: str, messages: Messages) -> Completion:
     payload = {"model": model, "messages": messages, "max_completion_tokens": 640}
     if model == "qwen/qwen3.8-27b":
         payload["reasoning_effort"] = "none"
@@ -52,10 +64,10 @@ def groq_completion(key: str, model: str, messages: Messages) -> str:
         {"Authorization": f"Bearer {key}"},
         payload,
     )
-    return result["choices"][0]["message"]["content"]
+    return Completion(result["choices"][0]["message"]["content"], model_label(result.get("model") or model))
 
 
-def google_completion(key: str, model: str, messages: Messages) -> str:
+def google_completion(key: str, model: str, messages: Messages) -> Completion:
     result = request_completion(
         f"https://generativelanguage.googleapis.com/v1beta/models/{quote(model, safe='')}:generateContent",
         {"x-goog-api-key": key},
@@ -69,13 +81,14 @@ def google_completion(key: str, model: str, messages: Messages) -> str:
             "generationConfig": {"maxOutputTokens": 1024},
         },
     )
-    return "".join(
+    text = "".join(
         part.get("text", "") for part in result["candidates"][0]["content"]["parts"]
         if not part.get("thought")
     )
+    return Completion(text, model_label(result.get("modelVersion") or model))
 
 
-def yandex_completion(key: str, model: str, messages: Messages) -> str:
+def yandex_completion(key: str, model: str, messages: Messages) -> Completion:
     result = request_completion(
         "https://ai.api.cloud.yandex.net/foundationModels/v1/completion",
         {"Authorization": f"Api-Key {key}"},
@@ -85,7 +98,7 @@ def yandex_completion(key: str, model: str, messages: Messages) -> str:
             "messages": [{"role": message["role"], "text": message["content"]} for message in messages],
         },
     )
-    return result["result"]["alternatives"][0]["message"]["text"]
+    return Completion(result["result"]["alternatives"][0]["message"]["text"], model_label(model))
 
 
 def chat_providers() -> dict[str, ChatProvider]:
@@ -105,11 +118,11 @@ def chat_providers() -> dict[str, ChatProvider]:
     }
 
 
-def generate_answer(provider_id: str, provider: ChatProvider, messages: Messages) -> str:
+def generate_answer(provider_id: str, provider: ChatProvider, messages: Messages) -> Completion:
     try:
         result = provider.generate(provider.key, provider.model, messages)
-        if isinstance(result, str) and result.strip():
-            return result.strip()
+        if isinstance(result.text, str) and result.text.strip():
+            return Completion(result.text.strip(), result.model)
         raise ValueError("Empty reply")
     except httpx.HTTPStatusError as exc:
         status = exc.response.status_code
@@ -133,6 +146,6 @@ def generate_answer(provider_id: str, provider: ChatProvider, messages: Messages
     except httpx.RequestError as exc:
         logger.warning("Chat connection failed provider=%s type=%s", provider_id, type(exc).__name__)
         raise HTTPException(503, f"Не удалось подключиться к {provider.label}.") from exc
-    except (ValueError, KeyError, TypeError, IndexError) as exc:
+    except (ValueError, KeyError, TypeError, IndexError, AttributeError) as exc:
         logger.warning("Invalid chat response provider=%s type=%s", provider_id, type(exc).__name__)
         raise HTTPException(503, f"{provider.label} вернул пустой или некорректный ответ.") from exc

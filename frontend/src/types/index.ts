@@ -110,11 +110,20 @@ export interface CityDataRow {
   change_from_prev: number | null
 }
 
+export interface NewspaperSource {
+  id: string
+  source_pdf: string
+  source_page: number
+  title: string
+  available: boolean
+  transcript: boolean
+}
+
 export interface CityMood {
   city_id: string
   mood_index: number
   responses_count: number
-  sources?: { source_pdf: string; source_page: number; available: boolean }[]
+  sources?: NewspaperSource[]
 }
 
 export interface CityCompareRow {
@@ -124,4 +133,31 @@ export interface CityCompareRow {
   mood_a: number | null
   mood_b: number | null
   delta: number | null
+}
+
+export interface ComparisonObservation {
+  value: number
+  count: number | null
+  method: string
+  unit: string
+  sources: NewspaperSource[]
+}
+
+export interface ComparisonRow {
+  id: string
+  name: string
+  a: ComparisonObservation | null
+  b: ComparisonObservation | null
+  delta: number | null
+  status: 'comparable' | 'different_methods' | 'only_a' | 'only_b'
+  lat?: number | null
+  lon?: number | null
+}
+
+export interface Comparison {
+  periods: TimePeriod[]
+  period_a: TimePeriod | null
+  period_b: TimePeriod | null
+  cities: ComparisonRow[]
+  regions: ComparisonRow[]
 }

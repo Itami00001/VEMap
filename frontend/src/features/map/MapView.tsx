@@ -20,6 +20,7 @@ const DEFAULT_CENTER: [number, number] = [105, 61]
 export interface MapViewProps {
   values: Record<string, number | null | undefined>
   mode?: MapMode
+  compare?: boolean
   mini?: boolean
   interactive?: boolean
   year?: number | null
@@ -65,18 +66,16 @@ const RUSSIA_FILL = '#416d73'
 const UKRAINE_FILL = '#83754b'
 const CRIMEA_REGIONS = ['RU-CR', 'RU-SEV']
 
-function fillColorExpr(mode: MapMode): Expression {
+function fillColorExpr(mode: MapMode, compare: boolean): Expression {
   // Единая яркая шкала с точками: 0 красный → 0.5 голубой → 1 зелёный.
   const stops: Expression =
     mode === 'mood'
       ? ['interpolate', ['linear'], ['get', 'value'], ...MOOD_STOPS]
-      : ['interpolate', ['linear'], ['get', 'value'], -10, '#d64545', 0, '#3d4657', 10, '#4f8cff']
-  return [
-    'case',
-    ['in', ['get', 'region_id'], ['literal', CRIMEA_REGIONS]], RUSSIA_FILL,
-    ['==', ['get', 'value'], null], 'transparent',
-    stops,
-  ]
+      : ['interpolate', ['linear'], ['get', 'value'], -100, '#f46464', -25, '#b74652', 0, '#687685', 25, '#427be5', 100, '#76b7ff']
+  const background = ['case', ['in', ['get', 'region_id'], ['literal', CRIMEA_REGIONS]], RUSSIA_FILL, 'transparent']
+  return ['case',
+    ['any', ['==', ['get', 'value'], null], ['all', !compare, ['in', ['get', 'region_id'], ['literal', CRIMEA_REGIONS]]]],
+    background, stops]
 }
 
 const DIM_BORDER = '#2e343b'
@@ -124,6 +123,7 @@ function applyValues(base: GeoCollection, values: Record<string, number | null |
 export default function MapView({
   values,
   mode = 'mood',
+  compare = false,
   mini = false,
   interactive = true,
   year = null,
@@ -145,12 +145,14 @@ export default function MapView({
   const dimModernRef = useRef(dimModern)
   const valuesRef = useRef(values)
   const modeRef = useRef(mode)
+  const compareRef = useRef(compare)
   const clickRef = useRef(onRegionClick)
   const bgClickRef = useRef(onBackgroundClick)
   const readyRef = useRef(onMapReady)
 
   valuesRef.current = values
   modeRef.current = mode
+  compareRef.current = compare
   dimModernRef.current = dimModern
   clickRef.current = onRegionClick
   bgClickRef.current = onBackgroundClick
@@ -236,7 +238,7 @@ export default function MapView({
             type: 'fill',
             source: 'regions',
             paint: {
-              'fill-color': fillColorExpr(modeRef.current) as never,
+              'fill-color': fillColorExpr(modeRef.current, compareRef.current) as never,
               'fill-opacity': [
                 'case', ['in', ['get', 'region_id'], ['literal', CRIMEA_REGIONS]], 1, 0.85,
               ],
@@ -301,8 +303,8 @@ export default function MapView({
     const source = map.getSource('regions') as maplibregl.GeoJSONSource | undefined
     if (!source) return
     source.setData(applyValues(base, values))
-    map.setPaintProperty('regions-fill', 'fill-color', fillColorExpr(mode) as never)
-  }, [values, mode])
+    map.setPaintProperty('regions-fill', 'fill-color', fillColorExpr(mode, compare) as never)
+  }, [values, mode, compare])
 
   useEffect(() => {
     if (!mapInstance) return

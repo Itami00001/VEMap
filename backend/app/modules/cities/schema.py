@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from app.modules.cities.newspapers import IssueOut
 
 
 class TimePeriodOut(BaseModel):
@@ -16,17 +17,11 @@ class CityOut(BaseModel):
     lon: float
 
 
-class CitySourceOut(BaseModel):
-    source_pdf: str
-    source_page: int
-    available: bool
-
-
 class CityMoodOut(BaseModel):
     city_id: str
     mood_index: float
     responses_count: int
-    sources: list[CitySourceOut]
+    sources: list[IssueOut]
 
 
 class CityDataRowOut(BaseModel):

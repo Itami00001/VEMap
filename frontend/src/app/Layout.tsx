@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import NewspaperChat from '../features/map/NewspaperChat'
 import { api } from '../services/api'
-import type { NewspaperCity } from '../services/api'
+import type { NewspaperCatalog } from '../services/api'
 
 interface ChatSelection {
   cityId: string
@@ -10,6 +10,7 @@ interface ChatSelection {
 }
 
 export interface LayoutContext {
+  chatOpen: boolean
   setChatSource: (source: ChatSelection | null) => void
 }
 
@@ -17,20 +18,22 @@ export default function Layout() {
   const [inverted, setInverted] = useState(false)
   const [chatOpen, setChatOpen] = useState(false)
   const [chatSource, setChatSource] = useState<ChatSelection | null>(null)
-  const [catalog, setCatalog] = useState<NewspaperCity[] | null>(null)
+  const [catalog, setCatalog] = useState<NewspaperCatalog | null>(null)
   const [catalogError, setCatalogError] = useState(false)
   const chatButton = useRef<HTMLButtonElement>(null)
   const onMap = useLocation().pathname === '/map'
 
   useEffect(() => {
-    if (!chatOpen || catalog) return
+    if (!chatOpen) return
     const controller = new AbortController()
     setCatalogError(false)
-    api.getNewspapers(controller.signal).then(setCatalog).catch(() => {
+    api.getNewspapers(controller.signal).then((data) => {
+      if (!controller.signal.aborted) setCatalog(data)
+    }).catch(() => {
       if (!controller.signal.aborted) setCatalogError(true)
     })
     return () => controller.abort()
-  }, [chatOpen, catalog])
+  }, [chatOpen])
 
   function toggleTheme() {
     document.documentElement.style.filter = inverted ? '' : 'invert(1) hue-rotate(180deg)'
@@ -70,7 +73,7 @@ export default function Layout() {
         </div>
       </header>
       <main className="site-main">
-        <Outlet context={{ setChatSource } satisfies LayoutContext} />
+        <Outlet context={{ chatOpen, setChatSource } satisfies LayoutContext} />
       </main>
       <footer className="site-footer">
         <span>VEMap · Историческая пресса на карте</span>

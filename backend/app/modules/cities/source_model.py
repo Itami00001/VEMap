@@ -5,7 +5,8 @@ from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.database import Base
 
-PDF_DIRECTORY = Path(__file__).resolve().parents[4] / "data" / "examples" / "all_searchable_pdfs"
+EXAMPLES_DIRECTORY = Path(__file__).resolve().parents[4] / "data" / "examples"
+PDF_DIRECTORY = EXAMPLES_DIRECTORY / "all_searchable_pdfs"
 
 
 class CityMoodSource(Base):
