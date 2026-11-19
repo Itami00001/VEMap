@@ -79,7 +79,8 @@ read_promotion() {
     *) echo "GitHub release lookup returned HTTP $status." >&2; return 1 ;;
   esac
   tag=$(python3 -c 'import json,sys; print(json.load(sys.stdin)["tag_name"])' <<< "${response%$'\n'*}") || return 1
-  if [[ ! "$tag" =~ ^deploy-[0-9a-f]{40}-[0-9]+-[0-9]+$ ]]; then
+  if [[ ! "$tag" =~ ^deploy-[0-9a-f]{40}-[0-9]+-[0-9]+$ &&
+        ! "$tag" =~ ^production-v[0-9]+\.[0-9]+\.[0-9]+(-[a-z0-9][a-z0-9.-]*)?$ ]]; then
     return 0
   fi
   curl -fsSL --proto '=https' --proto-redir '=https' --max-time 30 \

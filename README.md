@@ -27,7 +27,14 @@ Docker монтирует `data/` с хоста. PDF и одноимённые �
 
 ## CI/CD и домашний сервер
 
-GitHub Actions проверяет frontend и запускает тестовый стек с отдельной базой. После проверок изменения из `main` публикуются в GHCR с тегом `sha-<commit>` и двумя дайджестами в итогах запуска. Ветка `codex/home-server-ci` также публикует проверочные образы. Production-релиз создаётся из `main` через ручной запуск **VEMap CI and container delivery** с включённым **promote**.
+GitHub Actions проверяет frontend и запускает тестовый стек с отдельной базой. После проверок образы из `codex/home-server-ci` публикуются в GHCR с тегом `sha-<commit>` и двумя дайджестами в итогах запуска.
+
+Для production выберите проверенный коммит из `codex/home-server-ci` и отправьте новый тег вида `production-v1.0.0`. CI ещё раз проверит этот коммит, опубликует оба образа и добавит их дайджесты в манифест GitHub Release.
+
+```sh
+git tag -a production-v1.0.0 COMMIT_SHA -m 'Deploy VEMap 1.0.0'
+git push origin refs/tags/production-v1.0.0
+```
 
 На Fedora или Ubuntu серверу нужны Docker Compose **2.24.4+**, Bash, Python 3, `curl`, `flock` и исходящие подключения к GitHub и GHCR. Текущая установка использует Compose-проект `vemap-live` в `~/projects/vemap-live`, существующий том PostgreSQL и локальный origin `http://127.0.0.1:15173`. Для публичного HTTPS настройте маршрут Cloudflare Tunnel с `vemap.ru` на этот origin. На новом сервере клонируйте репозиторий, перенесите `.env` и `data/`, восстановите БД из проверенного дампа и настройте маршрут туннеля. Для первоначального запуска стека из исходников используйте `docker compose -p vemap-live -f docker-compose.yml -f deploy/compose.production.yml up -d --build`.
 
@@ -37,7 +44,7 @@ GitHub Actions проверяет frontend и запускает тестовы�
 docker login ghcr.io --username YOUR_GITHUB_LOGIN
 ```
 
-Первый деплой выполняется вручную из каталога стека. Передайте два полных значения вида `ghcr.io/...@sha256:...` из итогов успешного CI.
+Первый деплой выполняется вручную из каталога стека. После появления релиза запустите `bash deploy/rollout.sh --follow`. Для запуска по выбранным образам передайте два полных значения вида `ghcr.io/...@sha256:...` из итогов успешного CI.
 
 ```sh
 bash deploy/rollout.sh "$BACKEND_IMAGE" "$FRONTEND_IMAGE"

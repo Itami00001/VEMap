@@ -3,6 +3,7 @@ name: VEMap CI and container delivery
 on:
   push:
     branches: [main, codex/home-server-ci]
+    tags: [production-v*]
   pull_request:
     branches: [main]
   workflow_dispatch:
@@ -30,6 +31,12 @@ jobs:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
+          fetch-depth: 0
+      - name: Verify production tag and its source branch
+        if: github.ref_type == 'tag'
+        run: |
+          [[ "$GITHUB_REF_NAME" =~ ^production-v[0-9]+\.[0-9]+\.[0-9]+(-[a-z0-9][a-z0-9.-]*)?$ ]]
+          git merge-base --is-ancestor HEAD refs/remotes/origin/codex/home-server-ci
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
@@ -93,7 +100,9 @@ jobs:
           done
 
   promote:
-    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && inputs.promote
+    if: >-
+      (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/production-v')) ||
+      (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && inputs.promote)
     needs: publish
     runs-on: ubuntu-latest
     permissions:
@@ -108,7 +117,13 @@ jobs:
           manifest="$RUNNER_TEMP/vemap-production.json"
           jq -n --arg backend "$BACKEND_IMAGE" --arg frontend "$FRONTEND_IMAGE" \
             '{backend: $backend, frontend: $frontend}' > "$manifest"
-          gh release create "deploy-$GITHUB_SHA-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT" "$manifest" \
-            --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --latest \
+          tag="deploy-$GITHUB_SHA-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
+          target=(--target "$GITHUB_SHA")
+          if [[ "$GITHUB_REF_TYPE" == tag ]]; then
+            tag="$GITHUB_REF_NAME"
+            target=(--verify-tag)
+          fi
+          gh release create "$tag" "$manifest" \
+            --repo "$GITHUB_REPOSITORY" "${target[@]}" --latest \
             --title "VEMap production ${GITHUB_SHA:0:12}" \
             --notes 'Approved VEMap container digests for the home server.'
