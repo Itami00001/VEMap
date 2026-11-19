@@ -1,5 +1,5 @@
 # Frontend собирается внутри Docker (multi-stage), локальный node не нужен.
-FROM node:20-alpine AS build
+FROM node:24-alpine AS build
 
 WORKDIR /app
 

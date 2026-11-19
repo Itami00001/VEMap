@@ -1,0 +1,114 @@
+name: VEMap CI and container delivery
+
+on:
+  push:
+    branches: [main, codex/home-server-ci]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      promote:
+        description: Publish a production release from main
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      JWT_SECRET: ci-only-unsigned-placeholder-40-characters
+      ADMIN_PASSWORD: ci-only-local-admin-password
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Check frontend lint
+        working-directory: frontend
+        run: |
+          npm ci
+          npm run lint -- src
+      - name: Build and check the services
+        run: |
+          bash -n deploy/rollout.sh
+          docker compose up --build --wait --wait-timeout 120
+          curl --fail --silent --show-error http://localhost:5173/ | grep -F '<div id="root">'
+          curl --fail --silent --show-error --retry 15 --retry-all-errors \
+            --retry-delay 2 http://localhost:5173/api/periods | jq -e 'type == "array" and length > 0'
+          curl --fail --silent --show-error http://localhost:5173/api/newspaper-catalog \
+            | jq -e '.archive | type == "array" and length > 0'
+      - name: Show service logs on failure
+        if: failure()
+        run: docker compose logs --no-color
+      - name: Stop the isolated test stack
+        if: always()
+        run: docker compose down --volumes
+
+  publish:
+    if: github.event_name != 'pull_request'
+    needs: check
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      backend: ${{ steps.images.outputs.backend }}
+      frontend: ${{ steps.images.outputs.frontend }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: docker/setup-buildx-action@v3
+      - name: Sign in to GHCR
+        env:
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: printf '%s' "$GHCR_TOKEN" | docker login ghcr.io --username "$GITHUB_ACTOR" --password-stdin
+      - name: Publish both images by commit SHA
+        id: images
+        run: |
+          for service in backend frontend; do
+            image="ghcr.io/${GITHUB_REPOSITORY,,}-$service"
+            metadata="$RUNNER_TEMP/$service.json"
+            docker buildx build --platform linux/amd64 --push \
+              --tag "$image:sha-$GITHUB_SHA" \
+              --label "org.opencontainers.image.source=$GITHUB_SERVER_URL/$GITHUB_REPOSITORY" \
+              --label "org.opencontainers.image.revision=$GITHUB_SHA" \
+              --metadata-file "$metadata" "$service"
+            digest=$(jq -er '."containerimage.digest"' "$metadata")
+            printf '%s=%s@%s\n' "$service" "$image" "$digest" >> "$GITHUB_OUTPUT"
+            printf '\n`%s@%s`\n' "$image" "$digest" >> "$GITHUB_STEP_SUMMARY"
+          done
+
+  promote:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && inputs.promote
+    needs: publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Publish the approved production manifest
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BACKEND_IMAGE: ${{ needs.publish.outputs.backend }}
+          FRONTEND_IMAGE: ${{ needs.publish.outputs.frontend }}
+        run: |
+          manifest="$RUNNER_TEMP/vemap-production.json"
+          jq -n --arg backend "$BACKEND_IMAGE" --arg frontend "$FRONTEND_IMAGE" \
+            '{backend: $backend, frontend: $frontend}' > "$manifest"
+          gh release create "deploy-$GITHUB_SHA-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT" "$manifest" \
+            --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --latest \
+            --title "VEMap production ${GITHUB_SHA:0:12}" \
+            --notes 'Approved VEMap container digests for the home server.'

@@ -31,5 +31,7 @@ data/geo/historical/raw/
 
 # Large newspaper files - exclude from git but keep for local/Docker development
 data/examples/terjiman/
+data/examples/all_searchable_pdfs/
 frontend/public/data/examples/terjiman/
+.deploy-state/
 .omo/

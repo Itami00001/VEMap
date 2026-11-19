@@ -1,0 +1,25 @@
+services:
+  postgres:
+    ports: !reset []
+    restart: unless-stopped
+
+  backend:
+    ports: !reset []
+    volumes: !override
+      - ./data:/app/data:ro,z
+      - ./data:/data:ro,z
+    restart: unless-stopped
+    healthcheck:
+      test: [CMD, python, -c, 'import urllib.request; urllib.request.urlopen("http://127.0.0.1:8000/api/periods", timeout=3).read()']
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 15s
+
+  frontend:
+    ports: !override
+      - '127.0.0.1:15173:80'
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_healthy

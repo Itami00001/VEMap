@@ -1,0 +1,7 @@
+services:
+  backend:
+    build: !reset null
+    image: ${VEMAP_BACKEND_IMAGE:?Set VEMAP_BACKEND_IMAGE}
+  frontend:
+    build: !reset null
+    image: ${VEMAP_FRONTEND_IMAGE:?Set VEMAP_FRONTEND_IMAGE}

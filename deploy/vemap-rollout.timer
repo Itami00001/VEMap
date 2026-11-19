@@ -1,0 +1,10 @@
+[Unit]
+Description=Check for an approved VEMap release
+
+[Timer]
+OnBootSec=3min
+OnUnitActiveSec=5min
+Unit=vemap-rollout.service
+
+[Install]
+WantedBy=timers.target

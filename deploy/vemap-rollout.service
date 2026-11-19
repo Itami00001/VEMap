@@ -1,0 +1,7 @@
+[Unit]
+Description=Deploy the approved VEMap release
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/bash %h/projects/vemap-live/deploy/rollout.sh --follow
+TimeoutStartSec=20min
