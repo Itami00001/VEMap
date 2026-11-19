@@ -69,9 +69,16 @@ running_image() {
 }
 
 read_promotion() {
-  local endpoint tag
+  local endpoint response status tag
   endpoint=https://api.github.com/repos/Itami00001/VEMap/releases/latest
-  tag=$(curl -fsS --proto '=https' --max-time 20 "$endpoint" | python3 -c 'import json,sys; print(json.load(sys.stdin)["tag_name"])') || return 1
+  response=$(curl -sS --proto '=https' --max-time 20 --write-out $'\n%{http_code}' "$endpoint") || return 1
+  status=${response##*$'\n'}
+  case $status in
+    404) return 0 ;;
+    200) ;;
+    *) echo "GitHub release lookup returned HTTP $status." >&2; return 1 ;;
+  esac
+  tag=$(python3 -c 'import json,sys; print(json.load(sys.stdin)["tag_name"])' <<< "${response%$'\n'*}") || return 1
   if [[ ! "$tag" =~ ^deploy-[0-9a-f]{40}-[0-9]+-[0-9]+$ ]]; then
     return 0
   fi
