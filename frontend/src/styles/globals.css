@@ -1681,3 +1681,5 @@ a.archive-section-link:hover { border-color: var(--accent); text-decoration: non
   .compare-show-list .compare-map-view, .compare-show-map .compare-list-view { display: none; }
   .compare-list { max-height: none; }
 }
+
+.map-boundary-note { font-size: 12px; }

@@ -10,7 +10,6 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@turf/boolean-point-in-polygon": "7.4.0",
     "maplibre-gl": "6.11.2",
     "pdfjs-dist": "^5.4.624",
     "react": "^19.2.8",

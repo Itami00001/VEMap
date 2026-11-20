@@ -4,7 +4,7 @@ import type { Map as LibreMap } from 'maplibre-gl'
 import { api, newspaperUrl } from '../services/api'
 import type { Comparison, ComparisonObservation, ComparisonRow, TimePeriod } from '../types'
 import CompareYears from '../features/data/CompareYears'
-import MapView from '../features/map/MapView'
+import MapView, { BoundaryNote } from '../features/map/MapView'
 import { sentimentColor } from '../features/map/color'
 import DemoBadge from '../features/map/DemoBadge'
 
@@ -179,11 +179,13 @@ export default function ComparePage() {
         <section className="compare-map-view" aria-label="Карта сравнения">
           <div className="map-shell">
             <MapView values={values} mode={activeMode === 'delta' ? 'delta' : 'mood'}
+              year={(activeMode === 'a' ? a : b)?.year ?? null}
               initialCenter={MAP_CENTER} onMapReady={setMap}
               onRegionClick={activeScope === 'regions' ? setSelectedId : undefined} />
           </div>
           <p className="muted">{activeMode === 'delta' ? 'Красный − · синий + · серый: ноль или нет сравнимой пары. Точные значения — в списке.'
             : 'Карта показывает оценки выбранного периода.'}</p>
+          <BoundaryNote />
         </section>
         <section className="compare-list-view" aria-label="Результаты сравнения">
           <h2>{activeScope === 'cities' ? 'Города' : 'Регионы'} <span className="muted">· {rows.length}</span></h2>

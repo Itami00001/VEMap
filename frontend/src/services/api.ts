@@ -102,7 +102,7 @@ async function requestWithSignal<T>(path: string, signal: AbortSignal, init?: Re
 }
 
 export const GEOJSON_URL = `${import.meta.env.BASE_URL}data/geo/russia-regions.geojson`
-export const LAND_GEOJSON_URL = `${import.meta.env.BASE_URL}data/geo/world-land.geojson`
+export const WORLD_GEOJSON_URL = `${import.meta.env.BASE_URL}data/geo/world-countries-ru-view.geojson`
 const empty = <T,>(value: T) => Promise.resolve(value)
 
 function demoComparison(a = DEMO_PERIODS[0], b = DEMO_PERIODS[1]): Comparison {

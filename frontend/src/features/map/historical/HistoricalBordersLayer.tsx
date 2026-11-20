@@ -4,6 +4,7 @@ import * as maplibregl from 'maplibre-gl'
 export interface HistoricalBordersLayerProps {
   map: maplibregl.Map | null
   url: string | null
+  beforeId: string
 }
 
 const LINE_OPACITY = 1
@@ -12,10 +13,7 @@ const FADE_MS = 200
 
 const cache = new Map<string, unknown>()
 
-// Слой исторической границы — только контур (без заливки: белая заливка
-// давала чужой оттенок территории внутри границы). Линия ставится поверх
-// базовых слоёв, но ПОД маркеры городов. Смена года — fade 200ms.
-export default function HistoricalBordersLayer({ map, url }: HistoricalBordersLayerProps) {
+export default function HistoricalBordersLayer({ map, url, beforeId }: HistoricalBordersLayerProps) {
   useEffect(() => {
     if (!map) return
     let cancelled = false
@@ -35,14 +33,6 @@ export default function HistoricalBordersLayer({ map, url }: HistoricalBordersLa
       return
     }
 
-    // Порядок (снизу вверх): базовые линии → empire-line → cities-*.
-    // Если города уже нарисованы — переносим линию под них.
-    const placeLine = () => {
-      if (map.getLayer('empire-line') && map.getLayer('cities-glow')) {
-        map.moveLayer('empire-line', 'cities-glow')
-      }
-    }
-
     const ensureLayers = () => {
       if (!map.getSource('empire')) {
         map.addSource('empire', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } })
@@ -58,9 +48,8 @@ export default function HistoricalBordersLayer({ map, url }: HistoricalBordersLa
             'line-opacity': 0,
             'line-opacity-transition': { duration: FADE_MS, delay: 0 },
           },
-        })
+        }, beforeId)
       }
-      placeLine()
     }
 
     const safeEnsureLayers = () => {
@@ -74,11 +63,9 @@ export default function HistoricalBordersLayer({ map, url }: HistoricalBordersLa
     const apply = (data: unknown) => {
       if (cancelled || !map.getSource('empire')) return
       ;(map.getSource('empire') as maplibregl.GeoJSONSource).setData(data as never)
-      placeLine()
       map.setPaintProperty('empire-line', 'line-opacity', 0)
       requestAnimationFrame(() => {
         if (cancelled) return
-        placeLine()
         map.setPaintProperty('empire-line', 'line-opacity', LINE_OPACITY)
       })
     }
@@ -103,18 +90,10 @@ export default function HistoricalBordersLayer({ map, url }: HistoricalBordersLa
         })
     }
 
-    if (!map.isStyleLoaded()) {
-      map.once('load', () => {
-        if (cancelled) return
-        safeEnsureLayers()
-        loadData()
-      })
-      return () => { cancelled = true }
-    }
     safeEnsureLayers()
     loadData()
     return () => { cancelled = true }
-  }, [map, url])
+  }, [map, url, beforeId])
 
   return null
 }

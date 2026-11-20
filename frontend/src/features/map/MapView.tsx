@@ -1,10 +1,11 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import * as maplibregl from 'maplibre-gl'
 import type { FeatureCollection, MultiPolygon, Polygon } from 'geojson'
 import type { MapLayerMouseEvent, StyleSpecification } from 'maplibre-gl'
-import { GEOJSON_URL, LAND_GEOJSON_URL } from '../../services/api'
+import { GEOJSON_URL, WORLD_GEOJSON_URL } from '../../services/api'
 import { CITY_CLUSTER_LAYER } from './CityMarkers'
-import { addCountryOverview } from './countryOverview'
+import HistoricalBordersLayer from './historical/HistoricalBordersLayer'
+import { useHistoricalBorders } from './historical/useHistoricalBorders'
 
 // Воркер maplibre-gl v6 резолвится относительно бандла (./maplibre-gl-worker.mjs),
 // который Vite не эмитит -> 404 text/html -> карта мертва.
@@ -21,6 +22,7 @@ export interface MapViewProps {
   mode?: MapMode
   mini?: boolean
   interactive?: boolean
+  year?: number | null
   initialCenter?: [number, number]
   onRegionClick?: (regionId: string, point: { x: number; y: number }) => void
   onBackgroundClick?: () => void
@@ -33,18 +35,41 @@ type Expression = unknown[]
 
 // Яркие стопы единой шкалы (значение 0–100): красный → голубой → зелёный.
 const MOOD_STOPS: Expression = [0, '#c0392b', 25, '#9f8187', 50, '#7ec8e3', 75, '#56caaa', 100, '#2ecc71']
-const LAND_COLOR = '#424953'
-const ADMIN_TILEJSON = 'https://tiles.openfreemap.org/planet'
+const RUSSIA_FILL = '#416d73'
+const UKRAINE_FILL = '#83754b'
+const CLAIMS_GEOJSON_URL = `${import.meta.env.BASE_URL}data/geo/russian-claims-2022.geojson`
+const isCrimea: Expression = ['in', ['get', 'region_id'], ['literal', ['RU-CR', 'RU-SEV']]]
+
+export function BoundaryNote() {
+  return (
+    <p className="map-boundary-note muted">
+      Подложка для всех периодов показывает границы в российской трактовке.{' '}
+      <a href="https://digitallibrary.un.org/record/3990673?ln=ru" target="_blank" rel="noreferrer">Резолюция ГА ООН ES-11/4</a>
+      {' · '}
+      <a href="https://www.geoboundaries.org/api/current/gbOpen/UKR/ADM1/" target="_blank" rel="noreferrer">geoBoundaries</a>
+      {' · '}
+      <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">© OpenStreetMap, ODbL</a>
+    </p>
+  )
+}
+
+function regionsLinePaint(dimCrimea: boolean) {
+  return {
+    color: ['case', isCrimea, dimCrimea ? '#2e343b' : '#ffffff', '#6b7484'] as never,
+    width: ['case', isCrimea, dimCrimea ? 0.5 : 2.5, 0.5] as never,
+  }
+}
 
 function fillColorExpr(mode: MapMode): Expression {
   const stops: Expression = mode === 'mood'
     ? MOOD_STOPS
     : [-100, '#f46464', -25, '#b74652', 0, '#687685', 25, '#427be5', 100, '#76b7ff']
   const value = ['get', 'value']
-  return ['case', ['==', value, null], 'transparent', ['interpolate', ['linear'], value, ...stops]]
+  return ['case', ['==', value, null], ['case', isCrimea, RUSSIA_FILL, 'transparent'],
+    ['interpolate', ['linear'], value, ...stops]]
 }
 
-// Вода задаётся фоном, суша рисуется слоем land-fill.
+// Вода задаётся фоном, суша рисуется слоем countries-fill.
 const EMPTY_STYLE: StyleSpecification = {
   version: 8,
   sources: {},
@@ -70,6 +95,7 @@ export default function MapView({
   mode = 'mood',
   mini = false,
   interactive = true,
+  year = null,
   initialCenter = DEFAULT_CENTER,
   onRegionClick,
   onBackgroundClick,
@@ -77,6 +103,9 @@ export default function MapView({
 }: MapViewProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<maplibregl.Map | null>(null)
+  const [mapInstance, setMapInstance] = useState<maplibregl.Map | null>(null)
+  const historical = useHistoricalBorders(year)
+  const dimCrimea = historical !== null && !historical.keepModernHighlight
   const baseRef = useRef<GeoCollection | null>(null)
   const valuesRef = useRef(values)
   const modeRef = useRef(mode)
@@ -98,6 +127,7 @@ export default function MapView({
       center: initialCenter,
       zoom: 3,
       interactive,
+      attributionControl: false,
     })
     mapRef.current = map
     const controller = new AbortController()
@@ -106,18 +136,39 @@ export default function MapView({
 
     map.on('load', () => {
       Promise.all([
-        fetch(LAND_GEOJSON_URL, { signal: controller.signal }).then((r) => r.json() as Promise<GeoCollection>),
+        fetch(WORLD_GEOJSON_URL, { signal: controller.signal }).then((r) => r.json() as Promise<GeoCollection>),
+        fetch(CLAIMS_GEOJSON_URL, { signal: controller.signal }).then((r) => r.json() as Promise<GeoCollection>),
         fetch(GEOJSON_URL, { signal: controller.signal }).then((r) => r.json() as Promise<GeoCollection>),
       ])
-        .then(([land, data]) => {
+        .then(([world, claims, data]) => {
           if (controller.signal.aborted) return
           baseRef.current = data
-          map.addSource('land', { type: 'geojson', data: land })
+          map.addSource('world', { type: 'geojson', data: world })
           map.addLayer({
-            id: 'land-fill',
+            id: 'countries-fill',
             type: 'fill',
-            source: 'land',
-            paint: { 'fill-color': LAND_COLOR, 'fill-antialias': false },
+            source: 'world',
+            paint: {
+              'fill-color': ['match', ['get', 'ISO_A3'],
+                'RUS', RUSSIA_FILL, 'UKR', UKRAINE_FILL, '#424953'],
+            },
+          })
+          map.addSource('russian-claims', { type: 'geojson', data: claims })
+          map.addLayer({
+            id: 'russian-claims-fill',
+            type: 'fill',
+            source: 'russian-claims',
+            paint: { 'fill-color': RUSSIA_FILL },
+          })
+          map.addLayer({
+            id: 'countries-line',
+            type: 'line',
+            source: 'world',
+            paint: {
+              'line-color': ['match', ['get', 'ISO_A3'],
+                'RUS', '#ffffff', 'UKR', '#f1d778', '#697482'],
+              'line-width': ['match', ['get', 'ISO_A3'], ['RUS', 'UKR'], 2, 1],
+            },
           })
           map.addSource('regions', {
             type: 'geojson',
@@ -132,33 +183,22 @@ export default function MapView({
               'fill-opacity': 0.85,
             },
           })
-          map.addSource('local-divisions', { type: 'vector', url: ADMIN_TILEJSON })
+          const regionStroke = regionsLinePaint(false)
           map.addLayer({
-            id: 'local-divisions-line',
+            id: 'regions-line',
             type: 'line',
-            source: 'local-divisions',
-            'source-layer': 'boundary',
-            // В OpenMapTiles общий контур наследует самый низкий admin_level.
-            // Межгосударственные и особые линии (уровни 2 и 3) не рисуем.
-            filter: [
-              'all',
-              ['==', ['geometry-type'], 'LineString'],
-              ['>=', ['get', 'admin_level'], 4],
-              ['<=', ['get', 'admin_level'], 12],
-              ['!=', ['get', 'disputed'], 1],
-              ['!=', ['get', 'maritime'], 1],
-              ['==', ['coalesce', ['get', 'claimed_by'], ''], ''],
-              ['==', ['coalesce', ['get', 'disputed_name'], ''], ''],
-              ['==', ['coalesce', ['get', 'adm0_l'], ''], ''],
-              ['==', ['coalesce', ['get', 'adm0_r'], ''], ''],
-            ],
+            source: 'regions',
             paint: {
-              'line-color': '#aebac8',
-              'line-opacity': ['step', ['get', 'admin_level'], 0.65, 6, 0.52, 8, 0.42],
-              'line-width': ['interpolate', ['linear'], ['zoom'], 3, 0.85, 7, 1.25, 12, 1.5],
+              'line-color': regionStroke.color,
+              'line-width': regionStroke.width,
             },
-          }, 'regions-fill')
-          addCountryOverview(map, LAND_COLOR, controller.signal)
+          })
+          map.addLayer({
+            id: 'russian-claims-line',
+            type: 'line',
+            source: 'russian-claims',
+            paint: { 'line-color': '#d1e3e6', 'line-width': 1.2, 'line-dasharray': [3, 2] },
+          })
           if (interactive) {
             const clickedCity = (e: MapLayerMouseEvent) => {
               const layers = ['cities-circle', CITY_CLUSTER_LAYER].filter((layer) => map.getLayer(layer))
@@ -186,6 +226,7 @@ export default function MapView({
             })
           }
           readyRef.current?.(map)
+          setMapInstance(map)
         })
         .catch(() => undefined)
     })
@@ -196,6 +237,7 @@ export default function MapView({
       map.remove()
       mapRef.current = null
       baseRef.current = null
+      setMapInstance(null)
     }
   }, [initialCenter, interactive])
 
@@ -209,5 +251,17 @@ export default function MapView({
     map.setPaintProperty('regions-fill', 'fill-color', fillColorExpr(mode) as never)
   }, [values, mode])
 
-  return <div ref={containerRef} className={`map-canvas${mini ? ' mini' : ''}`} />
+  useEffect(() => {
+    if (!mapInstance) return
+    const { color, width } = regionsLinePaint(dimCrimea)
+    mapInstance.setPaintProperty('regions-line', 'line-color', color)
+    mapInstance.setPaintProperty('regions-line', 'line-width', width)
+  }, [mapInstance, dimCrimea])
+
+  return (
+    <>
+      <div ref={containerRef} className={`map-canvas${mini ? ' mini' : ''}`} />
+      <HistoricalBordersLayer map={mapInstance} url={historical?.geojsonUrl ?? null} beforeId="russian-claims-fill" />
+    </>
+  )
 }
