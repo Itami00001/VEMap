@@ -50,7 +50,7 @@ export default function Layout() {
           <NavLink to="/map">Карта</NavLink>
           <NavLink to="/data">Данные</NavLink>
           <NavLink to="/compare">Сравнение</NavLink>
-          <NavLink to="/forecast">Прогноз</NavLink>
+          <NavLink to="/wiki">VEMAP Viki</NavLink>
           <NavLink to="/about">О проекте</NavLink>
         </nav>
         <div className="nav-actions">

@@ -13,6 +13,7 @@ export const CITIES: City[] = [
   { city_id: 'kyiv', name_ru: 'Киев', region_id: null, region_name: 'Украина', country: 'UA', lat: 50.45, lon: 30.52 },
   { city_id: 'kharkiv', name_ru: 'Харьков', region_id: null, region_name: 'Украина', country: 'UA', lat: 49.99, lon: 36.23 },
   { city_id: 'mykolaiv', name_ru: 'Николаев', region_id: null, region_name: 'Украина', country: 'UA', lat: 46.97, lon: 32.0 },
+  { city_id: 'sevastopol', name_ru: 'Севастополь', region_id: 'RU-SEV', region_name: 'Севастополь', country: 'RU', lat: 44.62, lon: 33.53 },
   { city_id: 'simferopol', name_ru: 'Симферополь', region_id: 'RU-CR', region_name: 'Республика Крым', country: 'RU', lat: 44.95, lon: 34.1 },
   { city_id: 'yalta', name_ru: 'Ялта', region_id: 'RU-CR', region_name: 'Республика Крым', country: 'RU', lat: 44.5, lon: 34.17 },
   { city_id: 'kerch', name_ru: 'Керчь', region_id: 'RU-CR', region_name: 'Республика Крым', country: 'RU', lat: 45.36, lon: 36.47 },

@@ -1549,7 +1549,6 @@ a.archive-section-link:hover { border-color: var(--accent); text-decoration: non
 .newspaper-toolbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
 .newspaper-reader-page { max-height: 72vh; overflow: auto; background: var(--bg); text-align: center; }
 .newspaper-reader-page canvas { max-width: 100%; height: auto; margin-inline: auto; }
-.map-boundary-note { font-size: 12px; }
 
 .archive-spotlight, .archive-editorial, .archive-reading, .archive-stack {
   margin-block: clamp(48px, 8vw, 100px);
@@ -1669,7 +1668,7 @@ a.archive-section-link:hover { border-color: var(--accent); text-decoration: non
 .compare-bar { position: relative; display: block; height: 8px; align-self: center; background: var(--panel-2); border-radius: 4px; }
 .compare-bar::after { content: ''; position: absolute; left: 50%; top: -2px; bottom: -2px; border-left: 1px solid var(--text-muted); }
 .compare-bar i { position: absolute; height: 100%; border-radius: 4px; }
-.compare-marker { width: 15px; height: 15px; border: 2px solid white; border-radius: 50%; cursor: pointer; }
+.compare-marker { width: 15px; height: 15px; padding: 0; border: 2px solid white; border-radius: 50%; cursor: pointer; }
 .compare-marker.is-selected { box-shadow: 0 0 0 4px #78baff88; z-index: 1; }
 .compare-notice { border-left: 2px solid #ffd778; padding-left: 10px; color: var(--text-muted); }
 .compare-detail { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-block: 16px; }

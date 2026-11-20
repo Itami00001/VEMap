@@ -4,7 +4,7 @@ import type * as maplibregl from 'maplibre-gl'
 import { api } from '../services/api'
 import type { City, MapPoint, Region } from '../types'
 import CityMarkers from '../features/map/CityMarkers'
-import MapView, { BoundaryNote } from '../features/map/MapView'
+import MapView from '../features/map/MapView'
 import RegionPopup from '../features/map/RegionPopup'
 import { RegionDetails } from '../features/map/RegionPopup'
 import { moodLegend } from '../features/map/legend'
@@ -95,8 +95,6 @@ export default function MapPage() {
           values={values}
           mode="mood"
           initialCenter={MAP_CENTER}
-          year={period?.year ?? null}
-          month={period?.month ?? null}
           onRegionClick={handleRegionClick}
           onBackgroundClick={() => { setPopup(null); closeCity() }}
           onMapReady={setMap}
@@ -159,7 +157,6 @@ export default function MapPage() {
           </div>
         )}
       </div>
-      <BoundaryNote period={period} />
 
       {cityId && (
         <CityPanel key={`${cityId}-${period?.year}-${period?.month}`} city={city} cityId={cityId}

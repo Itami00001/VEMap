@@ -4,7 +4,8 @@
 // 1905-02..04 — СИНТЕЗИРОВАНЫ детерминированным сдвигом (БЕЗ random!),
 //   только чтобы ползунку было куда двигаться. В UI помечены DEMO DATA.
 
-import type { City, CityDataRow, CityMood, CompareRow, DataRow, HistoryPoint, MapPoint, Region, TimePeriod } from '../types'
+import { CITIES } from '../data/cities'
+import type { CityDataRow, CityMood, CompareRow, DataRow, HistoryPoint, MapPoint, Region, TimePeriod } from '../types'
 
 export const DEMO_REGIONS: Region[] = [
   { region_id: 'RU-MOW', region_code: 'RU-MOW', name_ru: 'Москва', name_en: 'Moscow', name_crh: 'Москва', federal_district: 'Центральный' },
@@ -17,23 +18,7 @@ export const DEMO_REGIONS: Region[] = [
   { region_id: 'RU-YAR', region_code: 'RU-YAR', name_ru: 'Ярославская область', name_en: 'Yaroslavl Oblast', name_crh: 'Ярославская область', federal_district: 'Центральный' },
 ]
 
-export const DEMO_CITIES: City[] = [
-  { city_id: 'moskva', name_ru: 'Москва', region_id: 'RU-MOW', region_name: 'Москва' },
-  { city_id: 'spb', name_ru: 'Санкт-Петербург', region_id: 'RU-SPE', region_name: 'Санкт-Петербург' },
-  { city_id: 'simferopol', name_ru: 'Симферополь', region_id: 'RU-CR', region_name: 'Республика Крым' },
-  { city_id: 'sevastopol', name_ru: 'Севастополь', region_id: 'RU-SEV', region_name: 'Севастополь' },
-  { city_id: 'yalta', name_ru: 'Ялта', region_id: 'RU-CR', region_name: 'Республика Крым' },
-  { city_id: 'kerch', name_ru: 'Керчь', region_id: 'RU-CR', region_name: 'Республика Крым' },
-  { city_id: 'evpatoria', name_ru: 'Евпатория', region_id: 'RU-CR', region_name: 'Республика Крым' },
-  { city_id: 'belogorsk', name_ru: 'Белогорск', region_id: 'RU-CR', region_name: 'Республика Крым' },
-  { city_id: 'kursk', name_ru: 'Курск', region_id: 'RU-KRS', region_name: 'Курская область' },
-  { city_id: 'voronezh', name_ru: 'Воронеж', region_id: 'RU-VOR', region_name: 'Воронежская область' },
-  { city_id: 'saratov', name_ru: 'Саратов', region_id: 'RU-SAR', region_name: 'Саратовская область' },
-  { city_id: 'yaroslavl', name_ru: 'Ярославль', region_id: 'RU-YAR', region_name: 'Ярославская область' },
-  { city_id: 'kyiv', name_ru: 'Киев', region_id: null, region_name: 'Украина' },
-  { city_id: 'kharkiv', name_ru: 'Харьков', region_id: null, region_name: 'Украина' },
-  { city_id: 'mykolaiv', name_ru: 'Николаев', region_id: null, region_name: 'Украина' },
-]
+export const DEMO_CITIES = CITIES
 
 export const DEMO_PERIODS: TimePeriod[] = [
   { year: 1905, month: 1 },
