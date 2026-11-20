@@ -1,8 +1,10 @@
 import { useEffect, useRef } from 'react'
 import * as maplibregl from 'maplibre-gl'
+import type { FeatureCollection, MultiPolygon, Polygon } from 'geojson'
 import type { MapLayerMouseEvent, StyleSpecification } from 'maplibre-gl'
 import { GEOJSON_URL, LAND_GEOJSON_URL } from '../../services/api'
 import { CITY_CLUSTER_LAYER } from './CityMarkers'
+import { addCountryOverview } from './countryOverview'
 
 // Воркер maplibre-gl v6 резолвится относительно бандла (./maplibre-gl-worker.mjs),
 // который Vite не эмитит -> 404 text/html -> карта мертва.
@@ -25,16 +27,7 @@ export interface MapViewProps {
   onMapReady?: (map: maplibregl.Map) => void
 }
 
-interface GeoFeature {
-  type: 'Feature'
-  properties: Record<string, unknown>
-  geometry: unknown
-}
-
-interface GeoCollection {
-  type: 'FeatureCollection'
-  features: GeoFeature[]
-}
+type GeoCollection = FeatureCollection<Polygon | MultiPolygon, Record<string, unknown>>
 
 type Expression = unknown[]
 
@@ -164,7 +157,8 @@ export default function MapView({
               'line-opacity': ['step', ['get', 'admin_level'], 0.65, 6, 0.52, 8, 0.42],
               'line-width': ['interpolate', ['linear'], ['zoom'], 3, 0.85, 7, 1.25, 12, 1.5],
             },
-          })
+          }, 'regions-fill')
+          addCountryOverview(map, LAND_COLOR, controller.signal)
           if (interactive) {
             const clickedCity = (e: MapLayerMouseEvent) => {
               const layers = ['cities-circle', CITY_CLUSTER_LAYER].filter((layer) => map.getLayer(layer))

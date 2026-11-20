@@ -90,7 +90,7 @@ export default function CityMarkers({ map, cities, cityMoods, loading, error, an
 
     const move = (event: MapLayerMouseEvent) => {
       const feature = event.features?.[0]
-      if (!feature) {
+      if (feature?.geometry.type !== 'Point') {
         leave()
         return
       }
@@ -100,8 +100,7 @@ export default function CityMarkers({ map, cities, cityMoods, loading, error, an
       map.getCanvas().style.cursor = 'pointer'
       const mood = byId.get(cityId)
       const status = loading ? 'Загрузка…' : error ? 'Ошибка загрузки' : 'Нет данных'
-      const { coordinates } = feature.geometry as { coordinates: [number, number] }
-      const [longitude, latitude] = coordinates
+      const [longitude, latitude] = feature.geometry.coordinates
       const wrappedLongitude = longitude + 360 * Math.round((event.lngLat.lng - longitude) / 360)
       popup.setLngLat([wrappedLongitude, latitude])
         .setHTML(tipHtml(escapeHtml(String(name)), mood?.mood_index ?? null, mood?.responses_count ?? null, status))
