@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 import * as maplibregl from 'maplibre-gl'
 import type { MapLayerMouseEvent, StyleSpecification } from 'maplibre-gl'
-import { GEOJSON_URL, WORLD_GEOJSON_URL } from '../../services/api'
+import { GEOJSON_URL, LAND_GEOJSON_URL } from '../../services/api'
 import { CITY_CLUSTER_LAYER } from './CityMarkers'
 
 // Воркер maplibre-gl v6 резолвится относительно бандла (./maplibre-gl-worker.mjs),
@@ -41,6 +41,7 @@ type Expression = unknown[]
 // Яркие стопы единой шкалы (значение 0–100): красный → голубой → зелёный.
 const MOOD_STOPS: Expression = [0, '#c0392b', 25, '#9f8187', 50, '#7ec8e3', 75, '#56caaa', 100, '#2ecc71']
 const LAND_COLOR = '#424953'
+const ADMIN_TILEJSON = 'https://tiles.openfreemap.org/planet'
 
 function fillColorExpr(mode: MapMode): Expression {
   const stops: Expression = mode === 'mood'
@@ -50,7 +51,7 @@ function fillColorExpr(mode: MapMode): Expression {
   return ['case', ['==', value, null], 'transparent', ['interpolate', ['linear'], value, ...stops]]
 }
 
-// Вода задаётся фоном, суша рисуется слоем countries-fill.
+// Вода задаётся фоном, суша рисуется слоем land-fill.
 const EMPTY_STYLE: StyleSpecification = {
   version: 8,
   sources: {},
@@ -104,8 +105,6 @@ export default function MapView({
       center: initialCenter,
       zoom: 3,
       interactive,
-      // Атрибуция отключена: AttributionControl со шторкой не нужен.
-      attributionControl: false,
     })
     mapRef.current = map
     const controller = new AbortController()
@@ -114,17 +113,17 @@ export default function MapView({
 
     map.on('load', () => {
       Promise.all([
-        fetch(WORLD_GEOJSON_URL, { signal: controller.signal }).then((r) => r.json() as Promise<GeoCollection>),
+        fetch(LAND_GEOJSON_URL, { signal: controller.signal }).then((r) => r.json() as Promise<GeoCollection>),
         fetch(GEOJSON_URL, { signal: controller.signal }).then((r) => r.json() as Promise<GeoCollection>),
       ])
-        .then(([world, data]) => {
+        .then(([land, data]) => {
           if (controller.signal.aborted) return
           baseRef.current = data
-          map.addSource('world', { type: 'geojson', data: world })
+          map.addSource('land', { type: 'geojson', data: land })
           map.addLayer({
-            id: 'countries-fill',
+            id: 'land-fill',
             type: 'fill',
-            source: 'world',
+            source: 'land',
             paint: { 'fill-color': LAND_COLOR, 'fill-antialias': false },
           })
           map.addSource('regions', {
@@ -138,6 +137,32 @@ export default function MapView({
             paint: {
               'fill-color': fillColorExpr(modeRef.current) as never,
               'fill-opacity': 0.85,
+            },
+          })
+          map.addSource('local-divisions', { type: 'vector', url: ADMIN_TILEJSON })
+          map.addLayer({
+            id: 'local-divisions-line',
+            type: 'line',
+            source: 'local-divisions',
+            'source-layer': 'boundary',
+            // В OpenMapTiles общий контур наследует самый низкий admin_level.
+            // Межгосударственные и особые линии (уровни 2 и 3) не рисуем.
+            filter: [
+              'all',
+              ['==', ['geometry-type'], 'LineString'],
+              ['>=', ['get', 'admin_level'], 4],
+              ['<=', ['get', 'admin_level'], 12],
+              ['!=', ['get', 'disputed'], 1],
+              ['!=', ['get', 'maritime'], 1],
+              ['==', ['coalesce', ['get', 'claimed_by'], ''], ''],
+              ['==', ['coalesce', ['get', 'disputed_name'], ''], ''],
+              ['==', ['coalesce', ['get', 'adm0_l'], ''], ''],
+              ['==', ['coalesce', ['get', 'adm0_r'], ''], ''],
+            ],
+            paint: {
+              'line-color': '#aebac8',
+              'line-opacity': ['step', ['get', 'admin_level'], 0.65, 6, 0.52, 8, 0.42],
+              'line-width': ['interpolate', ['linear'], ['zoom'], 3, 0.85, 7, 1.25, 12, 1.5],
             },
           })
           if (interactive) {
