@@ -11,7 +11,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # AButon-8/iskra_ocr, Apache 2.0. We pin the upstream revision and check both files.
 ADD --checksum=sha256:cac59e7e4b8e29de87a1ab8c831c8abff5bfc4492f137adc3bd31ec9e8bf2a13 https://raw.githubusercontent.com/AButon-8/iskra_ocr/02f34dc42af9f78d022848e83e103b182c9af134/orus.traineddata /usr/local/share/vemap/ocr/orus.traineddata
 ADD --checksum=sha256:4aaf8af4a78756e28314821904e35e97b3a1dce1bf122cbaa6a5b0b694de06e0 https://raw.githubusercontent.com/AButon-8/iskra_ocr/02f34dc42af9f78d022848e83e103b182c9af134/LICENSE /usr/local/share/vemap/ocr/LICENSE
-RUN chmod 0444 /usr/local/share/vemap/ocr/orus.traineddata /usr/local/share/vemap/ocr/LICENSE
+# Tesseract tessdata_fast, Apache 2.0. Used for newspapers printed in Arabic script.
+ADD --checksum=sha256:e3206d3dc87fd50c24a0fb9f01838615911d25168f4e64415244b67d2bb3e729 https://raw.githubusercontent.com/tesseract-ocr/tessdata_fast/87416418657359cb625c412a48b6e1d6d41c29bd/ara.traineddata /usr/local/share/vemap/ocr/ara.traineddata
+ADD --checksum=sha256:cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30 https://raw.githubusercontent.com/tesseract-ocr/tessdata_fast/87416418657359cb625c412a48b6e1d6d41c29bd/LICENSE /usr/local/share/vemap/ocr/TESSDATA_FAST_LICENSE
+RUN chmod 0444 /usr/local/share/vemap/ocr/*
 
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt

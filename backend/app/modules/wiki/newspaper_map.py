@@ -3,7 +3,6 @@ import csv
 import json
 import os
 import re
-import shutil
 import subprocess
 import tempfile
 import unicodedata
@@ -12,9 +11,10 @@ from pathlib import Path
 
 from pypdf import PdfReader
 
+from app.modules.wiki.newspaper_ocr import local_ocr, usable
+
 FIELDS = ("name", "lat", "lon", "mood_index", "file_index", "page")
 MAX_PAGES = 32
-TESSDATA = Path("/usr/local/share/vemap/ocr")
 ORTHOGRAPHY = str.maketrans("ѣѢіІѳѲѵѴёЁ‑–—", "еЕиИфФиИеЕ---")
 ALIASES = {
     "москва": ("Москве", "Москву", "Москвы", "Москвой"),
@@ -71,29 +71,6 @@ def find_points(pages: list[str], cities: tuple[re.Pattern, dict], file_index: i
                 "name": city["name"], "lat": city["lat"], "lon": city["lon"],
                 "mood_index": None, "file_index": file_index, "page": page,
             }
-
-
-def usable(text: str) -> bool:
-    letters = sum(letter.isalpha() for letter in text)
-    return letters >= 16 and letters >= len(text) * 0.35
-
-
-def local_ocr(path: Path, page: int, scratch: Path) -> str:
-    if not shutil.which("pdftoppm") or not shutil.which("tesseract") or not (TESSDATA / "orus.traineddata").is_file():
-        raise RuntimeError("Tesseract orus and pdftoppm are required for scans")
-    image = scratch / "page"
-    subprocess.run(
-        ["pdftoppm", "-f", str(page), "-l", str(page), "-scale-to", "3600", "-gray", "-singlefile",
-         "-png", str(path), str(image)],
-        check=True, timeout=20, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
-    )
-    result = subprocess.run(
-        ["tesseract", str(image.with_suffix(".png")), "stdout", "--tessdata-dir", str(TESSDATA),
-         "-l", "orus", "--psm", "3"],
-        check=True, timeout=35, capture_output=True, text=True, encoding="utf-8",
-        env={**os.environ, "OMP_THREAD_LIMIT": "1"},
-    )
-    return result.stdout
 
 
 def extract_pages(path: Path, remaining: int, scratch: Path, ocr_command: list[str]) -> list[str]:
