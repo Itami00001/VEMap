@@ -44,9 +44,10 @@ def test(directory: Path) -> None:
     class Bot:
         def __init__(self):
             self.sent = []
+            self.public = False
 
         async def get_chat(self, chat_id):
-            return SimpleNamespace(id=chat_id, type="supergroup", username=None)
+            return SimpleNamespace(id=chat_id, type="supergroup", username="public" if self.public else None)
 
         async def send_document(self, chat_id, file, **kwargs):
             assert chat_id == group_id and kwargs["protect_content"]
@@ -69,6 +70,12 @@ def test(directory: Path) -> None:
             message=SimpleNamespace(chat=SimpleNamespace(id=chat_id, type="supergroup"), message_id=123),
             from_user=SimpleNamespace(is_bot=False),
             data=f"wiki:{action}:{value}", id="callback",
+        ))
+
+    def command(chat_id, text):
+        return SimpleNamespace(callback_query=None, message=SimpleNamespace(
+            text=text, chat=SimpleNamespace(id=chat_id, type="supergroup"),
+            sender_chat=None, from_user=SimpleNamespace(is_bot=False),
         ))
 
     def store_csv(ident, content):
@@ -101,6 +108,14 @@ def test(directory: Path) -> None:
         assert client.get("/api/wiki/articles").json()["articles"] == []
 
         bot = Bot()
+        for help_command in ("/help@wiki", "/hel", "/wiki"):
+            asyncio.run(handle_update(bot, group_id, "wiki", command(group_id, help_command)))
+            assert all(f"/{name}" in bot.sent[-1] for name in ("help", "list", "view", "delete", "retry"))
+        asyncio.run(handle_update(bot, group_id, "wiki", command(group_id, "/list")))
+        assert bot.sent[-1] == "Опубликованных статей пока нет."
+        asyncio.run(handle_update(bot, group_id, "wiki", command(group_id, f"/view {ident}")))
+        assert bot.sent[-1] == "Опубликованная статья не найдена."
+        bot.sent.clear()
         asyncio.run(deliver_one(bot, group_id))
         asyncio.run(deliver_one(bot, group_id))
         assert len(bot.sent) == 3, bot.sent
@@ -115,7 +130,24 @@ def test(directory: Path) -> None:
         store_csv(ident, "name,lat,lon,file_index,page\nВаршава,52.23,21.01,0,1\n")
         assert client.get(endpoint).json()["points"][0]["page"] == 1
         assert "Варшава" in client.get(endpoint + "/points.csv").text
-        service.apply_decision("delete", ident)
+        sizes_before = len(bot.sent)
+        for denied_group, bot_public, target in (
+            (group_id + 1, False, "wiki"),
+            (group_id, True, "wiki"),
+            (group_id, False, "another_bot"),
+        ):
+            bot.public = bot_public
+            for request in (f"/view@{target} {ident}", f"/list@{target}"):
+                asyncio.run(handle_update(bot, group_id, "wiki", command(denied_group, request)))
+            assert len(bot.sent) == sizes_before
+        bot.public = False
+        asyncio.run(handle_update(bot, group_id, "wiki", command(group_id, "/list")))
+        assert all(value in bot.sent[-1] for value in (ident, "historical.pdf", "МСК", "VEMap-Client-Smoke"))
+        asyncio.run(handle_update(bot, group_id, "wiki", command(group_id, f"/view {ident}")))
+        assert payload.encode() in bot.sent[-2] and title.encode() in bot.sent[-2]
+        assert b"VEMap-Client-Smoke" in bot.sent[-2] and bot.sent[-1] == pdf
+        asyncio.run(handle_update(bot, group_id, "wiki", command(group_id, f"/delete {ident}")))
+        assert ident in bot.sent[-1] and "удалена" in bot.sent[-1]
         assert client.get(endpoint).status_code == 404
         assert client.get(endpoint + "/files/0").status_code == 404
         service.collect_deleted()
@@ -169,7 +201,7 @@ def test(directory: Path) -> None:
         assert order == list(range(5)), order
 
     asyncio.run(check_queue())
-    print("Wiki smoke passed: private drafts, exact Telegram copies, callback scope, moderation, limits, CSV and FIFO.")
+    print("Wiki smoke passed: private drafts, exact Telegram copies, command and callback scope, moderation, limits, CSV and FIFO.")
 
 
 if __name__ == "__main__":
