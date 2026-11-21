@@ -49,8 +49,8 @@ class ChatProvider:
         return None
 
 
-def request_completion(url: str, headers: dict[str, str], payload: dict) -> dict:
-    response = httpx.post(url, headers=headers, json=payload, timeout=httpx.Timeout(65, connect=10))
+def request_completion(url: str, headers: dict[str, str], payload: dict, *, timeout: float = 65) -> dict:
+    response = httpx.post(url, headers=headers, json=payload, timeout=httpx.Timeout(timeout, connect=10))
     response.raise_for_status()
     return response.json()
 
@@ -69,8 +69,8 @@ def groq_completion(key: str, model: str, messages: Messages) -> Completion:
 
 def local_completion(url: str, model: str, messages: Messages) -> Completion:
     result = request_completion(f"{url.rstrip('/')}/v1/chat/completions", {}, {
-        "model": model, "messages": messages, "max_tokens": 320, "temperature": 0.2,
-    })
+        "model": model, "messages": messages, "max_tokens": 128, "temperature": 0.2,
+    }, timeout=95)
     return Completion(result["choices"][0]["message"]["content"], model_label(result.get("model") or model))
 
 
