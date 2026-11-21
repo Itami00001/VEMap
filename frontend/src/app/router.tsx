@@ -6,6 +6,7 @@ import DataPage from '../pages/DataPage'
 import Landing from '../pages/Landing'
 import MapPage from '../pages/MapPage'
 import WikiPage from '../pages/WikiPage'
+import WikiArticlePage from '../pages/WikiArticlePage'
 import AdminDashboard from '../pages/admin/AdminDashboard'
 import AdminLogin from '../pages/admin/AdminLogin'
 
@@ -16,6 +17,7 @@ export const router = createHashRouter([
     { path: 'data', element: <DataPage /> },
     { path: 'compare', element: <ComparePage /> },
     { path: 'wiki', element: <WikiPage /> },
+    { path: 'wiki/:id', element: <WikiArticlePage /> },
     { path: 'forecast', element: <Navigate to="/wiki" replace /> },
     { path: 'about', element: <AboutPage /> },
     { path: 'admin/login', element: <AdminLogin /> },

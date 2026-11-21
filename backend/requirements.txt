@@ -15,3 +15,5 @@ python-jose[cryptography]
 aiogram
 httpx
 pypdf
+
+tzdata

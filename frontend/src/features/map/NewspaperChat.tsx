@@ -28,7 +28,7 @@ export default function NewspaperChat({ open, selection, onSelect, catalog, cata
   const closeRef = useRef<HTMLButtonElement>(null)
   const [providers, setProviders] = useState<ChatProvider[] | null>(null)
   const [providersError, setProvidersError] = useState(false)
-  const [providerId, setProviderId] = useState('groq')
+  const [providerId, setProviderId] = useState('local')
   const [citySearch, setCitySearch] = useState('')
   const [issueSearch, setIssueSearch] = useState('')
   const [compactFor, setCompactFor] = useState<string | null>(null)
@@ -194,7 +194,7 @@ function ChatConversation({ open, sourcePdf, provider, onSend, onModel }: {
           setError({ title: 'Проверьте баланс', detail: failure instanceof NewspaperChatError ? failure.message : '' })
           break
         case 429:
-          setError({ title: 'Слишком много запросов', detail: 'Подождите немного и отправьте вопрос снова.' })
+          setError({ title: 'Слишком много запросов', detail: failure instanceof NewspaperChatError ? failure.message : 'Подождите немного и отправьте вопрос снова.' })
           break
         case 503:
           setError({ title: 'Провайдер недоступен', detail: failure instanceof NewspaperChatError ? failure.message : '' })
@@ -228,7 +228,7 @@ function ChatConversation({ open, sourcePdf, provider, onSend, onModel }: {
                 )}
               </li>
             ))}
-            {pending && <li className="muted">Ожидаем ответ…</li>}
+            {pending && <li className="muted" role="status">{provider?.id === 'local' ? 'Запрос в очереди или обрабатывается…' : 'Ожидаем ответ…'}</li>}
           </ol>
           {page !== null && (
             <section className="chat-source-preview" aria-label="Газетная страница">

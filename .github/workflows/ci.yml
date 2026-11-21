@@ -56,6 +56,7 @@ jobs:
             --retry-delay 2 http://localhost:5173/api/periods | jq -e 'type == "array" and length > 0'
           curl --fail --silent --show-error http://localhost:5173/api/newspaper-catalog \
             | jq -e '.archive | type == "array" and length > 0'
+          docker compose exec -T backend python -m scripts.smoke_wiki
       - name: Show service logs on failure
         if: failure()
         run: docker compose logs --no-color

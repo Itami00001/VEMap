@@ -67,6 +67,13 @@ def groq_completion(key: str, model: str, messages: Messages) -> Completion:
     return Completion(result["choices"][0]["message"]["content"], model_label(result.get("model") or model))
 
 
+def local_completion(url: str, model: str, messages: Messages) -> Completion:
+    result = request_completion(f"{url.rstrip('/')}/v1/chat/completions", {}, {
+        "model": model, "messages": messages, "max_tokens": 320, "temperature": 0.2,
+    })
+    return Completion(result["choices"][0]["message"]["content"], model_label(result.get("model") or model))
+
+
 def google_completion(key: str, model: str, messages: Messages) -> Completion:
     result = request_completion(
         f"https://generativelanguage.googleapis.com/v1beta/models/{quote(model, safe='')}:generateContent",
@@ -107,7 +114,15 @@ def chat_providers() -> dict[str, ChatProvider]:
     google_key = settings.GOOGLE_API_KEY.get_secret_value().strip()
     folder = settings.YANDEX_FOLDER_ID.strip()
     yandex_model = settings.YANDEX_MODEL.strip()
+    url = settings.LOCAL_LLM_URL.strip()
+    providers = {
+        "local": ChatProvider("Локальная модель VEMap", url, settings.LOCAL_LLM_MODEL.strip(), local_completion,
+                              None if url else "LOCAL_LLM_URL"),
+    }
+    if not settings.CHAT_ALLOW_CLOUD:
+        return providers
     return {
+        **providers,
         "groq": ChatProvider("Groq", groq_key, settings.GROQ_MODEL.strip(), groq_completion,
                              None if groq_key else "GROQ_API_KEY"),
         "yandex": ChatProvider("Yandex AI Studio", yandex_key,

@@ -4,14 +4,15 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Literal
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
+from starlette.concurrency import run_in_threadpool
 from pydantic import BaseModel, Field, StringConstraints
 from pypdf import PdfReader
 from sqlalchemy.orm import Session
 from typing_extensions import Annotated
 
 from app.core.dependencies import get_db
-from app.modules.cities.chat_providers import ProviderStatus, chat_providers, generate_answer, model_label
+from app.modules.cities.chat_providers import ChatProvider, ProviderStatus, chat_providers, generate_answer, model_label
 from app.modules.cities.newspapers import find_issue, transcript_path
 
 router = APIRouter(prefix="/api", tags=["newspaper chat"])
@@ -131,18 +132,26 @@ def list_chat_providers() -> list[ProviderStatus]:
 
 
 @router.post("/chat", response_model=ChatResponse)
-def chat(body: ChatRequest, db: Session = Depends(get_db)) -> ChatResponse:
+async def chat(body: ChatRequest, request: Request, db: Session = Depends(get_db)) -> ChatResponse:
     provider = chat_providers().get(body.provider)
     if provider is None:
         raise HTTPException(400, "Неизвестный провайдер чата.")
     if reason := provider.unavailable_reason:
         raise HTTPException(503, f"{provider.label} недоступен. {reason}")
 
+    if body.provider == "local":
+        async with request.app.state.local_chat_queue.enter(request):
+            return await run_in_threadpool(answer_newspaper, body, provider, db)
+    return await run_in_threadpool(answer_newspaper, body, provider, db)
+
+
+def answer_newspaper(body: ChatRequest, provider: ChatProvider, db: Session) -> ChatResponse:
     issue = find_issue(db, body.source_pdf)
     if issue is None or issue.path is None:
         raise HTTPException(404, "Газета не найдена.")
 
-    context, pages = read_newspaper(issue.path, body.question)
+    local = body.provider == "local"
+    context, pages = read_newspaper(issue.path, body.question, 3300 if local else MAX_CONTEXT_CHARS)
     messages = [
         {
             "role": "system",
@@ -155,8 +164,15 @@ def chat(body: ChatRequest, db: Session = Depends(get_db)) -> ChatResponse:
                 f"Выпуск: {issue.title}\n\n{context}"
             ),
         },
-        *({"role": message.role, "content": message.content[:600]} for message in body.history[-4:]),
+        *({"role": message.role, "content": message.content[:280 if local else 600]}
+          for message in body.history[-(2 if local else 4):]),
         {"role": "user", "content": body.question},
     ]
     reply = generate_answer(body.provider, provider, messages)
-    return ChatResponse(answer=reply.text, model=reply.model, pages=pages)
+    answer = reply.text
+    if local and pages and not any(
+        int(number) in pages for number in re.findall(r"\]\(#page=([1-9]\d*)\)", answer)
+    ):
+        links = ", ".join(f"[стр. {page}](#page={page})" for page in pages[:6])
+        answer += f"\n\nСтраницы из подобранного контекста: {links}."
+    return ChatResponse(answer=answer, model=reply.model, pages=pages)

@@ -22,6 +22,7 @@ services:
     volumes:
       - ./data:/app/data
       - ./data:/data
+      - wiki_files:/app/storage/wiki
     environment:
       DATABASE_URL: postgresql://mapmood:mapmood@postgres:5432/mapmood
       JWT_SECRET: ${JWT_SECRET}
@@ -34,6 +35,14 @@ services:
       YANDEX_MODEL: ${YANDEX_MODEL:-yandexgpt/latest}
       GOOGLE_API_KEY: ${GOOGLE_API_KEY:-}
       GOOGLE_MODEL: ${GOOGLE_MODEL:-gemini-3.5-flash-lite}
+      CHAT_ALLOW_CLOUD: ${CHAT_ALLOW_CLOUD:-true}
+      LOCAL_LLM_URL: ${LOCAL_LLM_URL:-}
+      LOCAL_LLM_MODEL: ${LOCAL_LLM_MODEL:-Qwen2.5-1.5B-Instruct}
+      WIKI_TELEGRAM_TOKEN: ${WIKI_TELEGRAM_TOKEN:-}
+      WIKI_TELEGRAM_CHAT_ID: ${WIKI_TELEGRAM_CHAT_ID:-0}
+      WIKI_TRUST_PROXY: ${WIKI_TRUST_PROXY:-false}
+      WIKI_PROCESSOR: ${WIKI_PROCESSOR:-[]}
+      WIKI_OCR_COMMAND: ${WIKI_OCR_COMMAND:-[]}
     depends_on:
       postgres:
         condition: service_healthy
@@ -47,3 +56,4 @@ services:
 
 volumes:
   postgres_data:
+  wiki_files:

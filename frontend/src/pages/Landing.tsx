@@ -4,7 +4,7 @@ import { newspaperUrl } from '../services/api'
 const sections = [
   { to: '/map', title: 'Карта', detail: 'Выбирайте город и период, открывайте газетные страницы.' },
   { to: '/data', title: 'Данные', detail: 'Просматривайте оценки и объём материалов по городам.' },
-  { to: '/wiki', title: 'VEMAP Viki', detail: 'Вики проекта в разработке.' },
+  { to: '/wiki', title: 'VEMap Wiki', detail: 'Газеты и карты, собранные читателями.' },
 ]
 
 const pipeline = [
