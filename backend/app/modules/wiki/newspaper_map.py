@@ -37,7 +37,9 @@ def normalize(text: str) -> str:
     text = unicodedata.normalize("NFC", text).translate(ORTHOGRAPHY)
     text = re.sub(r"(?<=\w)-[ \t]*\n[ \t]*(?=\w)", "", text)
     text = re.sub(r"(?<=[бвгджзклмнпрстфхцчшщБВГДЖЗКЛМНПРСТФХЦЧШЩ])[Ъъ]\b", "", text)
-    return re.sub(r"\s+", " ", text).strip()
+    text = re.sub(r"\s+", " ", text).strip()
+    # orus may drop the final yat in "въ Варшавѣ" on historical scans.
+    return re.sub(r"\b([Вв] )Варшав\b", r"\1Варшаве", text)
 
 
 def city_index(cities: list[dict]) -> tuple[re.Pattern, dict]:

@@ -137,7 +137,7 @@ def test(directory: Path) -> None:
         {"id": "b", "name": "Берлинъ", "lat": 52.52, "lon": 13.40},
         {"id": "c", "name": "Москва", "lat": 55.75, "lon": 37.62},
     ])
-    points = list(find_points(["Выставка въ Варшавѣ.", "Изъ Берлина въ Варшаву."], cities, 2))
+    points = list(find_points(["Выставка въ Варшав.", "Изъ Берлина въ Варшаву."], cities, 2))
     assert [(p["name"], p["page"], p["file_index"], p["mood_index"]) for p in points] == [
         ("Варшава", 1, 2, None), ("Берлинъ", 2, 2, None),
     ], points
