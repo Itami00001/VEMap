@@ -44,18 +44,20 @@ def test(directory: Path) -> None:
     class Bot:
         def __init__(self):
             self.sent = []
+            self.markup = None
             self.public = False
 
         async def get_chat(self, chat_id):
             return SimpleNamespace(id=chat_id, type="supergroup", username="public" if self.public else None)
 
         async def send_document(self, chat_id, file, **kwargs):
-            assert chat_id == group_id and kwargs["protect_content"]
+            assert chat_id == group_id and not kwargs.get("protect_content")
             self.sent.append(Path(file.path).read_bytes() if hasattr(file, "path") else file.data)
             return SimpleNamespace(message_id=len(self.sent))
 
         async def send_message(self, chat_id, text, **kwargs):
-            assert chat_id == group_id
+            assert chat_id == group_id and not kwargs.get("protect_content")
+            self.markup = kwargs.get("reply_markup")
             self.sent.append(text)
             return SimpleNamespace(message_id=len(self.sent))
 
@@ -146,8 +148,22 @@ def test(directory: Path) -> None:
         asyncio.run(handle_update(bot, group_id, "wiki", command(group_id, f"/view {ident}")))
         assert payload.encode() in bot.sent[-2] and title.encode() in bot.sent[-2]
         assert b"VEMap-Client-Smoke" in bot.sent[-2] and bot.sent[-1] == pdf
+        asyncio.run(handle_update(bot, group_id, "wiki", command(group_id, "/automative")))
+        assert bot.markup.inline_keyboard[0][0].callback_data == "wiki:list:1"
+        asyncio.run(handle_update(bot, group_id, "wiki", callback(group_id, "list", "1")))
+        buttons = {button.callback_data for row in bot.markup.inline_keyboard for button in row}
+        assert {f"wiki:view:{ident}", f"wiki:ask-delete:{ident}", f"wiki:retry:{ident}"} <= buttons
+        asyncio.run(handle_update(bot, group_id, "wiki", callback(group_id, "view", ident)))
+        assert payload.encode() in bot.sent[-2] and bot.sent[-1] == pdf
+        asyncio.run(handle_update(bot, group_id, "wiki", callback(group_id, "ask-delete", ident)))
+        assert bot.markup.inline_keyboard[0][0].callback_data == f"wiki:delete:{ident}"
+        assert client.get(endpoint).status_code == 200
+        asyncio.run(handle_update(bot, group_id, "wiki", callback(group_id, "cancel", "")))
+        assert client.get(endpoint).status_code == 200
+        asyncio.run(handle_update(bot, group_id, "wiki", callback(group_id, "delete", ident)))
+        assert client.get(endpoint).status_code == 404
         asyncio.run(handle_update(bot, group_id, "wiki", command(group_id, f"/delete {ident}")))
-        assert ident in bot.sent[-1] and "удалена" in bot.sent[-1]
+        assert "удалена" in bot.sent[-1]
         assert client.get(endpoint).status_code == 404
         assert client.get(endpoint + "/files/0").status_code == 404
         service.collect_deleted()
