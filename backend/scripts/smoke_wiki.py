@@ -45,6 +45,9 @@ def test(directory: Path) -> None:
         def __init__(self):
             self.sent = []
 
+        async def get_chat(self, chat_id):
+            return SimpleNamespace(id=chat_id, type="supergroup", username=None)
+
         async def send_document(self, chat_id, file, **kwargs):
             assert chat_id == group_id and kwargs["protect_content"]
             self.sent.append(Path(file.path).read_bytes() if hasattr(file, "path") else file.data)

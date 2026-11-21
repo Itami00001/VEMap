@@ -28,6 +28,9 @@ async def deliver_one(bot: Bot, group_id: int) -> None:
         ).order_by(WikiArticle.created_at, WikiArticle.id).limit(1))
     if article is None:
         return
+    group = await bot.get_chat(group_id)
+    if group.id != group_id or group.type not in CHAT_TYPES or group.username or getattr(group, "active_usernames", None):
+        raise RuntimeError("Wiki Telegram group is no longer private")
     ids = list(article.delivery)
     for index, file in enumerate(article.files):
         if index < len(ids):

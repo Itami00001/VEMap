@@ -50,7 +50,8 @@ def initialize() -> None:
 
 
 def control(db: Session) -> WikiControl:
-    return db.scalars(select(WikiControl).where(WikiControl.id == 1).with_for_update()).one()
+    return db.scalars(select(WikiControl).where(WikiControl.id == 1)
+                      .with_for_update().execution_options(populate_existing=True)).one()
 
 
 def client_key(request: Request) -> str:
