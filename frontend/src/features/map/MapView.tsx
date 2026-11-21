@@ -4,6 +4,7 @@ import type { FeatureCollection, MultiPolygon, Polygon } from 'geojson'
 import type { MapLayerMouseEvent, StyleSpecification } from 'maplibre-gl'
 import { GEOJSON_URL, WORLD_GEOJSON_URL } from '../../services/api'
 import { CITY_CLUSTER_LAYER } from './CityMarkers'
+import { MOOD_STOPS } from './color'
 import HistoricalBordersLayer from './historical/HistoricalBordersLayer'
 import { useHistoricalBorders } from './historical/useHistoricalBorders'
 
@@ -33,10 +34,8 @@ type GeoCollection = FeatureCollection<Polygon | MultiPolygon, Record<string, un
 
 type Expression = unknown[]
 
-// Яркие стопы единой шкалы (значение 0–100): красный → голубой → зелёный.
-const MOOD_STOPS: Expression = [0, '#c0392b', 25, '#9f8187', 50, '#7ec8e3', 75, '#56caaa', 100, '#2ecc71']
 const RUSSIA_FILL = '#416d73'
-const UKRAINE_FILL = '#83754b'
+const LAND_FILL = '#424953'
 const CLAIMS_GEOJSON_URL = `${import.meta.env.BASE_URL}data/geo/russian-claims-2022.geojson`
 const isCrimea: Expression = ['in', ['get', 'region_id'], ['literal', ['RU-CR', 'RU-SEV']]]
 
@@ -61,7 +60,7 @@ function regionsLinePaint(dimCrimea: boolean) {
 }
 
 function fillColorExpr(mode: MapMode): Expression {
-  const stops: Expression = mode === 'mood'
+  const stops = mode === 'mood'
     ? MOOD_STOPS
     : [-100, '#f46464', -25, '#b74652', 0, '#687685', 25, '#427be5', 100, '#76b7ff']
   const value = ['get', 'value']
@@ -150,7 +149,7 @@ export default function MapView({
             source: 'world',
             paint: {
               'fill-color': ['match', ['get', 'ISO_A3'],
-                'RUS', RUSSIA_FILL, 'UKR', UKRAINE_FILL, '#424953'],
+                'RUS', RUSSIA_FILL, LAND_FILL],
             },
           })
           map.addSource('russian-claims', { type: 'geojson', data: claims })
@@ -166,8 +165,8 @@ export default function MapView({
             source: 'world',
             paint: {
               'line-color': ['match', ['get', 'ISO_A3'],
-                'RUS', '#ffffff', 'UKR', '#f1d778', '#697482'],
-              'line-width': ['match', ['get', 'ISO_A3'], ['RUS', 'UKR'], 2, 1],
+                'RUS', '#ffffff', '#697482'],
+              'line-width': ['match', ['get', 'ISO_A3'], 'RUS', 2, 1],
             },
           })
           map.addSource('regions', {

@@ -4,6 +4,7 @@ import type * as maplibregl from 'maplibre-gl'
 import { api } from '../services/api'
 import type { City, MapPoint, Region } from '../types'
 import CityMarkers from '../features/map/CityMarkers'
+import ForeignMoodRegions from '../features/map/ForeignMoodRegions'
 import MapView, { BoundaryNote } from '../features/map/MapView'
 import RegionPopup from '../features/map/RegionPopup'
 import { RegionDetails } from '../features/map/RegionPopup'
@@ -80,7 +81,7 @@ export default function MapPage() {
         <div>
           <h1>Карта настроений</h1>
           <p>
-            Mood Index по регионам России (агрегат городов). Период:{' '}
+            Mood Index по областям и регионам по данным городов. Период:{' '}
             {period ? formatPeriod(period) : '—'}.
             Кликните по региону для деталей. <DemoBadge />
           </p>
@@ -100,6 +101,7 @@ export default function MapPage() {
           onBackgroundClick={() => { setPopup(null); closeCity() }}
           onMapReady={setMap}
         />
+        <ForeignMoodRegions map={map} cities={cities} moods={cityMoods} />
         <div className="map-overlay-cities">
           <CityMarkers map={map} cities={cities} cityMoods={cityMoods} loading={loading} error={error !== null}
             animationPaused={chatOpen}
@@ -160,6 +162,11 @@ export default function MapPage() {
       </div>
 
       <BoundaryNote />
+      <p className="map-boundary-note muted">
+        Заливка зарубежных областей рассчитана по городам архива внутри современных контуров.{' '}
+        <a href="https://www.naturalearthdata.com/downloads/10m-cultural-vectors/10m-admin-1-states-provinces/"
+           target="_blank" rel="noreferrer">Natural Earth ADM1</a>
+      </p>
 
       {cityId && (
         <CityPanel key={`${cityId}-${period?.year}-${period?.month}`} city={city} cityId={cityId}

@@ -4,6 +4,7 @@ export const MOOD_MAX_YEAR = 2026
 export const COLOR_RED = '#c0392b'
 export const COLOR_NEUTRAL = '#7ec8e3'
 export const COLOR_GREEN = '#2ecc71'
+export const MOOD_STOPS = [0, COLOR_RED, 25, '#9f8187', 50, COLOR_NEUTRAL, 75, '#56caaa', 100, COLOR_GREEN] as const
 // Серый — только для «нет данных» (NO_DATA '#39404e' в слоях).
 
 export function ageFactor(year: number): number {
