@@ -1,10 +1,10 @@
 import { lazy, Suspense, useState } from 'react'
 import { newspaperUrl } from '../../services/api'
-import { formatPeriod } from './TimeSlider'
-import type { City, CityMood, TimePeriod } from '../../types'
-import type { NewspaperSource } from '../../types'
+import { formatPeriodTitle } from './TimeSlider'
+import type { City, CityMood, NewspaperSource, TimePeriod } from '../../types'
 
 const NewspaperReader = lazy(() => import('./NewspaperReader'))
+const NewspaperThumbnail = lazy(() => import('./NewspaperThumbnail'))
 
 export interface CityPanelProps {
   city: City | undefined
@@ -13,83 +13,53 @@ export interface CityPanelProps {
   period: TimePeriod | null
   loading: boolean
   error: boolean
-  activeSource: string | null
-  onOpenSource: (filename: string) => void
-  onClose: () => void
+  onOpenSource: (filename: string | null) => void
+  onChat: (filename: string) => void
 }
 
-function closeness(mood: number | null): string {
-  if (mood == null) return '—'
-  if (mood >= 66.7) return 'good'
-  if (mood >= 33.3) return 'neutral'
-  return 'bad'
-}
-
-export default function CityPanel({ city, cityId, mood, period, loading, error, activeSource, onOpenSource, onClose }: CityPanelProps) {
-  const [expanded, setExpanded] = useState(false)
+export default function CityPanel({ city, cityId, mood, period, loading, error, onOpenSource, onChat }: CityPanelProps) {
   const [selected, setSelected] = useState<NewspaperSource | null>(null)
-  const hasData = mood !== null && period !== null && !loading && !error
-  const periodLabel = period ? formatPeriod(period) : ''
+  const sources = mood?.sources ?? []
 
   return (
-    <aside className="city-panel city-panel--bottom">
-      <button type="button" className="close" onClick={onClose} aria-label="Закрыть">
-        ✕
-      </button>
-      <div className="city-panel-row">
-        <h3>{city?.name_ru ?? cityId}</h3>
-        <button type="button" className="btn city-period-button" disabled={!hasData}
-          aria-expanded={hasData && expanded} onClick={() => setExpanded(!expanded)}>
-          {loading ? 'Загрузка…' : error ? 'Ошибка загрузки' : hasData ? `Информация за ${periodLabel}` : 'Нет данных'}
-        </button>
-      </div>
-      {hasData && expanded && <div className="city-panel-row">
-        <div className="popup-metric">
-          <span>Mood</span>
-          <b>{mood ? mood.mood_index.toFixed(1) : '—'}</b>
+    <div className="atlas-city-panel">
+      <h2>{city?.name_ru ?? cityId}</h2>
+      {period && <p>{formatPeriodTitle(period)}</p>}
+      {loading ? <p role="status">Загрузка данных…</p> : error ? <p role="alert">Данные не загрузились.</p> : mood ? (
+        <div className="atlas-city-metrics">
+          <strong>{mood.mood_index.toLocaleString('ru', { maximumFractionDigits: 1 })} / 100</strong>
+          <span>{mood.responses_count} · объём выборки</span>
         </div>
-        <div className="popup-metric">
-          <span>Publication</span>
-          <b>{mood?.responses_count ?? '—'}</b>
-        </div>
-        <div className="popup-metric">
-          <span>Closer to</span>
-          <b>{closeness(mood?.mood_index ?? null)}</b>
-        </div>
-      </div>}
-      
-      {hasData && expanded && (
-        <div className="city-panel-newspaper">
-          {mood?.sources?.length ? (
-            <ul>
-              {mood.sources.map((source) => {
-                const { id, title, source_page, available } = source
-                return <li key={id + ':' + source_page}>
-                  {available ? (
-                    <button type="button" className="btn newspaper-source-button"
-                      aria-pressed={selected?.id === id && selected.source_page === source_page}
-                      onClick={() => {
-                        setSelected(source)
-                        onOpenSource(id)
-                      }}>
-                      Открыть источник · {title}, стр. {source_page}
-                    </button>
-                  ) : (
-                    <span className="muted">PDF недоступен · {title}, стр. {source_page}</span>
-                  )}
-                  {activeSource === id && <span className="muted"> · выбран для чата</span>}
-                </li>
-              })}
-            </ul>
-          ) : (
-            <p className="muted">Для этого периода источник не указан</p>
-          )}
-          {selected && <Suspense fallback={<p role="status">Загружаем просмотрщик…</p>}>
-            <NewspaperReader key={`${selected.id}:${selected.source_page}`}
-              url={newspaperUrl(selected.id, selected.source_page)} initialPage={selected.source_page} />
-          </Suspense>}
-        </div>
+      ) : <p>За этот период нет данных.</p>}
+      {!loading && !error && sources.length > 0 && (
+        <ul className="atlas-city-sources">
+          {sources.map((source) => {
+            const { id, title, source_page: page, available } = source
+            const active = selected?.id === id && selected.source_page === page
+            return <li key={id + ':' + page}>
+              {available && <Suspense fallback={null}>
+                <NewspaperThumbnail url={newspaperUrl(id, page)} page={page} />
+              </Suspense>}
+              <div>
+                <strong>{title}</strong>
+                <p>Страница {page}{!available && ' · PDF недоступен'}</p>
+                {available && <button className="btn primary" type="button" aria-expanded={active}
+                  onClick={() => { setSelected(active ? null : source); onOpenSource(active ? null : id) }}>
+                  {active ? 'Свернуть страницу' : 'Открыть страницу'}
+                </button>}
+              </div>
+            </li>
+          })}
+        </ul>
       )}
-    </aside>
+      {mood && !loading && !sources.length && <p>Для этого периода источник не указан.</p>}
+      {selected && <>
+        <button className="btn atlas-source-chat" type="button" onClick={() => onChat(selected.id)}>Спросить об этом выпуске</button>
+        <Suspense fallback={<p role="status">Загружаем просмотрщик…</p>}>
+          <NewspaperReader key={selected.id + ':' + selected.source_page} initialPage={selected.source_page}
+            url={newspaperUrl(selected.id, selected.source_page)} />
+        </Suspense>
+      </>}
+    </div>
   )
 }

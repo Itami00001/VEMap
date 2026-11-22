@@ -7,6 +7,8 @@ import CompareYears from '../features/data/CompareYears'
 import MapView, { BoundaryNote } from '../features/map/MapView'
 import { sentimentColor } from '../features/map/color'
 import DemoBadge from '../features/map/DemoBadge'
+import { formatPeriodTitle } from '../features/map/TimeSlider'
+import { moodLegend } from '../features/map/legend'
 
 const MAP_CENTER: [number, number] = [36, 49]
 const EMPTY_ROWS: ComparisonRow[] = []
@@ -17,6 +19,7 @@ const DELTA_LABEL = {
   only_b: 'Только B',
 }
 const formatter = new Intl.NumberFormat('ru', { maximumFractionDigits: 2 })
+const legend = moodLegend()
 
 function valueLabel(value: number | undefined) {
   return value === undefined ? '—' : formatter.format(value)
@@ -50,15 +53,71 @@ function ObservationDetails({ label, observation }: { label: string; observation
   )
 }
 
+type MapValue = 'delta' | 'a' | 'b'
+
+function ComparisonMap({ period, mode, scope, rows, selectedId, onSelect, onReady }: {
+  period: TimePeriod | null
+  mode: MapValue
+  scope: 'cities' | 'regions'
+  rows: ComparisonRow[]
+  selectedId: string | null
+  onSelect: (id: string) => void
+  onReady: (map: LibreMap) => void
+}) {
+  const [map, setMap] = useState<LibreMap | null>(null)
+  const markers = useRef(new Map<string, Marker>())
+  const values = useMemo(() => scope === 'regions'
+    ? Object.fromEntries(rows.map((row) => [row.id, mode === 'delta' ? row.delta : row[mode]?.value ?? null]))
+    : {}, [mode, rows, scope])
+
+  useEffect(() => {
+    if (!map || scope !== 'cities') return
+    const active = markers.current
+    for (const row of rows) {
+      if (row.lat == null || row.lon == null) continue
+      const point = document.createElement('button')
+      point.type = 'button'
+      point.className = 'compare-marker'
+      const value = mode === 'delta' ? row.delta : row[mode]?.value
+      point.style.backgroundColor = value == null ? '#6b7786' : mode !== 'delta' ? sentimentColor(value / 100)
+        : value > 0 ? '#559aff' : value < 0 ? '#f16b70' : '#8b99a8'
+      point.setAttribute('aria-label', row.name + ', ' + (value == null ? 'Нет данных' : valueLabel(value)))
+      point.title = row.name
+      point.addEventListener('click', (event) => { event.stopPropagation(); onSelect(row.id) })
+      active.set(row.id, new Marker({ element: point }).setLngLat([row.lon, row.lat]).addTo(map))
+    }
+    return () => {
+      active.forEach((marker) => marker.remove())
+      active.clear()
+    }
+  }, [map, mode, onSelect, rows, scope])
+
+  useEffect(() => {
+    for (const [id, marker] of markers.current) {
+      marker.getElement().classList.toggle('is-selected', id === selectedId)
+      marker.getElement().setAttribute('aria-pressed', String(id === selectedId))
+    }
+  }, [map, mode, rows, scope, selectedId])
+
+  return <section className="atlas-compare-map" aria-label={period ? formatPeriodTitle(period) : 'Карта периода'}>
+    <h2>{mode === 'delta' ? 'Изменение индекса' : period ? formatPeriodTitle(period) : 'Период'}</h2>
+    <div className="map-shell">
+      <MapView values={values} mode={mode === 'delta' ? 'delta' : 'mood'} year={period?.year ?? null}
+        initialCenter={MAP_CENTER} onMapReady={(instance) => { setMap(instance); onReady(instance) }}
+        onRegionClick={scope === 'regions' ? onSelect : undefined} />
+    </div>
+  </section>
+}
+
 export default function ComparePage() {
   const [comparison, setComparison] = useState<Comparison | null>(null)
   const [pair, setPair] = useState<[TimePeriod, TimePeriod] | null>(null)
   const [scope, setScope] = useState<'cities' | 'regions' | null>(null)
-  const [mode, setMode] = useState<'delta' | 'a' | 'b'>('delta')
-  const [mobileView, setMobileView] = useState<'list' | 'map'>('list')
+  const [mode, setMode] = useState<'paired' | 'delta'>('paired')
   const [selectedId, setSelectedId] = useState<string | null>(null)
-  const [map, setMap] = useState<LibreMap | null>(null)
-  const markersById = useRef(new Map<string, Marker>())
+  const [mapA, setMapA] = useState<LibreMap | null>(null)
+  const [mapB, setMapB] = useState<LibreMap | null>(null)
+  const [linked, setLinked] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const matchesPair = comparison && (!pair || (
     comparison.period_a?.year === pair[0].year && comparison.period_a.month === pair[0].month &&
@@ -76,14 +135,8 @@ export default function ComparePage() {
     left.name.localeCompare(right.name, 'ru')), [rows])
   const selected = rows.find((row) => row.id === selectedId)
   const hasDelta = rows.some((row) => row.delta !== null)
-  const hasA = rows.some((row) => row.a !== null)
-  const hasB = rows.some((row) => row.b !== null)
-  const availableModes = { delta: hasDelta, a: hasA, b: hasB }
-  const activeMode = availableModes[mode] ? mode : hasB ? 'b' : 'a'
+  const activeMode = mode === 'delta' && hasDelta ? 'delta' : 'paired'
   const deltaScale = Math.max(1, ...rows.map((row) => Math.abs(row.delta ?? 0)))
-  const values = useMemo(() => activeScope === 'regions'
-    ? Object.fromEntries(rows.map((row) => [row.id, activeMode === 'delta' ? row.delta : row[activeMode]?.value ?? null]))
-    : {}, [activeScope, activeMode, rows])
 
   useEffect(() => {
     const controller = new AbortController()
@@ -94,35 +147,27 @@ export default function ComparePage() {
   }, [pair])
 
   useEffect(() => {
-    if (!map || activeScope !== 'cities') return
-    const markers = markersById.current
-    for (const row of rows) {
-      if (row.lat == null || row.lon == null) continue
-      const point = document.createElement('button')
-      point.type = 'button'
-      point.className = 'compare-marker'
-      const value = activeMode === 'delta' ? row.delta : row[activeMode]?.value
-      const color = value == null ? '#6b7786' : activeMode !== 'delta' ? sentimentColor(value / 100)
-        : value > 0 ? '#559aff' : value < 0 ? '#f16b70' : '#8b99a8'
-      point.style.backgroundColor = color
-      point.setAttribute('aria-label', row.name + ', ' + (activeMode === 'delta' ? difference(row) : value == null ? 'Нет данных' : valueLabel(value)))
-      point.title = point.getAttribute('aria-label') ?? ''
-      point.addEventListener('click', (event) => { event.stopPropagation(); setSelectedId(row.id) })
-      markers.set(row.id, new Marker({ element: point }).setLngLat([row.lon, row.lat]).addTo(map))
+    if (!mapA || !mapB || !linked || activeMode !== 'paired') return
+    let syncing = false
+    function follow(source: LibreMap, target: LibreMap) {
+      if (syncing) return
+      syncing = true
+      try {
+        target.jumpTo({ center: source.getCenter(), zoom: source.getZoom(), bearing: source.getBearing(), pitch: source.getPitch() })
+      } finally {
+        syncing = false
+      }
     }
+    const followA = () => follow(mapA, mapB)
+    const followB = () => follow(mapB, mapA)
+    followA()
+    mapA.on('move', followA)
+    mapB.on('move', followB)
     return () => {
-      markers.forEach((marker) => marker.remove())
-      markers.clear()
+      mapA.off('move', followA)
+      mapB.off('move', followB)
     }
-  }, [map, rows, activeScope, activeMode])
-
-  useEffect(() => {
-    for (const [id, marker] of markersById.current) {
-      const point = marker.getElement()
-      point.classList.toggle('is-selected', id === selectedId)
-      point.setAttribute('aria-pressed', String(id === selectedId))
-    }
-  }, [map, rows, activeScope, activeMode, selectedId])
+  }, [activeMode, linked, mapA, mapB])
 
   function changePair(nextA: TimePeriod, nextB: TimePeriod) {
     if (a?.year === nextA.year && a.month === nextA.month && b?.year === nextB.year && b.month === nextB.month) return
@@ -133,13 +178,15 @@ export default function ComparePage() {
 
   function selectRow(row: ComparisonRow) {
     setSelectedId(row.id)
-    if (row.lat != null && row.lon != null) map?.easeTo({ center: [row.lon, row.lat] })
+    if (row.lat == null || row.lon == null) return
+    mapA?.easeTo({ center: [row.lon, row.lat] })
+    if (!linked && activeMode === 'paired') mapB?.easeTo({ center: [row.lon, row.lat] })
   }
 
   return (
-    <div className="page compare-page">
-      <div className="page-head">
-        <div><h1>Сравнение периодов</h1><p>Оценки A и B и изменение в пунктах Mood Index. <DemoBadge /></p></div>
+    <div className="page atlas-page compare-page">
+      <div className="atlas-page-heading">
+        <h1>Сравнение периодов</h1><DemoBadge />
       </div>
       <CompareYears periods={comparison?.periods ?? []} periodA={a} periodB={b}
         onA={(next) => { if (b) changePair(next, b) }} onB={(next) => { if (a) changePair(a, next) }}
@@ -152,15 +199,21 @@ export default function ComparePage() {
               onClick={() => { setScope(option); setSelectedId(null) }}>{option === 'cities' ? 'Города' : 'Регионы'}</button>
           ))}
         </div>
+        <select aria-label={activeScope === 'cities' ? 'Выбрать город' : 'Выбрать регион'} value={selectedId ?? ''}
+          onChange={(event) => {
+            const row = rows.find((item) => item.id === event.target.value)
+            if (row) selectRow(row)
+            else setSelectedId(null)
+          }}>
+          <option value="">{activeScope === 'cities' ? 'Все города' : 'Все регионы'}</option>
+          {[...rows].sort((left, right) => left.name.localeCompare(right.name, 'ru')).map((row) =>
+            <option value={row.id} key={row.id}>{row.name}</option>)}
+        </select>
         <div role="group" aria-label="Значения на карте">
+          <button className="btn" type="button" aria-pressed={activeMode === 'paired'}
+            onClick={() => { setMapB(null); setMode('paired') }} disabled={activeMode === 'paired'}>Два периода</button>
           <button className="btn" type="button" aria-pressed={activeMode === 'delta'}
-            disabled={!hasDelta} onClick={() => setMode('delta')}>Изменение</button>
-          <button className="btn" type="button" aria-pressed={activeMode === 'a'} disabled={!hasA} onClick={() => setMode('a')}>Период A</button>
-          <button className="btn" type="button" aria-pressed={activeMode === 'b'} disabled={!hasB} onClick={() => setMode('b')}>Период B</button>
-        </div>
-        <div className="compare-mobile-tabs" role="group" aria-label="Представление">
-          <button className="btn" type="button" aria-pressed={mobileView === 'list'} onClick={() => setMobileView('list')}>Список</button>
-          <button className="btn" type="button" aria-pressed={mobileView === 'map'} onClick={() => setMobileView('map')}>Карта</button>
+            disabled={!hasDelta} onClick={() => { setMapB(null); setMode('delta') }}>Изменение</button>
         </div>
       </div>
       {error && <p className="alert error" role="alert">{error}</p>}
@@ -168,6 +221,21 @@ export default function ComparePage() {
       {current && !rows.length && <p className="muted">Для выбранных периодов на этом уровне нет данных.</p>}
       {rows.some((row) => row.status === 'different_methods') &&
         <p className="compare-notice">Для оценок, рассчитанных по разным методикам, показаны A и B. Дельта скрыта.</p>}
+      <div className={`atlas-compare-pair${activeMode === 'delta' ? ' atlas-compare-delta' : ''}`}>
+        <ComparisonMap period={activeMode === 'delta' ? b : a} mode={activeMode === 'delta' ? 'delta' : 'a'}
+          scope={activeScope} rows={rows} selectedId={selectedId} onSelect={setSelectedId} onReady={setMapA} />
+        {activeMode === 'paired' && <ComparisonMap period={b} mode="b" scope={activeScope} rows={rows}
+          selectedId={selectedId} onSelect={setSelectedId} onReady={setMapB} />}
+      </div>
+      <div className="atlas-compare-legend">
+        {activeMode === 'paired' ? <>
+          <strong>Индекс настроения</strong>
+          <div><div className="legend-scale">{legend.map((item) => <span key={item.label} style={{ background: item.color }} />)}</div>
+            <div className="legend-labels"><span>0</span><span>50</span><span>100</span></div></div>
+          <label><input type="checkbox" checked={linked} onChange={(event) => setLinked(event.target.checked)} /> Связать карты</label>
+        </> : <p>Красный — снижение, синий — рост. Серый означает нулевое изменение или отсутствие сравнимой пары.</p>}
+      </div>
+      <BoundaryNote />
       {selected && (
         <section className="compare-detail" aria-label={'Подробности: ' + selected.name}>
           <h2>{selected.name} · {difference(selected)}{selected.delta !== null && ' п.'}</h2>
@@ -175,18 +243,7 @@ export default function ComparePage() {
           <ObservationDetails label="Период B" observation={selected.b} />
         </section>
       )}
-      <div className={'compare-workspace compare-show-' + mobileView}>
-        <section className="compare-map-view" aria-label="Карта сравнения">
-          <div className="map-shell">
-            <MapView values={values} mode={activeMode === 'delta' ? 'delta' : 'mood'}
-              year={(activeMode === 'a' ? a : b)?.year ?? null}
-              initialCenter={MAP_CENTER} onMapReady={setMap}
-              onRegionClick={activeScope === 'regions' ? setSelectedId : undefined} />
-          </div>
-          <p className="muted">{activeMode === 'delta' ? 'Красный − · синий + · серый: ноль или нет сравнимой пары. Точные значения — в списке.'
-            : 'Карта показывает оценки выбранного периода.'}</p>
-          <BoundaryNote />
-        </section>
+      <div className="atlas-compare-results">
         <section className="compare-list-view" aria-label="Результаты сравнения">
           <h2>{activeScope === 'cities' ? 'Города' : 'Регионы'} <span className="muted">· {rows.length}</span></h2>
           <ul className="compare-list">

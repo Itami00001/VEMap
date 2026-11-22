@@ -1,18 +1,30 @@
-import { useEffect, useRef, useState } from 'react'
+import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import type { FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { wiki } from '../services/wiki'
 import type { WikiSummary } from '../services/wiki'
+import { atlasArt } from '../features/atlasArt'
+
+const NewspaperThumbnail = lazy(() => import('../features/map/NewspaperThumbnail'))
+const WikiMapPreview = lazy(() => import('../features/map/WikiMapPreview'))
 
 const publishedDate = new Intl.DateTimeFormat('ru', { dateStyle: 'medium', timeZone: 'Europe/Moscow' })
 
 function PublicationTile({ article }: { article: WikiSummary }) {
   return (
     <Link to={`/wiki/${article.id}`} className="wiki-tile">
-      <time dateTime={article.date}>{publishedDate.format(new Date(article.date))}</time>
-      <h2>{article.title}</h2>
-      <p>{article.summary}</p>
-      <footer><span>PDF · {article.file_count}</span><span>{article.processing === 'ready' ? `Точек · ${article.point_count}` : 'Карта готовится'}</span></footer>
+      <Suspense fallback={<div className="atlas-pdf-thumb" aria-hidden="true">PDF</div>}>
+        {article.file_count > 0 && <NewspaperThumbnail url={wiki.pdf(article.id, 0)} />}
+      </Suspense>
+      <div className="atlas-wiki-tile-copy">
+        <time dateTime={article.date}>{publishedDate.format(new Date(article.date))}</time>
+        <h2>{article.title}</h2>
+        <p>{article.summary}</p>
+        <footer><span>PDF · {article.file_count}</span><span>{article.processing === 'ready' ? `Точек · ${article.point_count}` : 'Карта готовится'}</span></footer>
+        <strong>Открыть публикацию <span aria-hidden="true">↗</span></strong>
+      </div>
+      {article.processing === 'ready' && article.point_count > 0 &&
+        <Suspense fallback={null}><WikiMapPreview id={article.id} /></Suspense>}
     </Link>
   )
 }
@@ -99,11 +111,14 @@ export default function WikiPage() {
   }, [reload, before])
 
   return (
-    <div className="page wiki-page">
+    <div className="page atlas-page wiki-page">
       <header className="wiki-header">
-        <div><h1>VEMap Wiki</h1><p>Газеты и карты, собранные читателями архива.</p></div>
-        <button className="btn primary" type="button" disabled={!catalogue?.accepting || creating}
-          onClick={() => { setReceipt(null); setCreating(true) }}>Создать статью</button>
+        <div className="atlas-page-heading"><h1>VEMap Wiki</h1><p>Газеты и карты от участников проекта.</p></div>
+        <div className="atlas-wiki-create">
+          <img src={atlasArt('folder.webp')} alt="" />
+          <button className="btn primary" type="button" disabled={!catalogue?.accepting || creating}
+            onClick={() => { setReceipt(null); setCreating(true) }}>Создать статью</button>
+        </div>
       </header>
       {receipt && <div className="wiki-receipt" role="status">
         <strong>Статья отправлена на рассмотрение.</strong>

@@ -1,33 +1,49 @@
 import { Link } from 'react-router-dom'
+import { atlasArt } from '../features/atlasArt'
+import { moodLegend } from '../features/map/legend'
+
+const steps = [
+  ['Оцифровка', 'Распознаём текст архивных газет. За фрагментом сохраняется ссылка на страницу PDF.', 'folder.webp'],
+  ['Анализ текста', 'Связываем публикации с городами и датами и оцениваем тональность распознанных фрагментов.', 'reader.webp'],
+  ['Карта настроений', 'Показываем оценки за доступные периоды. Из карточки города можно открыть оригинал.', 'compare.webp'],
+]
 
 export default function AboutPage() {
   return (
-    <div className="page archive-about">
-      <div className="page-head">
-        <div>
-          <h1>О проекте</h1>
-          <p>VEMap помогает исследовать историческую прессу по городам и времени.</p>
+    <div className="page atlas-page atlas-about">
+      <section className="atlas-about-intro">
+        <div className="atlas-page-heading">
+          <h1>О проекте VEMap</h1>
+          <p>Оцифровываем исторические газеты и наносим тон публикаций на карту.</p>
+          <Link to="/map" className="btn primary">Открыть карту</Link>
         </div>
-      </div>
-      <section className="archive-method">
-        <div>
-          <h2>От скана до карты</h2>
-          <p>Распознанные фрагменты связываются с упомянутыми городами и датами. Там, где есть привязка к выпуску, из сводки можно перейти к странице оригинала.</p>
-        </div>
-        <div>
-          <h2>Как читать оценки</h2>
-          <p>Mood Index показывает тональность материалов по шкале от 0 до 100. Оценки зависят от состава корпуса и качества OCR. Серый маркер означает, что за выбранный период нет оценки.</p>
-        </div>
-        <div>
-          <h2>Как работает чат</h2>
-          <p>Вы выбираете город и выпуск. Чат использует распознанный текст этого PDF. Контекст может быть ограничен размером выпуска и качеством распознавания.</p>
-        </div>
-        <div>
-          <h2>Границы и даты</h2>
-          <p>Карта показывает доступные исторические слои. С октября 2022 года отдельный пунктир обозначает административные контуры четырёх областей по законодательству РФ. Источники геометрии и пояснение доступны под картой.</p>
+        <div className="atlas-about-art" aria-hidden="true">
+          <img src={atlasArt('compare.webp')} alt="" />
+          <img src={atlasArt('reader.webp')} alt="" />
         </div>
       </section>
-      <Link to="/map" className="btn primary">Открыть карту</Link>
+      <section className="atlas-about-steps" aria-label="Как устроен VEMap">
+        {steps.map(([title, description, art]) => <article key={title}>
+          <img src={atlasArt(art)} alt="" />
+          <div><h2>{title}</h2><p>{description}</p></div>
+        </article>)}
+      </section>
+      <section className="atlas-about-index">
+        <h2>Как читать индекс</h2>
+        <div>
+          <div className="legend-scale">{moodLegend().map((item) => <span key={item.label} style={{ background: item.color }} />)}</div>
+          <div className="legend-labels"><span>0</span><span>50</span><span>100</span></div>
+        </div>
+        <p>Индекс описывает тон материалов в выборке. При сравнении учитывайте её объём, методику расчёта и качество распознавания.</p>
+      </section>
+      <section className="atlas-about-details">
+        <details><summary>Как работает чат по выпуску</summary>
+          <p>Модель отвечает по подобранным фрагментам выбранного PDF. По ссылкам в ответе можно открыть страницы и сверить вывод.</p>
+        </details>
+        <details><summary>Границы и даты</summary>
+          <p>Карта использует доступные исторические слои. Источники геометрии и пояснения доступны в разделе «Легенда» на карте.</p>
+        </details>
+      </section>
     </div>
   )
 }

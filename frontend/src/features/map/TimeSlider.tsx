@@ -13,6 +13,12 @@ export function formatPeriod(p: TimePeriod): string {
 
 const monthName = new Intl.DateTimeFormat('ru-RU', { month: 'long', timeZone: 'UTC' })
 
+export function formatPeriodTitle(period: TimePeriod): string {
+  if (period.month === null) return String(period.year)
+  const month = monthName.format(new Date(Date.UTC(2000, period.month - 1, 1)))
+  return month.charAt(0).toUpperCase() + month.slice(1) + ' ' + period.year
+}
+
 export default function TimeSlider({ periods, value, onChange }: TimeSliderProps) {
   const index = periods.findIndex((p) => p.year === value?.year && p.month === value?.month)
   if (!value || index === -1) return <div className="year-slider muted">Нет доступных периодов</div>
@@ -22,7 +28,7 @@ export default function TimeSlider({ periods, value, onChange }: TimeSliderProps
   const ticks = periods.flatMap((period, position) =>
     position % interval === 0 || position === last ? [{ period, position }] : [])
   const progress = last > 0 ? index / last * 100 : 0
-  const label = value.month === null ? value.year : `${monthName.format(new Date(Date.UTC(2000, value.month - 1, 1)))} ${value.year}`
+  const label = formatPeriodTitle(value)
 
   return (
     <div className="time-slider" role="group" aria-label="Периоды карты">
