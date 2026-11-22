@@ -1,7 +1,7 @@
 import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import type { FormEvent } from 'react'
 import { api, askNewspaper, NewspaperChatError, newspaperUrl } from '../../services/api'
-import type { ChatProvider, NewspaperChatMessage, NewspaperCatalog } from '../../services/api'
+import type { ChatCredentials, ChatProvider, NewspaperChatMessage, NewspaperCatalog } from '../../services/api'
 
 const NewspaperReader = lazy(() => import('./NewspaperReader'))
 const ChatMarkdown = lazy(() => import('./ChatMarkdown'))
@@ -29,6 +29,9 @@ export default function NewspaperChat({ open, selection, onSelect, catalog, cata
   const [providers, setProviders] = useState<ChatProvider[] | null>(null)
   const [providersError, setProvidersError] = useState(false)
   const [providerId, setProviderId] = useState('local')
+  const [keyMode, setKeyMode] = useState<string | null>(null)
+  const [personalKeys, setPersonalKeys] = useState<Record<string, string>>({})
+  const [folderId, setFolderId] = useState('')
   const [citySearch, setCitySearch] = useState('')
   const [issueSearch, setIssueSearch] = useState('')
   const [compactFor, setCompactFor] = useState<string | null>(null)
@@ -43,7 +46,7 @@ export default function NewspaperChat({ open, selection, onSelect, catalog, cata
     api.getChatProviders(controller.signal).then((items) => {
       if (controller.signal.aborted) return
       setProviders(items)
-      setProviderId((current) => items.some((item) => item.id === current && item.available)
+      setProviderId((current) => items.some((item) => item.id === current && (item.available || item.accepts_personal_key))
         ? current
         : items.find((item) => item.available)?.id ?? items[0]?.id ?? '')
     }).catch(() => {
@@ -58,6 +61,14 @@ export default function NewspaperChat({ open, selection, onSelect, catalog, cata
   const sources = selection?.cityId === ARCHIVE ? catalog?.archive : city?.sources
   const issue = sources?.find((item) => item.id === selection?.filename)
   const provider = providers?.find((item) => item.id === providerId)
+  const usePersonalKey = Boolean(provider?.accepts_personal_key && (keyMode === providerId || !provider.available))
+  const apiKey = personalKeys[providerId]?.trim() ?? ''
+  const folder = folderId.trim()
+  const validCredentials = /^[!-~]{1,512}$/.test(apiKey) && (providerId !== 'yandex' || /^[a-z0-9]{1,64}$/.test(folder))
+  const credentials = usePersonalKey && validCredentials
+    ? { apiKey, folderId: providerId === 'yandex' ? folder : undefined }
+    : undefined
+  const readyProvider = (usePersonalKey ? Boolean(credentials) : provider?.available) ? provider : null
   const conversation = JSON.stringify([selection?.filename, providerId])
   const compact = conversation === compactFor
   const model = actualModel?.conversation === conversation ? actualModel.name : provider?.model
@@ -81,16 +92,44 @@ export default function NewspaperChat({ open, selection, onSelect, catalog, cata
       )}
       <div className="newspaper-catalog" id="chat-settings" hidden={compact}>
         <label>AI-провайдер
-          <select value={providerId} disabled={!providers?.some((item) => item.available)}
+          <select value={providerId} disabled={!providers?.some((item) => item.available || item.accepts_personal_key)}
             onChange={(event) => setProviderId(event.target.value)}>
             {!providers && <option value={providerId}>Провайдеры недоступны</option>}
             {providers?.map((item) => (
-              <option key={item.id} value={item.id} disabled={!item.available}>
-                {item.label}{item.available ? '' : ` · ${item.reason ?? 'Недоступен'}`}
+              <option key={item.id} value={item.id} disabled={!item.available && !item.accepts_personal_key}>
+                {item.label}{item.available ? '' : item.accepts_personal_key ? ' · нужен личный ключ' : ` · ${item.reason ?? 'Недоступен'}`}
               </option>
             ))}
           </select>
         </label>
+        {provider?.accepts_personal_key && provider.available && (
+          <button type="button" className="btn" aria-pressed={usePersonalKey}
+            onClick={() => setKeyMode(usePersonalKey ? null : providerId)}>
+            {usePersonalKey ? 'Переключиться на ключ VEMap' : 'Использовать свой API-ключ'}
+          </button>
+        )}
+        {usePersonalKey && (
+          <>
+            <label>Личный API-ключ
+              <input type="password" autoComplete="off" spellCheck={false} maxLength={512}
+                value={personalKeys[providerId] ?? ''}
+                onChange={(event) => {
+                  const value = event.target.value
+                  setPersonalKeys((keys) => ({ ...keys, [providerId]: value }))
+                }} />
+            </label>
+            {providerId === 'yandex' && (
+              <label>ID каталога Yandex Cloud
+                <input type="text" autoComplete="off" spellCheck={false} maxLength={64}
+                  value={folderId} onChange={(event) => setFolderId(event.target.value)} />
+              </label>
+            )}
+            <a href={providerId === 'yandex'
+              ? 'https://yandex.cloud/ru/docs/iam/operations/authentication/manage-api-keys'
+              : 'https://console.groq.com/keys'} target="_blank" rel="noreferrer">Где получить ключ</a>
+            <small>Ключ действует до обновления страницы и не сохраняется на сайте.</small>
+          </>
+        )}
         <label>Найти город
           <input type="search" value={citySearch} onChange={(event) => setCitySearch(event.target.value)}
             placeholder="Название города" />
@@ -131,19 +170,20 @@ export default function NewspaperChat({ open, selection, onSelect, catalog, cata
       {city && !city.sources.length && <p className="muted">Для этого города пока нет связанных выпусков. Откройте весь архив.</p>}
       {providersError && <p role="alert">Список провайдеров не загрузился. Откройте чат снова.</p>}
       {!providers && !providersError && <p role="status" className="muted">Проверяем настройки провайдеров…</p>}
-      {provider && !provider.available && <p className="muted">{provider.label}: {provider.reason}</p>}
+      {provider && !provider.available && !provider.accepts_personal_key && <p className="muted">{provider.label}: {provider.reason}</p>}
       {catalogError && <p role="alert">Каталог не загрузился. Закройте чат и откройте его снова.</p>}
       {!catalog && !catalogError && <p role="status" className="muted">Загружаем каталог…</p>}
       {catalog?.archive.length === 0 && <p className="muted">В архиве пока нет выпусков.</p>}
       <ChatConversation key={conversation} open={open} sourcePdf={issue?.available ? issue.id : null}
-        provider={provider?.available ? provider : null}
+        provider={readyProvider ?? null} credentials={credentials}
         onSend={() => setCompactFor(conversation)} onModel={(name) => setActualModel({ conversation, name })} />
     </aside>
   )
 }
 
-function ChatConversation({ open, sourcePdf, provider, onSend, onModel }: {
+function ChatConversation({ open, sourcePdf, provider, credentials, onSend, onModel }: {
   open: boolean; sourcePdf: string | null; provider: ChatProvider | null
+  credentials: ChatCredentials | undefined
   onSend: () => void; onModel: (model: string) => void
 }) {
   const [messages, setMessages] = useState<NewspaperChatMessage[]>([])
@@ -179,7 +219,7 @@ function ChatConversation({ open, sourcePdf, provider, onSend, onModel }: {
     }
     try {
       const history = messages.slice(-8).map(({ role, content }) => ({ role, content: content.slice(0, 6000) }))
-      const answer = await askNewspaper(text, sourcePdf, provider.id, history, controller.signal)
+      const answer = await askNewspaper(text, sourcePdf, provider.id, history, controller.signal, credentials)
       if (!controller.signal.aborted) {
         onModel(answer.model)
         setMessages([...next, { role: 'assistant', content: answer.answer, pages: answer.pages }])
@@ -198,6 +238,9 @@ function ChatConversation({ open, sourcePdf, provider, onSend, onModel }: {
           break
         case 503:
           setError({ title: 'Провайдер недоступен', detail: failure instanceof NewspaperChatError ? failure.message : '' })
+          break
+        case 422:
+          setError({ title: 'Текст выпуска недоступен', detail: failure instanceof NewspaperChatError ? failure.message : '' })
           break
         default:
           setError({

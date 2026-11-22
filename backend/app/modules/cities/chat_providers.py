@@ -19,6 +19,7 @@ class ProviderStatus(BaseModel):
     available: bool
     reason: str | None = None
     model: str
+    accepts_personal_key: bool = False
 
 
 @dataclass(frozen=True)
@@ -69,7 +70,7 @@ def groq_completion(key: str, model: str, messages: Messages) -> Completion:
 
 def local_completion(url: str, model: str, messages: Messages) -> Completion:
     result = request_completion(f"{url.rstrip('/')}/v1/chat/completions", {}, {
-        "model": model, "messages": messages, "max_tokens": 128, "temperature": 0.2,
+        "model": model, "messages": messages, "max_tokens": 224, "temperature": 0.2,
     }, timeout=95)
     return Completion(result["choices"][0]["message"]["content"], model_label(result.get("model") or model))
 

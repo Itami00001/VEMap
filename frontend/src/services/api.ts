@@ -45,6 +45,12 @@ export interface ChatProvider {
   available: boolean
   reason: string | null
   model: string
+  accepts_personal_key?: boolean
+}
+
+export interface ChatCredentials {
+  apiKey: string
+  folderId?: string
 }
 
 interface ChatAnswer {
@@ -68,10 +74,16 @@ export async function askNewspaper(
   provider: string,
   history: NewspaperChatMessage[],
   signal: AbortSignal,
+  credentials?: ChatCredentials,
 ): Promise<ChatAnswer> {
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' }
+  if (credentials) {
+    headers['X-VEMap-Provider-Key'] = credentials.apiKey
+    if (credentials.folderId) headers['X-VEMap-Yandex-Folder'] = credentials.folderId
+  }
   const response = await fetch(`${BASE_URL}/api/chat`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers,
     body: JSON.stringify({ question, source_pdf: sourcePdf, provider, history }),
     signal,
   })
