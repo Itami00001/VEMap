@@ -107,6 +107,7 @@
 .atlas-home-hero h1 { max-width: 14ch; }
 .atlas-home-hero p { max-width: 36ch; }
 .atlas-home-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 12px 20px; margin-top: 24px; }
+.atlas-home-actions .btn.primary { padding: 11px 17px; font-weight: 700; }
 .atlas-home-actions > a:not(.btn) { text-decoration: underline; text-underline-offset: 5px; font-weight: 650; }
 .atlas-home-preview {
   position: relative;
@@ -136,12 +137,12 @@
 .atlas-home-folio img { display: block; width: 100%; aspect-ratio: .9; object-fit: cover; object-position: top; }
 .atlas-home-features { display: grid; gap: 14px; grid-template-columns: repeat(3, minmax(0, 1fr)); margin-top: clamp(18px, 3vw, 36px); }
 .atlas-feature {
-  display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, .8fr); align-items: center; gap: 10px;
+  display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, .65fr); align-items: center; gap: 10px;
   padding: clamp(14px, 2vw, 25px); border: 1px solid var(--border); border-radius: 10px; color: var(--text);
   background: var(--panel);
 }
 .atlas-feature:hover { border-color: var(--accent); text-decoration: none; }
-.atlas-feature h2 { font-size: clamp(1.21rem, 2.3vw, 1.85rem); margin-bottom: 9px; overflow-wrap: anywhere; }
+.atlas-feature h2 { font-size: clamp(1.18rem, 2vw, 1.67rem); margin-bottom: 9px; hyphens: auto; overflow-wrap: break-word; }
 .atlas-feature strong { color: var(--accent); font-size: .88rem; }
 .atlas-feature img { display: block; width: 100%; max-height: 150px; object-fit: contain; }
 
