@@ -112,6 +112,8 @@
 .atlas-home-preview {
   position: relative;
   isolation: isolate;
+  width: 100%;
+  min-width: 0;
   min-height: 320px;
   aspect-ratio: 1.58;
   overflow: hidden;
