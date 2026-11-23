@@ -6,7 +6,8 @@ import type { ChatCredentials, ChatProvider, NewspaperChatMessage, NewspaperCata
 const NewspaperReader = lazy(() => import('./NewspaperReader'))
 const ChatMarkdown = lazy(() => import('./ChatMarkdown'))
 const ARCHIVE = 'archive'
-const DEMO = 'bucharest-demo'
+const BUCHAREST_DEMO = 'bucharest-demo'
+const PETROGRAD_DEMO = 'petrograd-demo'
 
 interface NewspaperChatProps {
   open: boolean
@@ -30,7 +31,7 @@ export default function NewspaperChat({ open, selection, onSelect, catalog, cata
   const [providers, setProviders] = useState<ChatProvider[] | null>(null)
   const [providersError, setProvidersError] = useState(false)
   const [providerId, setProviderId] = useState('local')
-  const [demo, setDemo] = useState(false)
+  const [demo, setDemo] = useState<typeof BUCHAREST_DEMO | typeof PETROGRAD_DEMO | null>(null)
   const [keyMode, setKeyMode] = useState<string | null>(null)
   const [personalKeys, setPersonalKeys] = useState<Record<string, string>>({})
   const [folderId, setFolderId] = useState('')
@@ -81,7 +82,7 @@ export default function NewspaperChat({ open, selection, onSelect, catalog, cata
       onKeyDown={(event) => { if (event.key === 'Escape') onClose() }}>
       <header className="newspaper-chat-header">
         <ChatAvatar role="assistant" />
-        <h2 id="newspaper-chat-title">{demo ? 'Демо-диалог по газете' : `Чат с ${model || 'ИИ'}`}</h2>
+        <h2 id="newspaper-chat-title">{demo === PETROGRAD_DEMO ? 'Демо-поиск по архиву' : demo ? 'Демо-диалог по газете' : `Чат с ${model || 'ИИ'}`}</h2>
         <button ref={closeRef} type="button" className="nav-icon" aria-label="Закрыть чат" onClick={onClose}>
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" /></svg>
         </button>
@@ -94,10 +95,14 @@ export default function NewspaperChat({ open, selection, onSelect, catalog, cata
       )}
       <div className="newspaper-catalog" id="chat-settings" hidden={compact}>
         <label>AI-провайдер
-          <select value={demo ? DEMO : providerId} onChange={(event) => {
+          <select value={demo ?? providerId} onChange={(event) => {
             const chosen = event.target.value
-            setDemo(chosen === DEMO)
-            if (chosen !== DEMO) setProviderId(chosen)
+            if (chosen === BUCHAREST_DEMO || chosen === PETROGRAD_DEMO) {
+              setDemo(chosen)
+            } else {
+              setDemo(null)
+              setProviderId(chosen)
+            }
           }}>
             {!providers && <option value={providerId} disabled>Провайдеры недоступны</option>}
             {providers?.map((item) => (
@@ -105,7 +110,8 @@ export default function NewspaperChat({ open, selection, onSelect, catalog, cata
                 {item.label}{item.available ? '' : item.accepts_personal_key ? ' · нужен личный ключ' : ` · ${item.reason ?? 'Недоступен'}`}
               </option>
             ))}
-            <option value={DEMO}>Газета Бухарестъ · Ноябрь 1900 (демо)</option>
+            <option value={BUCHAREST_DEMO}>Газета Бухарестъ · Ноябрь 1900 (демо)</option>
+            <option value={PETROGRAD_DEMO}>Поиск газет · Петроград, март 1917 (демо)</option>
           </select>
         </label>
         {!demo && <>
@@ -175,7 +181,8 @@ export default function NewspaperChat({ open, selection, onSelect, catalog, cata
           </label>
         </>}
       </div>
-      {demo && <BucharestDemo />}
+      {demo === BUCHAREST_DEMO && <ArchiveDemo key={demo} messages={bucharestConversation} sourcePdf={BUCHAREST_PDF} />}
+      {demo === PETROGRAD_DEMO && <ArchiveDemo key={demo} messages={petrogradConversation} />}
       <div style={{ display: demo ? 'none' : 'contents' }}>
         {city && !city.sources.length && <p className="muted">Для этого города пока нет связанных выпусков. Откройте весь архив.</p>}
         {providersError && <p role="alert">Список провайдеров не загрузился. Откройте чат снова.</p>}
@@ -206,12 +213,32 @@ const bucharestConversation: NewspaperChatMessage[] = [
   },
 ]
 
-function BucharestDemo() {
+const petrogradConversation: NewspaperChatMessage[] = [
+  { role: 'user', content: 'Найди газеты о Петрограде за март 1917 года. Что тогда происходило в городе и с какого выпуска лучше начать?' },
+  {
+    role: 'assistant',
+    content: `В архиве VEMap есть три выпуска, по которым можно проследить, как газеты описывали первые недели после Февральской революции. Даты ниже указаны так, как они напечатаны в газетах, по старому стилю.
+
+### Что почитать
+
+1. **«День», 8 марта.** На первой полосе автор выступает за отмену смертной казни и пишет, что такой призыв должен прозвучать в Петрограде. Это взгляд из столичной газеты на то, чего ждали от революции. [Открыть стр. 1](https://vemap.ru/api/newspapers/33e7239e-5ca2-540c-8eb8-1475f2342d34#page=1)
+2. **«Приамурские ведомости», № 2543 от 14 марта.** В телеграммах из Петрограда сообщают о новой присяге на верность Российскому государству и о решении Временного правительства лишить свободы Николая II и Александру Фёдоровну. [Открыть стр. 5](https://vemap.ru/api/newspapers/e7cb12f4-048e-56d5-aeec-2d61b31dc34d#page=5)
+3. **«Приамурские ведомости», № 2544 от 16 марта.** Газета сообщает, что представители Всероссийского крестьянского союза обратились одновременно к главе Временного правительства и к Петроградскому совету. [Открыть стр. 2](https://vemap.ru/api/newspapers/ac1e6a6f-ef1b-5827-b236-a2789c659de6#page=2)
+
+### Что видно по этим выпускам
+
+После отречения Николая II в столице действовали Временное правительство и Петроградский совет. Эти выпуски показывают, как перемены отразились в прессе: обсуждали отмену смертной казни, публиковали новую присягу и сообщали, к кому обращались общественные организации. [Историческая справка Президентской библиотеки](https://www.prlib.ru/history/619088)
+
+**Если читать только один выпуск**, начните с [«Приамурских ведомостей» от 14 марта, стр. 5](https://vemap.ru/api/newspapers/e7cb12f4-048e-56d5-aeec-2d61b31dc34d#page=5). На одной странице видны и текст новой присяги, и новости о судьбе бывшего императора.`,
+  },
+]
+
+function ArchiveDemo({ messages, sourcePdf }: { messages: NewspaperChatMessage[]; sourcePdf?: string }) {
   const [page, setPage] = useState<number | null>(null)
   return <>
-    <p className="muted"><strong>Демо</strong> · Подготовленный диалог по архивному выпуску.</p>
+    <p className="muted"><strong>Демо</strong> · Подготовленный ответ по архиву VEMap.</p>
     <ol className="newspaper-chat-history" aria-label="Демонстрационный диалог">
-      {bucharestConversation.map(({ role, content, pages }, index) => (
+      {messages.map(({ role, content, pages }, index) => (
         <li key={index} className={`newspaper-chat-message ${role}`}>
           <ChatAvatar role={role} />
           {role === 'user' ? <p aria-label="Вы">{content}</p> : (
@@ -222,15 +249,15 @@ function BucharestDemo() {
         </li>
       ))}
     </ol>
-    {page !== null && (
+    {sourcePdf && page !== null && (
       <section className="chat-source-preview" aria-label="Газетная страница">
         <button className="btn" type="button" onClick={() => setPage(null)}>Закрыть PDF</button>
         <Suspense fallback={<p role="status">Загружаем просмотрщик…</p>}>
-          <NewspaperReader key={page} url={newspaperUrl(BUCHAREST_PDF, page)} initialPage={page} />
+          <NewspaperReader key={page} url={newspaperUrl(sourcePdf, page)} initialPage={page} />
         </Suspense>
       </section>
     )}
-    <a href={newspaperUrl(BUCHAREST_PDF, 4)} target="_blank" rel="noreferrer">Открыть оригинал газеты, стр. 4 ↗</a>
+    {sourcePdf && <a href={newspaperUrl(sourcePdf, 4)} target="_blank" rel="noreferrer">Открыть оригинал газеты, стр. 4 ↗</a>}
   </>
 }
 
