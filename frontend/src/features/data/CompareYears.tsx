@@ -1,5 +1,6 @@
 import type { TimePeriod } from '../../types'
 import { periodLabel } from './Filters'
+import { formatPeriodTitle } from '../map/TimeSlider'
 
 export interface CompareYearsProps {
   periods: TimePeriod[]
@@ -22,7 +23,7 @@ function Select({ label, periods, value, onChange }: { label: string; periods: T
         }}
       >
         {periods.map((p) => (
-          <option key={periodLabel(p)} value={periodLabel(p)}>{periodLabel(p)}</option>
+          <option key={periodLabel(p)} value={periodLabel(p)}>{p.month === 0 ? formatPeriodTitle(p) : periodLabel(p)}</option>
         ))}
       </select>
     </label>

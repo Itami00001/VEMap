@@ -24,6 +24,7 @@ export interface MapViewProps {
   mini?: boolean
   interactive?: boolean
   year?: number | null
+  month?: number | null
   initialCenter?: [number, number]
   onRegionClick?: (regionId: string, point: { x: number; y: number }) => void
   onBackgroundClick?: () => void
@@ -39,10 +40,17 @@ const LAND_FILL = '#424953'
 const CLAIMS_GEOJSON_URL = `${import.meta.env.BASE_URL}data/geo/russian-claims-2022.geojson`
 const isCrimea: Expression = ['in', ['get', 'region_id'], ['literal', ['RU-CR', 'RU-SEV']]]
 
-export function BoundaryNote() {
+export function BoundaryNote({ historical = false }: { historical?: boolean }) {
   return (
     <p className="map-boundary-note muted">
-      Подложка для всех периодов показывает границы в российской трактовке.{' '}
+      {historical && <>
+        Исторический контур — на середину месяца или конец года.{' '}
+        <a href="https://icr.ethz.ch/data/cshapes/" target="_blank" rel="noreferrer">CShapes 2.0</a>
+        {' · '}
+        <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noreferrer">CC BY-NC-SA 4.0</a>
+        {'. '}
+      </>}
+      {historical ? 'Остальные контуры взяты с современной подложки в российской трактовке. ' : 'Границы подложки показаны в российской трактовке. '}
       <a href="https://digitallibrary.un.org/record/3990673?ln=ru" target="_blank" rel="noreferrer">Резолюция ГА ООН ES-11/4</a>
       {' · '}
       <a href="https://www.geoboundaries.org/api/current/gbOpen/UKR/ADM1/" target="_blank" rel="noreferrer">geoBoundaries</a>
@@ -59,12 +67,12 @@ function regionsLinePaint(dimCrimea: boolean) {
   }
 }
 
-function fillColorExpr(mode: MapMode): Expression {
+function fillColorExpr(mode: MapMode, historical = false): Expression {
   const stops = mode === 'mood'
     ? MOOD_STOPS
     : [-100, '#f46464', -25, '#b74652', 0, '#687685', 25, '#427be5', 100, '#76b7ff']
   const value = ['get', 'value']
-  return ['case', ['==', value, null], ['case', isCrimea, RUSSIA_FILL, 'transparent'],
+  return ['case', ['==', value, null], historical ? 'transparent' : ['case', isCrimea, RUSSIA_FILL, 'transparent'],
     ['interpolate', ['linear'], value, ...stops]]
 }
 
@@ -95,6 +103,7 @@ export default function MapView({
   mini = false,
   interactive = true,
   year = null,
+  month = null,
   initialCenter = DEFAULT_CENTER,
   onRegionClick,
   onBackgroundClick,
@@ -103,7 +112,9 @@ export default function MapView({
   const containerRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<maplibregl.Map | null>(null)
   const [mapInstance, setMapInstance] = useState<maplibregl.Map | null>(null)
-  const historical = useHistoricalBorders(year)
+  const historical = useHistoricalBorders(year, month)
+  const historicalMap = historical?.historical === true
+  const imperial = historical?.imperial === true
   const dimCrimea = historical !== null && !historical.keepModernHighlight
   const baseRef = useRef<GeoCollection | null>(null)
   const valuesRef = useRef(values)
@@ -247,20 +258,39 @@ export default function MapView({
     const source = map.getSource('regions') as maplibregl.GeoJSONSource | undefined
     if (!source) return
     source.setData(applyValues(base, values))
-    map.setPaintProperty('regions-fill', 'fill-color', fillColorExpr(mode) as never)
-  }, [values, mode])
+    map.setPaintProperty('regions-fill', 'fill-color', fillColorExpr(mode, historicalMap) as never)
+  }, [values, mode, historicalMap])
 
   useEffect(() => {
     if (!mapInstance) return
     const { color, width } = regionsLinePaint(dimCrimea)
     mapInstance.setPaintProperty('regions-line', 'line-color', color)
     mapInstance.setPaintProperty('regions-line', 'line-width', width)
-  }, [mapInstance, dimCrimea])
+    mapInstance.setPaintProperty('countries-fill', 'fill-color', historicalMap ? LAND_FILL :
+      ['match', ['get', 'ISO_A3'], 'RUS', RUSSIA_FILL, LAND_FILL])
+    mapInstance.setPaintProperty('countries-line', 'line-width',
+      ['match', ['get', 'ISO_A3'], 'RUS', historicalMap ? 0 : 2, 1])
+    mapInstance.setLayoutProperty('russian-claims-fill', 'visibility', historicalMap ? 'none' : 'visible')
+    mapInstance.setLayoutProperty('russian-claims-line', 'visibility', historicalMap ? 'none' : 'visible')
+    mapInstance.setPaintProperty('regions-fill', 'fill-color', fillColorExpr(modeRef.current, historicalMap) as never)
+  }, [mapInstance, dimCrimea, historicalMap])
+
+  useEffect(() => {
+    if (!mapInstance || !imperial) return
+    const emblem = document.createElement('img')
+    emblem.src = import.meta.env.BASE_URL + 'atlas/imperial-arms.webp'
+    emblem.alt = 'Герб Российской империи'
+    emblem.className = 'atlas-imperial-arms'
+    emblem.draggable = false
+    const marker = new maplibregl.Marker({ element: emblem }).setLngLat([66, 61]).addTo(mapInstance)
+    return () => { marker.remove() }
+  }, [imperial, mapInstance])
 
   return (
     <>
       <div ref={containerRef} className={`map-canvas${mini ? ' mini' : ''}`} />
-      <HistoricalBordersLayer map={mapInstance} url={historical?.geojsonUrl ?? null} beforeId="russian-claims-fill" />
+      <HistoricalBordersLayer map={mapInstance} url={historical?.geojsonUrl ?? null}
+        beforeId={historicalMap ? 'russian-claims-line' : 'russian-claims-fill'} historical={historicalMap} />
     </>
   )
 }

@@ -17,6 +17,7 @@ from app.modules.cities.model import City
 from app.modules.cities.mood_model import CityMoodRecord
 from app.modules.cities.source_model import CityMoodSource
 from import_csv_moods import CANONICAL, SCORING_VERSION
+from newspaper_corpus import document_key, load_corpus, merge_corpus, regional_lookup
 
 EXAMPLES_DIR = Path(__file__).resolve().parents[2] / "data" / "examples"
 ALIASES = {"петербургъ": "санкт-петербург", "саратовъ": "саратов"}
@@ -45,11 +46,12 @@ def period_key(row):
     return place_key(row), int(row["year"]), int(row["month"])
 
 
-def collect_data():
+def collect_data(superseded=()):
     places = {}
     articles = defaultdict(list)
     article_sources = defaultdict(set)
     summaries = {}
+    replaced = set()
 
     def remember_place(row):
         name = place_key(row)
@@ -67,8 +69,11 @@ def collect_data():
     for row in read_csv("articles.csv"):
         remember_place(row)
         key = period_key(row)
-        articles[key].append(float(row["score"]))
         filename = (row.get("source_pdf") or row.get("source_file") or "").strip()
+        if document_key(filename) in superseded:
+            replaced.add(key)
+            continue
+        articles[key].append(float(row["score"]))
         page_text = (row.get("source_page") or row.get("page") or "").strip()
         if filename and page_text:
             page = int(page_text)
@@ -82,6 +87,8 @@ def collect_data():
 
     for row in read_csv("map_data.csv"):
         remember_place(row)
+        if period_key(row) in replaced:
+            continue
         score = float(row["score_mean"])
         summaries[period_key(row)] = score, (score + 1) / 2, int(row["n"]), "map_data"
 
@@ -130,7 +137,16 @@ def collect_data():
 
 
 def main():
-    cities, moods, sources = collect_data()
+    baseline = collect_data()
+    archive_dir = EXAMPLES_DIR / "newspaper_archive"
+    cities, moods, sources = baseline
+    if (archive_dir / "site_data.csv").is_file():
+        corpus = load_corpus(archive_dir)
+        superseded = {document_key(row["source"]) for row in corpus}
+        cities, moods, sources = merge_corpus(
+            corpus, *collect_data(superseded), list(read_csv("articles.csv")), CANONICAL,
+            regional_lookup(EXAMPLES_DIR.parent / "geo" / "russia-regions.geojson"),
+        )
     if not moods:
         raise ValueError("No city moods found in the source CSVs")
 
@@ -138,6 +154,15 @@ def main():
         City.__table__, CityMoodRecord.__table__, CityMoodSource.__table__,
     ])
     with SessionLocal.begin() as db:
+        expected = {(mood["city_id"], mood["year"], mood["month"]) for mood in moods}
+        old_keys = {(mood["city_id"], mood["year"], mood["month"]) for mood in baseline[1]}
+        obsolete = old_keys - expected
+        if obsolete:
+            db.execute(delete(CityMoodRecord).where(
+                tuple_(CityMoodRecord.city_id, CityMoodRecord.year, CityMoodRecord.month).in_(obsolete),
+                CityMoodRecord.scoring_version == SCORING_VERSION,
+                CityMoodRecord.source.in_(("articles", "map_data", "archive_fragments", "archive_merged")),
+            ))
         db.execute(
             insert(City).values(list(cities.values())).on_conflict_do_nothing(
                 index_elements=["city_id"]
@@ -155,7 +180,7 @@ def main():
         )
         db.execute(delete(CityMoodSource).where(
             tuple_(CityMoodSource.city_id, CityMoodSource.year, CityMoodSource.month).in_(
-                [(mood["city_id"], mood["year"], mood["month"]) for mood in moods]
+                expected | old_keys
             )
         ))
         if sources:

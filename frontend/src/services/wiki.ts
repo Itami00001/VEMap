@@ -24,6 +24,7 @@ export interface WikiArticle extends WikiSummary {
   body: string
   files: Array<{ name: string; size: number }>
   points: WikiPoint[]
+  has_transcript?: boolean
 }
 
 interface WikiCatalogue {
@@ -52,4 +53,5 @@ export const wiki = {
   pdf: (id: string, index: number, page?: number | null) =>
     `${ROOT}/${encodeURIComponent(id)}/files/${index}${page ? '#page=' + page : ''}`,
   csv: (id: string) => `${ROOT}/${encodeURIComponent(id)}/points.csv`,
+  transcript: (id: string) => `${ROOT}/${encodeURIComponent(id)}/transcript.txt`,
 }

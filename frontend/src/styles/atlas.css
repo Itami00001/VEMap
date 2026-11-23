@@ -147,6 +147,15 @@
 .atlas-feature h2 { font-size: clamp(1.18rem, 2vw, 1.67rem); margin-bottom: 9px; hyphens: auto; overflow-wrap: break-word; }
 .atlas-feature strong { color: var(--accent); font-size: .88rem; }
 .atlas-feature img { display: block; width: 100%; max-height: 150px; object-fit: contain; }
+.atlas-feature img[src$='/compare.webp'] { border: 3px solid #dfceb1; transform: rotate(-6deg); box-shadow: 0 3px 8px #33291738; }
+
+.atlas-imperial-arms {
+  width: clamp(34px, 5vw, 68px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  opacity: .62;
+  pointer-events: none;
+}
 
 .atlas-map-route { min-height: 0; height: 100dvh; overflow: hidden; }
 .atlas-map-route .site-main { flex: 1; min-height: 0; }

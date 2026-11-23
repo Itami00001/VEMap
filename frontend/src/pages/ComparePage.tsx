@@ -102,7 +102,7 @@ function ComparisonMap({ period, mode, scope, rows, selectedId, onSelect, onRead
   return <section className="atlas-compare-map" aria-label={period ? formatPeriodTitle(period) : 'Карта периода'}>
     <h2>{mode === 'delta' ? 'Изменение индекса' : period ? formatPeriodTitle(period) : 'Период'}</h2>
     <div className="map-shell">
-      <MapView values={values} mode={mode === 'delta' ? 'delta' : 'mood'} year={period?.year ?? null}
+      <MapView values={values} mode={mode === 'delta' ? 'delta' : 'mood'} year={period?.year ?? null} month={period?.month ?? null}
         initialCenter={MAP_CENTER} onMapReady={(instance) => { setMap(instance); onReady(instance) }}
         onRegionClick={scope === 'regions' ? onSelect : undefined} />
     </div>
@@ -235,7 +235,7 @@ export default function ComparePage() {
           <label><input type="checkbox" checked={linked} onChange={(event) => setLinked(event.target.checked)} /> Связать карты</label>
         </> : <p>Красный — снижение, синий — рост. Серый означает нулевое изменение или отсутствие сравнимой пары.</p>}
       </div>
-      <BoundaryNote />
+      <BoundaryNote historical={[a, b].some((period) => period && period.year >= 1900 && period.year <= 1919)} />
       {selected && (
         <section className="compare-detail" aria-label={'Подробности: ' + selected.name}>
           <h2>{selected.name} · {difference(selected)}{selected.delta !== null && ' п.'}</h2>

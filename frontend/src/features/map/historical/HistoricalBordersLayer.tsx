@@ -5,6 +5,7 @@ export interface HistoricalBordersLayerProps {
   map: maplibregl.Map | null
   url: string | null
   beforeId: string
+  historical: boolean
 }
 
 const LINE_OPACITY = 1
@@ -13,7 +14,7 @@ const FADE_MS = 200
 
 const cache = new Map<string, unknown>()
 
-export default function HistoricalBordersLayer({ map, url, beforeId }: HistoricalBordersLayerProps) {
+export default function HistoricalBordersLayer({ map, url, beforeId, historical }: HistoricalBordersLayerProps) {
   useEffect(() => {
     if (!map) return
     let cancelled = false
@@ -26,6 +27,7 @@ export default function HistoricalBordersLayer({ map, url, beforeId }: Historica
       const src = map.getSource('empire') as maplibregl.GeoJSONSource | undefined
       if (src) src.setData({ type: 'FeatureCollection', features: [] })
       if (map.getLayer('empire-line')) map.setPaintProperty('empire-line', 'line-opacity', 0)
+      if (map.getLayer('empire-fill')) map.setLayoutProperty('empire-fill', 'visibility', 'none')
     }
 
     if (!url) {
@@ -50,6 +52,14 @@ export default function HistoricalBordersLayer({ map, url, beforeId }: Historica
           },
         }, beforeId)
       }
+      if (!map.getLayer('empire-fill')) {
+        map.addLayer({
+          id: 'empire-fill', type: 'fill', source: 'empire',
+          paint: { 'fill-color': '#545451' },
+          layout: { visibility: 'none' },
+        }, 'regions-fill')
+      }
+      map.moveLayer('empire-line', beforeId)
     }
 
     const safeEnsureLayers = () => {
@@ -63,6 +73,8 @@ export default function HistoricalBordersLayer({ map, url, beforeId }: Historica
     const apply = (data: unknown) => {
       if (cancelled || !map.getSource('empire')) return
       ;(map.getSource('empire') as maplibregl.GeoJSONSource).setData(data as never)
+      map.setLayoutProperty('empire-fill', 'visibility', historical ? 'visible' : 'none')
+      map.setPaintProperty('empire-line', 'line-color', historical ? '#e3ceb0' : '#ffffff')
       map.setPaintProperty('empire-line', 'line-opacity', 0)
       requestAnimationFrame(() => {
         if (cancelled) return
@@ -91,9 +103,10 @@ export default function HistoricalBordersLayer({ map, url, beforeId }: Historica
     }
 
     safeEnsureLayers()
+    clear()
     loadData()
     return () => { cancelled = true }
-  }, [map, url, beforeId])
+  }, [map, url, beforeId, historical])
 
   return null
 }

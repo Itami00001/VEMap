@@ -14,6 +14,7 @@ import TimeSlider, { formatPeriod } from '../features/map/TimeSlider'
 import DemoBadge from '../features/map/DemoBadge'
 import CityPanel from '../features/map/CityPanel'
 import type { LayoutContext } from '../app/Layout'
+import { historicalRangeForYear } from '../features/map/historical/historicalBorders'
 
 const MAP_CENTER: [number, number] = [36, 49]
 const legend = moodLegend()
@@ -53,6 +54,7 @@ export default function MapPage() {
     .map(([id, point]) => [id, point.mood_index])), [points])
   const city = cities.find((item) => item.city_id === cityId)
   const region = regions.find((item) => item.region_id === regionId)
+  const snapshot = historicalRangeForYear(period?.year ?? null, period?.month ?? null)
   const mood = cityMoods.find((item) => item.city_id === cityId) ?? null
   const activeSource = mood?.sources?.some((item) => item.available && item.id === sourcePdf) ? sourcePdf : null
   const normalized = query.trim().toLocaleLowerCase('ru').replaceAll('ё', 'е')
@@ -109,7 +111,7 @@ export default function MapPage() {
     <section className={`atlas-map${chatOpen ? ' atlas-map-chat' : ''}`} aria-label="Карта настроений"
       onKeyDown={(event) => { if (event.key === 'Escape' && panel && !chatOpen) closePanel() }}>
       <div className="map-shell atlas-map-shell">
-        <MapView values={values} year={period?.year ?? null}
+        <MapView values={values} year={period?.year ?? null} month={period?.month ?? null}
           initialCenter={MAP_CENTER} onRegionClick={selectRegion} onMapReady={setMap} />
         <ForeignMoodRegions map={map} cities={cities} moods={cityMoods} />
         <div className="map-overlay-cities">
@@ -167,7 +169,8 @@ export default function MapPage() {
           <div className="legend-scale">{legend.map((item) => <span key={item.label} style={{ background: item.color }} />)}</div>
           <div className="legend-labels"><span>0</span><span>50</span><span>100</span></div>
           <p>Цвет показывает тон публикаций за выбранный период. Цвет подложки означает, что оценка недоступна.</p>
-          <BoundaryNote />
+          {snapshot?.historical && <p>{snapshot.label}</p>}
+          <BoundaryNote historical={snapshot?.historical} />
           <p>Заливка зарубежных областей рассчитана по городам архива внутри современных контуров.{' '}
             <a href="https://www.naturalearthdata.com/downloads/10m-cultural-vectors/10m-admin-1-states-provinces/"
               target="_blank" rel="noreferrer">Natural Earth ADM1</a></p>

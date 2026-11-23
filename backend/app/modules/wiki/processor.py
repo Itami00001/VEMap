@@ -20,6 +20,7 @@ from app.modules.wiki.service import storage_path
 logger = logging.getLogger(__name__)
 MAX_CSV_BYTES = 4 * 1024 * 1024
 MAX_POINTS = 5000
+MAX_TRANSCRIPT_BYTES = 8 * 1024 * 1024
 
 
 def read_points(csv_path: Path, file_count: int) -> list[dict]:
@@ -93,17 +94,32 @@ def process_one(command: list[str]) -> bool:
                 timeout=settings.WIKI_PROCESSOR_TIMEOUT, check=True, env=environment,
             )
             points = read_points(result_path, file_count)
-        finish(article_id, "ready", points)
+            transcript_path = result_path.with_suffix(".txt")
+            transcript = None
+            if transcript_path.is_file():
+                if transcript_path.stat().st_size > MAX_TRANSCRIPT_BYTES:
+                    raise ValueError("OCR transcript exceeds maximum size")
+                transcript = transcript_path.read_text(encoding="utf-8")
+        finish(article_id, "ready", points, transcript)
     except (OSError, ValueError, subprocess.SubprocessError) as exc:
         logger.warning("Wiki processing failed for %s: %s", article_id, type(exc).__name__)
         finish(article_id, "failed", [])
     return True
 
 
-def finish(article_id: str, status: str, points: list[dict]) -> None:
+def finish(article_id: str, status: str, points: list[dict], transcript: str | None = None) -> None:
     with SessionLocal.begin() as db:
         article = db.get(WikiArticle, article_id, with_for_update=True)
         if article and article.status == "approved" and article.processing == "running":
+            if transcript:
+                folder = storage_path(article_id)
+                with tempfile.NamedTemporaryFile(dir=folder, mode="w", encoding="utf-8", delete=False) as stream:
+                    staged = Path(stream.name)
+                    stream.write(transcript)
+                try:
+                    staged.replace(folder / "transcript.txt")
+                finally:
+                    staged.unlink(missing_ok=True)
             article.processing = status
             article.points = points
 

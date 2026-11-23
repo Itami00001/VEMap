@@ -27,6 +27,8 @@ def public_article(article: WikiArticle, *, full: bool = False) -> dict:
     }
     if full:
         result.update(body=article.body, files=article.files, points=article.points)
+        result["has_transcript"] = (article.processing == "ready"
+                                    and (storage_path(article.id) / "transcript.txt").is_file())
     return result
 
 
@@ -135,3 +137,13 @@ def article_csv(article_id: UUID, db: Session = Depends(get_db)):
         writer.writerow({**point, "name": name})
     return Response("\ufeff" + output.getvalue(), media_type="text/csv",
                     headers={"Content-Disposition": f'attachment; filename="{article.id}.csv"'})
+
+
+@router.get("/articles/{article_id}/transcript.txt")
+def article_transcript(article_id: UUID, db: Session = Depends(get_db)):
+    article = published(db, article_id)
+    path = storage_path(article.id) / "transcript.txt"
+    if article.processing != "ready" or not path.is_file():
+        raise HTTPException(404, "Распознанный текст ещё не готов.")
+    return FileResponse(path, media_type="text/plain", filename=f"{article.id}.txt",
+                        headers={"X-Content-Type-Options": "nosniff", "Cache-Control": "no-store"})

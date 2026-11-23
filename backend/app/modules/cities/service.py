@@ -32,11 +32,13 @@ def get_periods(db: Session) -> list[TimePeriodOut]:
         .all()
     )
     periods = {(year, month) for year, month in rows}
+    # Month zero is the newspaper view of the year. None remains an annual survey.
+    periods.update((year, 0) for year in range(1900, 1920))
     periods.update((year, month) for year, months in MONTHLY_CALENDAR.items() for month in months)
     periods.update((year, None) for year in mood_service.get_available_years(db, SCORING_VERSION))
     return [
         TimePeriodOut(year=year, month=month)
-        for year, month in sorted(periods, key=lambda period: (period[0], period[1] or 0))
+        for year, month in sorted(periods, key=lambda period: (period[0], period[1] is not None, period[1] or 0))
     ]
 
 
@@ -118,8 +120,8 @@ def get_city_data_rows(db: Session, year: int, month: int | None) -> list[dict]:
     change_from_prev — к предыдущему месяцу (или году, если месяц 1/None).
     """
     current = {c["city_id"]: c for c in get_city_moods(db, year, month)}
-    prev_month = month - 1 if month and month > 1 else None
-    prev_year = year if prev_month is not None else year - 1
+    prev_month = month - 1 if month and month > 1 else 0 if month == 0 else None
+    prev_year = year if prev_month else year - 1
     prev = {p["city_id"]: p["mood_index"] for p in get_city_moods(db, prev_year, prev_month)}
 
     cities = db.query(City).order_by(City.name_ru).all()

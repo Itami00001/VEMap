@@ -14,6 +14,7 @@ export function formatPeriod(p: TimePeriod): string {
 const monthName = new Intl.DateTimeFormat('ru-RU', { month: 'long', timeZone: 'UTC' })
 
 export function formatPeriodTitle(period: TimePeriod): string {
+  if (period.month === 0) return `${period.year} · газеты за год`
   if (period.month === null) return String(period.year)
   const month = monthName.format(new Date(Date.UTC(2000, period.month - 1, 1)))
   return month.charAt(0).toUpperCase() + month.slice(1) + ' ' + period.year
@@ -55,7 +56,7 @@ export default function TimeSlider({ periods, value, onChange }: TimeSliderProps
       <div className="timeline-ticks">
         {ticks.map(({ period, position }) => (
           <button key={formatPeriod(period)} type="button" aria-pressed={position === index}
-            onClick={() => onChange(period)}>{formatPeriod(period)}</button>
+            onClick={() => onChange(period)}>{period.month === 0 ? `${period.year} · год` : formatPeriod(period)}</button>
         ))}
       </div>
     </div>

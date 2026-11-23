@@ -12,7 +12,8 @@ from sqlalchemy.orm import Session
 from app.modules.cities.model import City
 from app.modules.cities.source_model import CityMoodSource, EXAMPLES_DIRECTORY, PDF_DIRECTORY
 
-ARCHIVE_ROOTS = (PDF_DIRECTORY, EXAMPLES_DIRECTORY / "terjiman")
+CORPUS_DIRECTORY = EXAMPLES_DIRECTORY / "newspaper_archive"
+ARCHIVE_ROOTS = (PDF_DIRECTORY, EXAMPLES_DIRECTORY / "terjiman", CORPUS_DIRECTORY / "pdf")
 
 
 class IssueOut(BaseModel):
@@ -66,7 +67,7 @@ def issue_title(filename: str) -> str:
     return match.group(1).replace("_", " ") if match else filename
 
 
-def scan_archive(root: Path):
+def scan_archive(root: Path, titles: dict[str, str] | None = None):
     for folder, directories, filenames in walk(root.resolve()):
         directories.sort()
         names = set(filenames)
@@ -80,14 +81,21 @@ def scan_archive(root: Path):
             except FileNotFoundError:
                 continue
             has_transcript = path.with_suffix(".txt").name in names and transcript_path(path) is not None
-            yield Issue(issue_id(name), name, issue_title(name), path, has_transcript)
+            title = titles.get(name) if titles is not None else None
+            # A searchable re-export can have a different PDF page order than a scan
+            # with the same library accession. Keep the editions independently addressable.
+            identity = (str(uuid5(NAMESPACE_URL, f"vemap:newspaper:archive:{name}"))
+                        if titles is not None else issue_id(name))
+            yield Issue(identity, name, title or issue_title(name), path, has_transcript)
 
 
 def issues(db: Session) -> tuple[dict[str, Issue], dict[str, Issue]]:
     by_id: dict[str, Issue] = {}
     by_filename: dict[str, Issue] = {}
+    titles_path = CORPUS_DIRECTORY / "titles.json"
+    titles = json.loads(titles_path.read_text(encoding="utf-8")) if titles_path.is_file() else None
     for root in ARCHIVE_ROOTS:
-        for issue in scan_archive(root):
+        for issue in scan_archive(root, titles if root == CORPUS_DIRECTORY / "pdf" else None):
             by_id.setdefault(issue.id, issue)
             by_filename.setdefault(issue.filename, by_id[issue.id])
 

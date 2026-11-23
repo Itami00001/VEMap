@@ -42,6 +42,9 @@ export default function AboutPage() {
         </details>
         <details><summary>Границы и даты</summary>
           <p>Карта использует доступные исторические слои. Источники геометрии и пояснения доступны в разделе «Легенда» на карте.</p>
+          <p>Иллюстрация — физическая карта из учебного атласа картографического заведения А. Ильина, 1898 год.{' '}
+            <a href="https://commons.wikimedia.org/wiki/File:Physical_map_of_the_Russian_Empire_(1898).jpg"
+              target="_blank" rel="noreferrer">Архивный лист</a></p>
         </details>
       </section>
     </div>

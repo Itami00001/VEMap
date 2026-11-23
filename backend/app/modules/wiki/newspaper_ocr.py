@@ -6,6 +6,7 @@ import subprocess
 from pathlib import Path
 
 TESSDATA = Path("/usr/local/share/vemap/ocr")
+TUNED_TESSDATA = Path("/data/ocr")
 
 
 def usable(text: str) -> bool:
@@ -48,8 +49,9 @@ def local_ocr(path: Path, page: int, scratch: Path, *, languages: str | None = N
          "-png", str(path), str(image_base)],
         check=True, timeout=25, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
     )
+    tessdata = TUNED_TESSDATA if languages == "orus" and (TUNED_TESSDATA / "orus.traineddata").is_file() else TESSDATA
     result = subprocess.run(
-        ["tesseract", str(image), "stdout", "--tessdata-dir", str(TESSDATA), "-l", languages, "--oem", "1", "--psm", "3"],
+        ["tesseract", str(image), "stdout", "--tessdata-dir", str(tessdata), "-l", languages, "--oem", "1", "--psm", "3"],
         check=True, timeout=65, capture_output=True, text=True, encoding="utf-8",
         env={**os.environ, "OMP_THREAD_LIMIT": "1"},
     )

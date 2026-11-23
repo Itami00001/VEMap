@@ -1,4 +1,5 @@
 import type { TimePeriod } from '../../types'
+import { formatPeriodTitle } from '../map/TimeSlider'
 
 export interface FiltersProps {
   periods: TimePeriod[]
@@ -25,7 +26,7 @@ export default function Filters({ periods, period, onPeriod, query, onQuery }: F
           }}
         >
           {periods.map((p) => (
-            <option key={periodLabel(p)} value={periodLabel(p)}>{periodLabel(p)}</option>
+            <option key={periodLabel(p)} value={periodLabel(p)}>{p.month === 0 ? formatPeriodTitle(p) : periodLabel(p)}</option>
           ))}
         </select>
       </label>

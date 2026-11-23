@@ -109,15 +109,21 @@ def main() -> None:
     cities = city_index(json.loads(args.catalogue.read_text(encoding="utf-8")))
     remaining = MAX_PAGES
     points = []
+    transcript = []
     for index, path in enumerate(args.input):
         with tempfile.TemporaryDirectory(dir=args.output.parent) as temporary:
             pages = extract_pages(path.resolve(), remaining, Path(temporary), args.ocr_command)
         remaining -= len(pages)
         points.extend(find_points(pages, cities, index))
+        recognized = [f"[Страница {page}]\n{text.strip()}" for page, text in enumerate(pages, 1) if text.strip()]
+        if recognized:
+            transcript.extend([f"[Файл {index + 1}]", *recognized])
     with args.output.open("x", encoding="utf-8", newline="") as stream:
         writer = csv.DictWriter(stream, fieldnames=FIELDS)
         writer.writeheader()
         writer.writerows(points)
+    if transcript:
+        args.output.with_suffix(".txt").write_text("\n\n".join(transcript) + "\n", encoding="utf-8")
 
 
 if __name__ == "__main__":

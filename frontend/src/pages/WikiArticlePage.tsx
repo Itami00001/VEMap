@@ -13,9 +13,9 @@ function PublicationMap({ points, map, onMapReady, selected, onSelect }: {
   points: WikiPoint[]; map: LibreMap | null; onMapReady: (map: LibreMap) => void
   selected: number; onSelect: (index: number) => void
 }) {
-  const initial = useMemo<[number, number]>(() => [points[0].lon, points[0].lat], [points])
+  const initial = useMemo<[number, number]>(() => points.length ? [points[0].lon, points[0].lat] : [36, 49], [points])
   useEffect(() => {
-    if (!map) return
+    if (!map || !points.length) return
     const bounds = new LngLatBounds(initial, initial)
     const features = points.map((point, index) => {
       bounds.extend([point.lon, point.lat])
@@ -86,10 +86,13 @@ function Article({ article }: { article: WikiArticle }) {
       <section className="wiki-section">
         <div className="wiki-section-heading"><h2>Карта статьи</h2>
           {article.processing === 'ready' && <a href={wiki.csv(article.id)} className="btn">Скачать CSV</a>}
+          {article.has_transcript && <a href={wiki.transcript(article.id)} className="btn">Скачать распознанный текст</a>}
         </div>
-        {point ? <>
+        {(article.processing === 'ready' || point) && <>
           <PublicationMap points={article.points} map={map} onMapReady={setMap} selected={selected} onSelect={setSelected} />
           <BoundaryNote />
+        </>}
+        {point ? <>
           <div className="wiki-point-details">
             <label>Точка на карте
               <select value={selected} onChange={(event) => selectPoint(Number(event.target.value))}>
