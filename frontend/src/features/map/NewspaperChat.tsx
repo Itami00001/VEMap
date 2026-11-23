@@ -6,6 +6,7 @@ import type { ChatCredentials, ChatProvider, NewspaperChatMessage, NewspaperCata
 const NewspaperReader = lazy(() => import('./NewspaperReader'))
 const ChatMarkdown = lazy(() => import('./ChatMarkdown'))
 const ARCHIVE = 'archive'
+const DEMO = 'bucharest-demo'
 
 interface NewspaperChatProps {
   open: boolean
@@ -29,6 +30,7 @@ export default function NewspaperChat({ open, selection, onSelect, catalog, cata
   const [providers, setProviders] = useState<ChatProvider[] | null>(null)
   const [providersError, setProvidersError] = useState(false)
   const [providerId, setProviderId] = useState('local')
+  const [demo, setDemo] = useState(false)
   const [keyMode, setKeyMode] = useState<string | null>(null)
   const [personalKeys, setPersonalKeys] = useState<Record<string, string>>({})
   const [folderId, setFolderId] = useState('')
@@ -70,7 +72,7 @@ export default function NewspaperChat({ open, selection, onSelect, catalog, cata
     : undefined
   const readyProvider = (usePersonalKey ? Boolean(credentials) : provider?.available) ? provider : null
   const conversation = JSON.stringify([selection?.filename, providerId])
-  const compact = conversation === compactFor
+  const compact = !demo && conversation === compactFor
   const model = actualModel?.conversation === conversation ? actualModel.name : provider?.model
 
   return (
@@ -79,7 +81,7 @@ export default function NewspaperChat({ open, selection, onSelect, catalog, cata
       onKeyDown={(event) => { if (event.key === 'Escape') onClose() }}>
       <header className="newspaper-chat-header">
         <ChatAvatar role="assistant" />
-        <h2 id="newspaper-chat-title">Чат с {model || 'ИИ'}</h2>
+        <h2 id="newspaper-chat-title">{demo ? 'Демо-диалог по газете' : `Чат с ${model || 'ИИ'}`}</h2>
         <button ref={closeRef} type="button" className="nav-icon" aria-label="Закрыть чат" onClick={onClose}>
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" /></svg>
         </button>
@@ -92,93 +94,144 @@ export default function NewspaperChat({ open, selection, onSelect, catalog, cata
       )}
       <div className="newspaper-catalog" id="chat-settings" hidden={compact}>
         <label>AI-провайдер
-          <select value={providerId} disabled={!providers?.some((item) => item.available || item.accepts_personal_key)}
-            onChange={(event) => setProviderId(event.target.value)}>
-            {!providers && <option value={providerId}>Провайдеры недоступны</option>}
+          <select value={demo ? DEMO : providerId} onChange={(event) => {
+            const chosen = event.target.value
+            setDemo(chosen === DEMO)
+            if (chosen !== DEMO) setProviderId(chosen)
+          }}>
+            {!providers && <option value={providerId} disabled>Провайдеры недоступны</option>}
             {providers?.map((item) => (
               <option key={item.id} value={item.id} disabled={!item.available && !item.accepts_personal_key}>
                 {item.label}{item.available ? '' : item.accepts_personal_key ? ' · нужен личный ключ' : ` · ${item.reason ?? 'Недоступен'}`}
               </option>
             ))}
+            <option value={DEMO}>Газета Бухарестъ · Ноябрь 1900 (демо)</option>
           </select>
         </label>
-        {provider?.accepts_personal_key && provider.available && (
-          <button type="button" className="btn" aria-pressed={usePersonalKey}
-            onClick={() => setKeyMode(usePersonalKey ? null : providerId)}>
-            {usePersonalKey ? 'Переключиться на ключ VEMap' : 'Использовать свой API-ключ'}
-          </button>
-        )}
-        {usePersonalKey && (
-          <>
-            <label>Личный API-ключ
-              <input type="password" autoComplete="off" spellCheck={false} maxLength={512}
-                value={personalKeys[providerId] ?? ''}
-                onChange={(event) => {
-                  const value = event.target.value
-                  setPersonalKeys((keys) => ({ ...keys, [providerId]: value }))
-                }} />
-            </label>
-            {providerId === 'yandex' && (
-              <label>ID каталога Yandex Cloud
-                <input type="text" autoComplete="off" spellCheck={false} maxLength={64}
-                  value={folderId} onChange={(event) => setFolderId(event.target.value)} />
+        {!demo && <>
+          {provider?.accepts_personal_key && provider.available && (
+            <button type="button" className="btn" aria-pressed={usePersonalKey}
+              onClick={() => setKeyMode(usePersonalKey ? null : providerId)}>
+              {usePersonalKey ? 'Переключиться на ключ VEMap' : 'Использовать свой API-ключ'}
+            </button>
+          )}
+          {usePersonalKey && (
+            <>
+              <label>Личный API-ключ
+                <input type="password" autoComplete="off" spellCheck={false} maxLength={512}
+                  value={personalKeys[providerId] ?? ''}
+                  onChange={(event) => {
+                    const value = event.target.value
+                    setPersonalKeys((keys) => ({ ...keys, [providerId]: value }))
+                  }} />
               </label>
-            )}
-            <a href={providerId === 'yandex'
-              ? 'https://yandex.cloud/ru/docs/iam/operations/authentication/manage-api-keys'
-              : 'https://console.groq.com/keys'} target="_blank" rel="noreferrer">Где получить ключ</a>
-            <small>Ключ действует до обновления страницы и не сохраняется на сайте.</small>
-          </>
-        )}
-        <label>Найти город
-          <input type="search" value={citySearch} onChange={(event) => setCitySearch(event.target.value)}
-            placeholder="Название города" />
-        </label>
-        <label>Город
-          <select value={selection?.cityId ?? ''} disabled={!catalog}
-            onChange={(event) => {
-              setIssueSearch('')
-              onSelect(event.target.value ? { cityId: event.target.value, filename: '' } : null)
-            }}>
-            <option value="">Выберите город</option>
-            <option value={ARCHIVE}>Весь архив</option>
-            {catalog?.cities.filter((item) => item.city_id === selection?.cityId ||
-              item.name_ru.toLowerCase().includes(citySearch.trim().toLowerCase()))
-              .map((item) => <option key={item.city_id} value={item.city_id}>{item.name_ru}</option>)}
-          </select>
-        </label>
-        {selection?.cityId === ARCHIVE && (
-          <label>Найти выпуск
-            <input type="search" value={issueSearch} onChange={(event) => setIssueSearch(event.target.value)}
-              placeholder="Название, дата или имя PDF" />
+              {providerId === 'yandex' && (
+                <label>ID каталога Yandex Cloud
+                  <input type="text" autoComplete="off" spellCheck={false} maxLength={64}
+                    value={folderId} onChange={(event) => setFolderId(event.target.value)} />
+                </label>
+              )}
+              <a href={providerId === 'yandex'
+                ? 'https://yandex.cloud/ru/docs/iam/operations/authentication/manage-api-keys'
+                : 'https://console.groq.com/keys'} target="_blank" rel="noreferrer">Где получить ключ</a>
+              <small>Ключ действует до обновления страницы и не сохраняется на сайте.</small>
+            </>
+          )}
+          <label>Найти город
+            <input type="search" value={citySearch} onChange={(event) => setCitySearch(event.target.value)}
+              placeholder="Название города" />
           </label>
-        )}
-        <label>Газета
-          <select value={selection?.filename ?? ''} disabled={!sources?.length}
-            onChange={(event) => { if (selection) onSelect({ cityId: selection.cityId, filename: event.target.value }) }}>
-            <option value="">Выберите выпуск</option>
-            {sources?.filter((source) => selection?.cityId !== ARCHIVE || source.id === issue?.id ||
-              (source.title + ' ' + source.source_pdf).toLowerCase().includes(issueSearch.trim().toLowerCase()))
-              .map((source) => (
-              <option key={source.id} value={source.id} disabled={!source.available}>
-                {source.title}{!source.available ? ' · PDF не найден' : source.transcript ? ' · есть расшифровка' : ''}
-              </option>
-            ))}
-          </select>
-        </label>
+          <label>Город
+            <select value={selection?.cityId ?? ''} disabled={!catalog}
+              onChange={(event) => {
+                setIssueSearch('')
+                onSelect(event.target.value ? { cityId: event.target.value, filename: '' } : null)
+              }}>
+              <option value="">Выберите город</option>
+              <option value={ARCHIVE}>Весь архив</option>
+              {catalog?.cities.filter((item) => item.city_id === selection?.cityId ||
+                item.name_ru.toLowerCase().includes(citySearch.trim().toLowerCase()))
+                .map((item) => <option key={item.city_id} value={item.city_id}>{item.name_ru}</option>)}
+            </select>
+          </label>
+          {selection?.cityId === ARCHIVE && (
+            <label>Найти выпуск
+              <input type="search" value={issueSearch} onChange={(event) => setIssueSearch(event.target.value)}
+                placeholder="Название, дата или имя PDF" />
+            </label>
+          )}
+          <label>Газета
+            <select value={selection?.filename ?? ''} disabled={!sources?.length}
+              onChange={(event) => { if (selection) onSelect({ cityId: selection.cityId, filename: event.target.value }) }}>
+              <option value="">Выберите выпуск</option>
+              {sources?.filter((source) => selection?.cityId !== ARCHIVE || source.id === issue?.id ||
+                (source.title + ' ' + source.source_pdf).toLowerCase().includes(issueSearch.trim().toLowerCase()))
+                .map((source) => (
+                <option key={source.id} value={source.id} disabled={!source.available}>
+                  {source.title}{!source.available ? ' · PDF не найден' : source.transcript ? ' · есть расшифровка' : ''}
+                </option>
+              ))}
+            </select>
+          </label>
+        </>}
       </div>
-      {city && !city.sources.length && <p className="muted">Для этого города пока нет связанных выпусков. Откройте весь архив.</p>}
-      {providersError && <p role="alert">Список провайдеров не загрузился. Откройте чат снова.</p>}
-      {!providers && !providersError && <p role="status" className="muted">Проверяем настройки провайдеров…</p>}
-      {provider && !provider.available && !provider.accepts_personal_key && <p className="muted">{provider.label}: {provider.reason}</p>}
-      {catalogError && <p role="alert">Каталог не загрузился. Закройте чат и откройте его снова.</p>}
-      {!catalog && !catalogError && <p role="status" className="muted">Загружаем каталог…</p>}
-      {catalog?.archive.length === 0 && <p className="muted">В архиве пока нет выпусков.</p>}
-      <ChatConversation key={conversation} open={open} sourcePdf={issue?.available ? issue.id : null}
-        provider={readyProvider ?? null} credentials={credentials}
-        onSend={() => setCompactFor(conversation)} onModel={(name) => setActualModel({ conversation, name })} />
+      {demo && <BucharestDemo />}
+      <div style={{ display: demo ? 'none' : 'contents' }}>
+        {city && !city.sources.length && <p className="muted">Для этого города пока нет связанных выпусков. Откройте весь архив.</p>}
+        {providersError && <p role="alert">Список провайдеров не загрузился. Откройте чат снова.</p>}
+        {!providers && !providersError && <p role="status" className="muted">Проверяем настройки провайдеров…</p>}
+        {provider && !provider.available && !provider.accepts_personal_key && <p className="muted">{provider.label}: {provider.reason}</p>}
+        {catalogError && <p role="alert">Каталог не загрузился. Закройте чат и откройте его снова.</p>}
+        {!catalog && !catalogError && <p role="status" className="muted">Загружаем каталог…</p>}
+        {catalog?.archive.length === 0 && <p className="muted">В архиве пока нет выпусков.</p>}
+        <ChatConversation key={conversation} open={open && !demo} sourcePdf={issue?.available ? issue.id : null}
+          provider={readyProvider ?? null} credentials={credentials}
+          onSend={() => setCompactFor(conversation)} onModel={(name) => setActualModel({ conversation, name })} />
+      </div>
     </aside>
   )
+}
+
+const BUCHAREST_PDF = '7fd366ec-913e-56df-a9c6-5d107359d15e'
+const bucharestConversation: NewspaperChatMessage[] = [
+  { role: 'user', content: 'Что сообщали из Бухареста в ноябре 1900 года?' },
+  {
+    role: 'assistant', pages: [1, 4],
+    content: 'В приложении к № 360 «Приамурских ведомостей» от 16 ноября 1900 года опубликована короткая заметка о судебных приговорах по делу о заговоре против короля Карла. По сообщению газеты, среди наказаний были десять лет тюрьмы, пожизненная каторга и совместная выплата 10 000 франков. [Дата выпуска — стр. 1](#page=1) · [Заметка — стр. 4](#page=4)',
+  },
+  { role: 'user', content: 'Можно ли по заметке объяснить, почему суд назначил разные наказания?' },
+  {
+    role: 'assistant', pages: [4],
+    content: 'В заметке перечислены решения суда и фамилии осуждённых. Мотивировка приговоров и материалы дела в ней отсутствуют. Для объяснения разницы между наказаниями понадобятся судебные документы или более подробный газетный отчёт. [Стр. 4](#page=4)',
+  },
+]
+
+function BucharestDemo() {
+  const [page, setPage] = useState<number | null>(null)
+  return <>
+    <p className="muted"><strong>Демо</strong> · Подготовленный диалог по архивному выпуску.</p>
+    <ol className="newspaper-chat-history" aria-label="Демонстрационный диалог">
+      {bucharestConversation.map(({ role, content, pages }, index) => (
+        <li key={index} className={`newspaper-chat-message ${role}`}>
+          <ChatAvatar role={role} />
+          {role === 'user' ? <p aria-label="Вы">{content}</p> : (
+            <Suspense fallback={<p>Оформляем ответ…</p>}>
+              <ChatMarkdown content={content} pages={pages} onPage={setPage} />
+            </Suspense>
+          )}
+        </li>
+      ))}
+    </ol>
+    {page !== null && (
+      <section className="chat-source-preview" aria-label="Газетная страница">
+        <button className="btn" type="button" onClick={() => setPage(null)}>Закрыть PDF</button>
+        <Suspense fallback={<p role="status">Загружаем просмотрщик…</p>}>
+          <NewspaperReader key={page} url={newspaperUrl(BUCHAREST_PDF, page)} initialPage={page} />
+        </Suspense>
+      </section>
+    )}
+    <a href={newspaperUrl(BUCHAREST_PDF, 4)} target="_blank" rel="noreferrer">Открыть оригинал газеты, стр. 4 ↗</a>
+  </>
 }
 
 function ChatConversation({ open, sourcePdf, provider, credentials, onSend, onModel }: {
