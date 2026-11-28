@@ -3,5 +3,10 @@ import { defineConfig } from 'vite'
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react()]
+  plugins: [react()],
+  build: {
+    rolldownOptions: {
+      input: ['index.html', 'archive/index.html', 'archive/1900/index.html'],
+    },
+  },
 })

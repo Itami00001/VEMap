@@ -1,4 +1,4 @@
-import { createHashRouter, Navigate, useLocation } from 'react-router-dom'
+import { createBrowserRouter, createHashRouter, Navigate, useLocation } from 'react-router-dom'
 import Layout from './Layout'
 import AboutPage from '../pages/AboutPage'
 import ComparePage from '../pages/ComparePage'
@@ -16,12 +16,18 @@ function LegacyDataPage() {
   return <Navigate to={{ pathname: '/archive/data', search }} replace />
 }
 
-export const router = createHashRouter([
+// Old links keep their hash routing. The public archive also has crawlable URLs.
+const createRouter = window.location.pathname === '/' || window.location.hash.startsWith('#/')
+  ? createHashRouter
+  : createBrowserRouter
+
+export const router = createRouter([
   { path: '/', element: <Layout />, children: [
     { index: true, element: <Landing /> },
     { path: 'map', element: <MapPage /> },
     { path: 'archive', element: <ArchiveLayout />, children: [
       { index: true, element: <ArchivePage /> },
+      { path: '1900', element: <ArchivePage presetYear="1900" /> },
       { path: 'data', element: <DataPage /> },
     ] },
     { path: 'data', element: <LegacyDataPage /> },

@@ -19,7 +19,7 @@ export default function Landing() {
         <p>Исследуйте тональность исторических газет о городах и регионах России. Выберите период, сравните публикации и откройте страницы первоисточников.</p>
         <div className="atlas-home-actions">
           <Link className="btn primary" to="/map">Открыть карту <span aria-hidden="true">→</span></Link>
-          <Link to="/archive">Читать архив</Link>
+          <a href="/archive">Читать архив</a>
         </div>
       </div>
       <div className="atlas-home-preview">

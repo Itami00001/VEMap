@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect, useRef, useState } from 'react'
-import { NavLink, Outlet, useSearchParams } from 'react-router-dom'
+import { NavLink, Outlet, useMatch, useNavigate, useSearchParams } from 'react-router-dom'
 import { api, newspaperUrl } from '../services/api'
 import type { NewspaperCatalog } from '../services/api'
 import type { NewspaperSource } from '../types'
@@ -12,10 +12,18 @@ const PAGE_SIZE = 12
 
 export function ArchiveLayout() {
   const context = useOutletContext<LayoutContext>()
+  const year1900 = useMatch('/archive/1900') !== null
   return <div className="page atlas-page">
-    <div className="atlas-page-heading"><h1>Архив газет</h1></div>
+    <div className="atlas-page-heading">
+      <h1>{year1900 ? 'Газеты 1900 года' : 'Архив исторических газет'}</h1>
+      <p>{year1900
+        ? 'Читайте выпуски 1900 года в PDF. Используйте поиск по названию выпуска или фильтр по городу.'
+        : 'Читайте оцифрованные исторические газеты в PDF. Выберите город, год или название выпуска.'}</p>
+    </div>
     <nav className="atlas-tabs" aria-label="Разделы архива">
-      <NavLink end to="/archive">Выпуски</NavLink>
+      <NavLink end to="/archive">Все выпуски</NavLink>
+      <a href="/archive/1900" className={year1900 ? 'active' : undefined}
+        aria-current={year1900 ? 'page' : undefined}>Газеты 1900 года</a>
       <NavLink to="/archive/data">Данные</NavLink>
     </nav>
     <Outlet context={context} />
@@ -48,14 +56,31 @@ function ArchiveReader({ issue, onClose, onChat }: {
   </dialog>
 }
 
-export default function ArchivePage() {
+export default function ArchivePage({ presetYear }: { presetYear?: string }) {
   const [catalog, setCatalog] = useState<NewspaperCatalog | null>(null)
   const [error, setError] = useState(false)
   const [query, setQuery] = useState('')
   const [city, setCity] = useState('')
-  const [year, setYear] = useState('')
   const [page, setPage] = useState(0)
   const [search, setSearch] = useSearchParams()
+  const navigate = useNavigate()
+  const year = presetYear ?? search.get('year') ?? ''
+
+  function changeYear(value: string) {
+    const next = new URLSearchParams(search)
+    if (value) next.set('year', value)
+    else next.delete('year')
+    setPage(0)
+    if (presetYear) navigate({ pathname: '/archive', search: next.toString() })
+    else setSearch(next)
+  }
+
+  function openIssue(issueId: string | null, replace = false) {
+    const next = new URLSearchParams(search)
+    if (issueId) next.set('issue', issueId)
+    else next.delete('issue')
+    setSearch(next, { replace })
+  }
   const { setChatSource, setChatOpen } = useOutletContext<LayoutContext>()
 
   useEffect(() => {
@@ -86,7 +111,7 @@ export default function ArchivePage() {
         {catalog?.cities.filter((item) => item.sources.some((source) => source.available))
           .map((item) => <option key={item.city_id} value={item.city_id}>{item.name_ru}</option>)}
       </select>
-      <select aria-label="Год" value={year} onChange={(event) => { setYear(event.target.value); setPage(0) }}>
+      <select aria-label="Год" value={year} onChange={(event) => changeYear(event.target.value)}>
         <option value="">Все годы</option>
         {years.map((item) => <option key={item}>{item}</option>)}
       </select>
@@ -103,7 +128,7 @@ export default function ArchivePage() {
         <div>
           <h2>{item.title}</h2>
           {publicationYear(item) && <p>{publicationYear(item)}</p>}
-          <button type="button" className="btn primary" onClick={() => setSearch({ issue: item.id })}>Открыть выпуск</button>
+          <button type="button" className="btn primary" onClick={() => openIssue(item.id)}>Открыть выпуск</button>
         </div>
       </article>)}
     </div>
@@ -112,9 +137,9 @@ export default function ArchivePage() {
       <span aria-live="polite">{page + 1} / {pageCount}</span>
       <button className="btn" type="button" disabled={page + 1 >= pageCount} onClick={() => setPage(page + 1)}>Далее</button>
     </nav>}
-    {issue && <ArchiveReader key={issue.id} issue={issue} onClose={() => setSearch({}, { replace: true })}
+    {issue && <ArchiveReader key={issue.id} issue={issue} onClose={() => openIssue(null, true)}
       onChat={() => {
-        setSearch({}, { replace: true })
+        openIssue(null, true)
         setChatSource({ cityId: 'archive', filename: issue.id })
         setChatOpen(true)
       }} />}
