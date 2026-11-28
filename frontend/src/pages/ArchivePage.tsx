@@ -10,6 +10,17 @@ const NewspaperReader = lazy(() => import('../features/map/NewspaperReader'))
 const NewspaperThumbnail = lazy(() => import('../features/map/NewspaperThumbnail'))
 const PAGE_SIZE = 12
 
+const highlights1900 = [
+  { id: 'f08bb289-c5b6-5a9b-a23c-343512ad1a00', page: 1,
+    title: '«Петербургский листок», выпуск от 24 января, стр. 1' },
+  { id: 'dc93bb34-e05b-57cd-9fa6-3826b4d2abb6', page: 2,
+    title: '«Приамурские ведомости», приложение к № 321, стр. 2',
+    description: 'Известия о театре и торговле в Петербурге.' },
+  { id: '7fd366ec-913e-56df-a9c6-5d107359d15e', page: 4,
+    title: '«Приамурские ведомости», приложение к № 360 от 16 ноября, стр. 4',
+    description: 'Телеграмма из Бухареста.' },
+]
+
 export function ArchiveLayout() {
   const context = useOutletContext<LayoutContext>()
   const year1900 = useMatch('/archive/1900') !== null
@@ -17,7 +28,7 @@ export function ArchiveLayout() {
     <div className="atlas-page-heading">
       <h1>{year1900 ? 'Газеты 1900 года' : 'Архив исторических газет'}</h1>
       <p>{year1900
-        ? 'Читайте выпуски 1900 года в PDF. Используйте поиск по названию выпуска или фильтр по городу.'
+        ? 'Оцифрованные газеты 1900 года в PDF, включая «Петербургский листок» и «Приамурские ведомости». Найдите нужный выпуск по названию или городу.'
         : 'Читайте оцифрованные исторические газеты в PDF. Выберите город, год или название выпуска.'}</p>
     </div>
     <nav className="atlas-tabs" aria-label="Разделы архива">
@@ -26,6 +37,14 @@ export function ArchiveLayout() {
         aria-current={year1900 ? 'page' : undefined}>Газеты 1900 года</a>
       <NavLink to="/archive/data">Данные</NavLink>
     </nav>
+    {year1900 && <section className="atlas-about-steps" aria-label="Выпуски из коллекции">
+      {highlights1900.map(({ id, title, page, description }) => <article key={id}>
+        <div>
+          <a href={newspaperUrl(id, page)} target="_blank" rel="noreferrer">{title}</a>
+          {description && <p>{description}</p>}
+        </div>
+      </article>)}
+    </section>}
     <Outlet context={context} />
   </div>
 }
