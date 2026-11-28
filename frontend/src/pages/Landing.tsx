@@ -15,8 +15,8 @@ export default function Landing() {
   return <div className="page atlas-page atlas-home">
     <section className="atlas-home-hero" aria-labelledby="atlas-home-title">
       <div className="atlas-page-heading">
-        <h1 id="atlas-home-title">Исторические газеты на карте</h1>
-        <p>Выберите город и дату, сравните тон газетных публикаций и откройте страницу источника.</p>
+        <h1 id="atlas-home-title">Карта настроений народов России</h1>
+        <p>Исследуйте тональность исторических газет о городах и регионах России. Выберите период, сравните публикации и откройте страницы первоисточников.</p>
         <div className="atlas-home-actions">
           <Link className="btn primary" to="/map">Открыть карту <span aria-hidden="true">→</span></Link>
           <Link to="/archive">Читать архив</Link>
@@ -40,6 +40,15 @@ export default function Landing() {
         </div>
         <img src={atlasArt(feature.art)} alt="" />
       </Link>)}
+    </section>
+    <section className="atlas-about-steps" aria-labelledby="atlas-home-method">
+      <article style={{ gridColumn: '1 / -1' }}>
+        <div>
+          <h2 id="atlas-home-method">Что показывает карта настроений</h2>
+          <p>Цвет на карте показывает тон газетных материалов о выбранном месте за доступный период. Индекс рассчитывается по архивной выборке, поэтому он отражает то, как события описывала пресса.</p>
+          <Link to="/about">Как устроен VEMap</Link>
+        </div>
+      </article>
     </section>
   </div>
 }
